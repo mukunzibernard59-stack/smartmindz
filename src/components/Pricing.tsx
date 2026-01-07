@@ -30,7 +30,7 @@ const Pricing: React.FC = () => {
     },
     {
       name: t('pricing.pro'),
-      price: '$4.99',
+      price: '$1.50',
       period: t('pricing.month'),
       description: 'Everything you need to excel',
       features: [
