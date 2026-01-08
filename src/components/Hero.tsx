@@ -43,10 +43,12 @@ const Hero: React.FC = () => {
                 <ArrowRight className="h-5 w-5" />
               </Button>
             </Link>
-            <Button variant="hero-secondary" size="xl" className="gap-2 w-full sm:w-auto">
-              <Play className="h-5 w-5" />
-              {t('hero.ctaSecondary')}
-            </Button>
+            <Link to="/quiz">
+              <Button variant="hero-secondary" size="xl" className="gap-2 w-full sm:w-auto">
+                <Brain className="h-5 w-5" />
+                {t('hero.ctaSecondary')}
+              </Button>
+            </Link>
           </div>
 
           {/* Feature Pills */}
@@ -78,7 +80,7 @@ const Hero: React.FC = () => {
                 <div className="w-3 h-3 rounded-full bg-warning/60" />
                 <div className="w-3 h-3 rounded-full bg-success/60" />
               </div>
-              <span className="text-sm font-medium text-muted-foreground">EduAI Chat</span>
+              <span className="text-sm font-medium text-muted-foreground">Smart Mind Chat</span>
             </div>
 
             {/* Chat Preview Content */}

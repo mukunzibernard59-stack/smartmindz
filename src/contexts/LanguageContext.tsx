@@ -20,16 +20,16 @@ const translations: Translations = {
     sw: 'Nyumbani',
   },
   'nav.learn': {
-    en: 'Learn',
-    fr: 'Apprendre',
-    rw: 'Kwiga',
-    sw: 'Jifunze',
+    en: 'AI Tutor',
+    fr: 'Tuteur IA',
+    rw: 'Umwarimu AI',
+    sw: 'Mwalimu AI',
   },
   'nav.quiz': {
-    en: 'Quiz',
+    en: 'Quizzes',
     fr: 'Quiz',
-    rw: 'Ikizamini',
-    sw: 'Jaribio',
+    rw: 'Ibizamini',
+    sw: 'Majaribio',
   },
   'nav.pricing': {
     en: 'Pricing',
@@ -51,59 +51,59 @@ const translations: Translations = {
   },
   // Hero
   'hero.badge': {
-    en: '🎓 AI-Powered Learning for Everyone',
-    fr: '🎓 Apprentissage IA pour Tous',
-    rw: '🎓 Kwigishwa na AI ku Bose',
-    sw: '🎓 Kujifunza kwa AI kwa Wote',
+    en: '🎓 Fast AI Learning for Everyone',
+    fr: '🎓 Apprentissage IA Rapide pour Tous',
+    rw: '🎓 Kwigishwa na AI Byihuse ku Bose',
+    sw: '🎓 Kujifunza Haraka kwa AI kwa Wote',
   },
   'hero.title': {
-    en: 'Learn Smarter with',
-    fr: 'Apprenez mieux avec',
-    rw: 'Wige byiza na',
-    sw: 'Jifunze vizuri na',
+    en: 'Learn Faster with',
+    fr: 'Apprenez Plus Vite avec',
+    rw: 'Wige Byihuse na',
+    sw: 'Jifunze Haraka na',
   },
   'hero.titleAccent': {
-    en: 'AI Tutoring',
-    fr: 'Tutorat IA',
-    rw: 'Ubufasha bwa AI',
-    sw: 'Mafunzo ya AI',
+    en: 'Smart Mind',
+    fr: 'Smart Mind',
+    rw: 'Smart Mind',
+    sw: 'Smart Mind',
   },
   'hero.subtitle': {
-    en: 'Get instant help with Math, Science, English, and more. Ask questions, practice with quizzes, and learn at your own pace in your language.',
-    fr: 'Obtenez une aide instantanée en maths, sciences, anglais et plus. Posez des questions, pratiquez avec des quiz et apprenez à votre rythme.',
-    rw: 'Bona ubufasha mu mibare, ubumenyi, icyongereza, n\'ibindi. Baza ibibazo, wigerageze, wige uko ubishaka.',
-    sw: 'Pata msaada wa haraka katika Hesabu, Sayansi, Kiingereza, na zaidi. Uliza maswali, fanya mazoezi, na jifunze kwa kasi yako.',
+    en: 'Get instant answers for Math, Science, English, and all subjects. Direct explanations, no fluff.',
+    fr: 'Obtenez des réponses instantanées pour les maths, sciences, anglais et toutes les matières.',
+    rw: 'Bona ibisubizo byihuse mu mibare, ubumenyi, icyongereza, n\'amasomo yose.',
+    sw: 'Pata majibu ya haraka kwa Hesabu, Sayansi, Kiingereza, na masomo yote.',
   },
   'hero.cta': {
-    en: 'Start Learning Free',
-    fr: 'Commencer Gratuitement',
-    rw: 'Tangira Kwiga',
-    sw: 'Anza Kujifunza',
+    en: 'Start Learning',
+    fr: 'Commencer',
+    rw: 'Tangira',
+    sw: 'Anza',
   },
   'hero.ctaSecondary': {
-    en: 'See How It Works',
-    fr: 'Comment ça marche',
-    rw: 'Reba uko bikora',
-    sw: 'Ona jinsi inavyofanya kazi',
+    en: 'Take a Quiz',
+    fr: 'Faire un Quiz',
+    rw: 'Kora Ikizamini',
+    sw: 'Fanya Jaribio',
   },
   // Features
   'features.title': {
-    en: 'Everything You Need to Succeed',
-    fr: 'Tout ce dont vous avez besoin',
-    rw: 'Ibyo ukeneye byose',
-    sw: 'Kila kitu unachohitaji',
+    en: 'Why Students Love Smart Mind',
+    fr: 'Pourquoi les étudiants adorent Smart Mind',
+    rw: 'Impamvu Abanyeshuri Bakunda Smart Mind',
+    sw: 'Kwa Nini Wanafunzi Wanapenda Smart Mind',
   },
   'features.ai.title': {
-    en: 'AI Tutor Chat',
-    fr: 'Chat Tuteur IA',
-    rw: 'Ikiganiro na AI',
-    sw: 'Mazungumzo na AI',
+    en: 'AI Tutor',
+    fr: 'Tuteur IA',
+    rw: 'Umwarimu AI',
+    sw: 'Mwalimu AI',
   },
   'features.ai.desc': {
-    en: 'Ask any question and get step-by-step explanations in simple language',
-    fr: 'Posez n\'importe quelle question et obtenez des explications étape par étape',
-    rw: 'Baza ikibazo icyo ari cyo cyose ubone ibisubizo byumvikana',
-    sw: 'Uliza swali lolote na upate maelezo rahisi hatua kwa hatua',
+    en: 'Ask anything, get instant direct answers with step-by-step explanations',
+    fr: 'Posez n\'importe quoi, obtenez des réponses directes instantanées',
+    rw: 'Baza icyo ushaka cyose, ubone ibisubizo byihuse',
+    sw: 'Uliza chochote, pata majibu ya moja kwa moja',
   },
   'features.voice.title': {
     en: 'Voice Mode',
@@ -112,10 +112,10 @@ const translations: Translations = {
     sw: 'Hali ya Sauti',
   },
   'features.voice.desc': {
-    en: 'Talk to your AI tutor using voice - perfect for hands-free learning',
-    fr: 'Parlez à votre tuteur IA par la voix - parfait pour apprendre sans les mains',
-    rw: 'Vugana na AI ufashwe n\'ijwi - byiza ku wiga adafashe',
-    sw: 'Zungumza na mwalimu wako wa AI kwa sauti - nzuri kwa kujifunza bila mikono',
+    en: 'Talk to Smart Mind using your voice - 5 free uses daily',
+    fr: 'Parlez à Smart Mind par la voix - 5 utilisations gratuites par jour',
+    rw: 'Vugana na Smart Mind ukoresha ijwi - 5 ku munsi',
+    sw: 'Zungumza na Smart Mind kwa sauti - matumizi 5 bure kwa siku',
   },
   'features.quiz.title': {
     en: 'Smart Quizzes',
@@ -124,22 +124,46 @@ const translations: Translations = {
     sw: 'Majaribio ya Akili',
   },
   'features.quiz.desc': {
-    en: 'Practice with AI-generated quizzes and track your progress',
-    fr: 'Pratiquez avec des quiz générés par IA et suivez vos progrès',
-    rw: 'Wigerageze ku bizamini AI yakora kandi ukurikirane aho ugeze',
-    sw: 'Fanya mazoezi na majaribio ya AI na fuatilia maendeleo yako',
+    en: 'AI-generated quizzes with instant feedback and progress tracking',
+    fr: 'Quiz générés par IA avec feedback instantané',
+    rw: 'Ibizamini AI yakora hamwe n\'ibisubizo byihuse',
+    sw: 'Majaribio ya AI na maoni ya haraka',
   },
   'features.homework.title': {
     en: 'Homework Help',
     fr: 'Aide aux Devoirs',
     rw: 'Ubufasha mu Mirimo',
-    sw: 'Msaada wa Kazi za Nyumbani',
+    sw: 'Msaada wa Kazi',
   },
   'features.homework.desc': {
-    en: 'Get explanations for homework problems, not just answers',
-    fr: 'Obtenez des explications pour vos devoirs, pas seulement des réponses',
-    rw: 'Bona ibisobanuro ku mirimo, si ibisubizo gusa',
-    sw: 'Pata maelezo ya matatizo ya kazi za nyumbani, si majibu tu',
+    en: 'Paste your homework, get explanations not just answers',
+    fr: 'Collez vos devoirs, obtenez des explications pas seulement des réponses',
+    rw: 'Shyira imirimo yawe, ubone ibisobanuro',
+    sw: 'Bandika kazi yako, pata maelezo si majibu tu',
+  },
+  'features.study.title': {
+    en: 'Study Plans',
+    fr: 'Plans d\'Étude',
+    rw: 'Gahunda yo Kwiga',
+    sw: 'Mipango ya Kusoma',
+  },
+  'features.study.desc': {
+    en: 'Daily/weekly study plans based on your level',
+    fr: 'Plans d\'étude quotidiens/hebdomadaires selon votre niveau',
+    rw: 'Gahunda yo kwiga ya buri munsi/cyumweru',
+    sw: 'Mipango ya kusoma ya kila siku/wiki',
+  },
+  'features.pdf.title': {
+    en: 'PDF Notes',
+    fr: 'Notes PDF',
+    rw: 'Inyandiko PDF',
+    sw: 'Maelezo ya PDF',
+  },
+  'features.pdf.desc': {
+    en: 'Download study notes as PDF - 2 free downloads daily',
+    fr: 'Téléchargez les notes en PDF - 2 téléchargements gratuits par jour',
+    rw: 'Kuramo inyandiko PDF - 2 ku munsi',
+    sw: 'Pakua maelezo kama PDF - upakuaji 2 bure kwa siku',
   },
   // Subjects
   'subjects.title': {
@@ -150,10 +174,10 @@ const translations: Translations = {
   },
   // Chat
   'chat.placeholder': {
-    en: 'Ask me anything about your studies...',
-    fr: 'Demandez-moi n\'importe quoi sur vos études...',
-    rw: 'Mbaza icyo ushaka cyose ku masomo...',
-    sw: 'Niulize chochote kuhusu masomo yako...',
+    en: 'Ask any question...',
+    fr: 'Posez une question...',
+    rw: 'Baza ikibazo...',
+    sw: 'Uliza swali lolote...',
   },
   'chat.send': {
     en: 'Send',
@@ -162,17 +186,29 @@ const translations: Translations = {
     sw: 'Tuma',
   },
   'chat.welcome': {
-    en: 'Hello! I\'m your AI tutor. Ask me anything about Math, Science, English, or any subject!',
-    fr: 'Bonjour! Je suis votre tuteur IA. Demandez-moi n\'importe quoi!',
-    rw: 'Muraho! Ndi umwarimu wawe wa AI. Mbaza icyo ushaka!',
-    sw: 'Habari! Mimi ni mwalimu wako wa AI. Niulize chochote!',
+    en: 'Hi! I\'m Smart Mind. Ask me anything - Math, Science, History, any subject. I give direct answers fast.',
+    fr: 'Salut! Je suis Smart Mind. Demandez-moi n\'importe quoi - je réponds vite et directement.',
+    rw: 'Muraho! Ndi Smart Mind. Mbaza icyo ushaka - nsubiza byihuse.',
+    sw: 'Habari! Mimi ni Smart Mind. Niulize chochote - najibu haraka na moja kwa moja.',
+  },
+  'chat.voiceLimit': {
+    en: 'Voice mode: {remaining} of 5 free uses left today',
+    fr: 'Mode vocal: {remaining} sur 5 utilisations gratuites restantes',
+    rw: 'Ijwi: {remaining} kuri 5 bisigaye uyu munsi',
+    sw: 'Hali ya sauti: matumizi {remaining} ya 5 bure yaliyobaki leo',
+  },
+  'chat.pdfLimit': {
+    en: 'PDF downloads: {remaining} of 2 free left today',
+    fr: 'Téléchargements PDF: {remaining} sur 2 gratuits restants',
+    rw: 'PDF: {remaining} kuri 2 bisigaye uyu munsi',
+    sw: 'Upakuaji PDF: {remaining} ya 2 bure zilizobaki leo',
   },
   // Pricing
   'pricing.title': {
-    en: 'Simple, Affordable Pricing',
-    fr: 'Tarifs Simples et Abordables',
+    en: 'Simple Pricing',
+    fr: 'Tarifs Simples',
     rw: 'Ibiciro Byoroshye',
-    sw: 'Bei Rahisi na Nafuu',
+    sw: 'Bei Rahisi',
   },
   'pricing.free': {
     en: 'Free',
@@ -192,12 +228,270 @@ const translations: Translations = {
     rw: '/ukwezi',
     sw: '/mwezi',
   },
+  'pricing.guarantee': {
+    en: '2-day money-back guarantee',
+    fr: 'Garantie de remboursement de 2 jours',
+    rw: 'Garanti yo gusubizwa amafaranga mu minsi 2',
+    sw: 'Dhamana ya kurudishiwa pesa siku 2',
+  },
+  // Quiz Page
+  'quiz.title': {
+    en: 'Smart Quizzes',
+    fr: 'Quiz Intelligents',
+    rw: 'Ibizamini Byiza',
+    sw: 'Majaribio ya Akili',
+  },
+  'quiz.subtitle': {
+    en: 'Test your knowledge with AI-generated questions',
+    fr: 'Testez vos connaissances avec des questions générées par IA',
+    rw: 'Gerageza ubumenyi bwawe n\'ibibazo AI yakora',
+    sw: 'Jaribu ujuzi wako na maswali ya AI',
+  },
+  'quiz.chooseSubject': {
+    en: 'Choose Subject',
+    fr: 'Choisir la Matière',
+    rw: 'Hitamo Isomo',
+    sw: 'Chagua Somo',
+  },
+  'quiz.searchSubject': {
+    en: 'Search subjects...',
+    fr: 'Rechercher les matières...',
+    rw: 'Shakisha amasomo...',
+    sw: 'Tafuta masomo...',
+  },
+  'quiz.settings': {
+    en: 'Quiz Settings',
+    fr: 'Paramètres du Quiz',
+    rw: 'Igenamiterere ry\'Ikizamini',
+    sw: 'Mipangilio ya Jaribio',
+  },
+  'quiz.difficulty': {
+    en: 'Difficulty',
+    fr: 'Difficulté',
+    rw: 'Uburemere',
+    sw: 'Ugumu',
+  },
+  'quiz.easy': {
+    en: 'Easy',
+    fr: 'Facile',
+    rw: 'Byoroshye',
+    sw: 'Rahisi',
+  },
+  'quiz.medium': {
+    en: 'Medium',
+    fr: 'Moyen',
+    rw: 'Hagati',
+    sw: 'Wastani',
+  },
+  'quiz.hard': {
+    en: 'Hard',
+    fr: 'Difficile',
+    rw: 'Bigoye',
+    sw: 'Ngumu',
+  },
+  'quiz.numQuestions': {
+    en: 'Questions',
+    fr: 'Questions',
+    rw: 'Ibibazo',
+    sw: 'Maswali',
+  },
+  'quiz.startQuiz': {
+    en: 'Start Quiz',
+    fr: 'Commencer',
+    rw: 'Tangira',
+    sw: 'Anza',
+  },
+  'quiz.quizzesTaken': {
+    en: 'Quizzes Taken',
+    fr: 'Quiz Effectués',
+    rw: 'Ibizamini Wakoze',
+    sw: 'Majaribio Uliyofanya',
+  },
+  'quiz.averageScore': {
+    en: 'Average Score',
+    fr: 'Score Moyen',
+    rw: 'Amanota Agereranijwe',
+    sw: 'Alama ya Wastani',
+  },
+  'quiz.dayStreak': {
+    en: 'Day Streak',
+    fr: 'Jours Consécutifs',
+    rw: 'Iminsi Ikurikirana',
+    sw: 'Siku Mfululizo',
+  },
+  'quiz.back': {
+    en: 'Back',
+    fr: 'Retour',
+    rw: 'Gusubira',
+    sw: 'Rudi',
+  },
+  'quiz.next': {
+    en: 'Next',
+    fr: 'Suivant',
+    rw: 'Ibikurikira',
+    sw: 'Ifuatayo',
+  },
+  'quiz.complete': {
+    en: 'Quiz Complete!',
+    fr: 'Quiz Terminé!',
+    rw: 'Ikizamini Kirangiye!',
+    sw: 'Jaribio Limekamilika!',
+  },
+  'quiz.yourScore': {
+    en: 'You scored {score} out of {total}',
+    fr: 'Vous avez obtenu {score} sur {total}',
+    rw: 'Wabonye {score} kuri {total}',
+    sw: 'Umepata {score} kati ya {total}',
+  },
+  'quiz.tryAgain': {
+    en: 'Try Again',
+    fr: 'Réessayer',
+    rw: 'Ongera Ugerageze',
+    sw: 'Jaribu Tena',
+  },
+  'quiz.explanation': {
+    en: 'Explanation',
+    fr: 'Explication',
+    rw: 'Ibisobanuro',
+    sw: 'Maelezo',
+  },
+  'quiz.topic': {
+    en: 'Topic (optional)',
+    fr: 'Sujet (optionnel)',
+    rw: 'Ingingo (ntibisabwa)',
+    sw: 'Mada (si lazima)',
+  },
+  'quiz.topicPlaceholder': {
+    en: 'e.g., Fractions, World War II...',
+    fr: 'ex: Fractions, Seconde Guerre mondiale...',
+    rw: 'urugero: Ibice, Intambara ya Kabiri...',
+    sw: 'mf: Sehemu, Vita vya Pili vya Dunia...',
+  },
+  // Subjects
+  'subject.math': {
+    en: 'Mathematics',
+    fr: 'Mathématiques',
+    rw: 'Imibare',
+    sw: 'Hesabu',
+  },
+  'subject.science': {
+    en: 'Science',
+    fr: 'Sciences',
+    rw: 'Ubumenyi',
+    sw: 'Sayansi',
+  },
+  'subject.english': {
+    en: 'English',
+    fr: 'Anglais',
+    rw: 'Icyongereza',
+    sw: 'Kiingereza',
+  },
+  'subject.geography': {
+    en: 'Geography',
+    fr: 'Géographie',
+    rw: 'Geografiya',
+    sw: 'Jiografia',
+  },
+  'subject.ict': {
+    en: 'ICT',
+    fr: 'Informatique',
+    rw: 'ICT',
+    sw: 'TEHAMA',
+  },
+  'subject.history': {
+    en: 'History',
+    fr: 'Histoire',
+    rw: 'Amateka',
+    sw: 'Historia',
+  },
+  'subject.physics': {
+    en: 'Physics',
+    fr: 'Physique',
+    rw: 'Fiziki',
+    sw: 'Fizikia',
+  },
+  'subject.chemistry': {
+    en: 'Chemistry',
+    fr: 'Chimie',
+    rw: 'Chimie',
+    sw: 'Kemia',
+  },
+  'subject.biology': {
+    en: 'Biology',
+    fr: 'Biologie',
+    rw: 'Biyoloji',
+    sw: 'Biolojia',
+  },
+  'subject.french': {
+    en: 'French',
+    fr: 'Français',
+    rw: 'Igifaransa',
+    sw: 'Kifaransa',
+  },
+  'subject.swahili': {
+    en: 'Swahili',
+    fr: 'Swahili',
+    rw: 'Igiswahili',
+    sw: 'Kiswahili',
+  },
+  'subject.economics': {
+    en: 'Economics',
+    fr: 'Économie',
+    rw: 'Ubukungu',
+    sw: 'Uchumi',
+  },
+  // Common
+  'common.loading': {
+    en: 'Loading...',
+    fr: 'Chargement...',
+    rw: 'Gutegereza...',
+    sw: 'Inapakia...',
+  },
+  'common.error': {
+    en: 'Something went wrong',
+    fr: 'Une erreur s\'est produite',
+    rw: 'Habaye ikibazo',
+    sw: 'Kuna tatizo',
+  },
+  'common.retry': {
+    en: 'Try Again',
+    fr: 'Réessayer',
+    rw: 'Ongera Ugerageze',
+    sw: 'Jaribu Tena',
+  },
+  // FAQ
+  'faq.comeback': {
+    en: 'Want to continue where you left off?',
+    fr: 'Voulez-vous reprendre là où vous vous êtes arrêté?',
+    rw: 'Urashaka gukomeza aho wahagarikiye?',
+    sw: 'Unataka kuendelea ulipoishia?',
+  },
+  'faq.streakReminder': {
+    en: 'Keep your {days}-day streak going! Learn something today.',
+    fr: 'Maintenez votre série de {days} jours! Apprenez quelque chose aujourd\'hui.',
+    rw: 'Komeza iminsi {days} ikurikirana! Wige ikintu uyu munsi.',
+    sw: 'Endelea na mfululizo wako wa siku {days}! Jifunze kitu leo.',
+  },
+  // Popular Questions
+  'popular.title': {
+    en: 'Most Asked Questions',
+    fr: 'Questions les Plus Posées',
+    rw: 'Ibibazo Bibazwa Cyane',
+    sw: 'Maswali Yanayoulizwa Zaidi',
+  },
+  // Contact
+  'contact.email': {
+    en: 'Contact: mukunzibernard59@gmail.com',
+    fr: 'Contact: mukunzibernard59@gmail.com',
+    rw: 'Twandikire: mukunzibernard59@gmail.com',
+    sw: 'Wasiliana: mukunzibernard59@gmail.com',
+  },
 };
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -205,10 +499,18 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('en');
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const translation = translations[key];
     if (!translation) return key;
-    return translation[language] || translation.en || key;
+    let text = translation[language] || translation.en || key;
+    
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        text = text.replace(`{${k}}`, String(v));
+      });
+    }
+    
+    return text;
   };
 
   return (
