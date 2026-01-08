@@ -14,11 +14,11 @@ const Footer: React.FC = () => {
                 <BookOpen className="h-5 w-5 text-primary-foreground" />
               </div>
               <span className="font-bold text-xl">
-                Edu<span className="text-primary">AI</span>
+                Smart<span className="text-primary">Mind</span>
               </span>
             </Link>
             <p className="text-muted-foreground text-sm mb-4">
-              AI-powered learning platform helping students worldwide succeed in their studies.
+              Fast AI learning - direct answers for all subjects.
             </p>
             <div className="flex gap-3">
               {[Twitter, Facebook, Instagram, Youtube].map((Icon, i) => (
@@ -63,20 +63,36 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              {['Help Center', 'Contact Us', 'Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
-                <li key={item}>
-                  <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
-                    {item}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  Help Center
+                </a>
+              </li>
+              <li>
+                <a href="mailto:mukunzibernard59@gmail.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  Contact Us
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                  Terms of Service
+                </a>
+              </li>
             </ul>
+            <p className="text-xs text-muted-foreground mt-4">
+              mukunzibernard59@gmail.com
+            </p>
           </div>
         </div>
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © 2025 EduAI. All rights reserved.
+            © 2025 Smart Mind. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
             <span className="text-muted-foreground text-sm">Available in:</span>

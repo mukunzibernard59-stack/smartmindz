@@ -27,7 +27,7 @@ const Navbar: React.FC = () => {
               <BookOpen className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
-              Edu<span className="text-primary">AI</span>
+              Smart<span className="text-primary">Mind</span>
             </span>
           </Link>
 
