@@ -29,15 +29,11 @@ const PricingPage: React.FC = () => {
     },
     {
       question: "Can I get a refund?",
-      answer: "We offer a 30-day money-back guarantee. If you're not satisfied with Pro, contact us within 30 days of your purchase for a full refund."
+      answer: "We offer a 2-day money-back guarantee. If you're not satisfied with Pro, contact us within 2 days of your purchase for a full refund."
     },
     {
       question: "How does the Family plan work?",
       answer: "The Family plan includes up to 5 individual accounts. Each family member gets their own login, progress tracking, and personalized learning experience. Parents get a dashboard to monitor all accounts."
-    },
-    {
-      question: "Do you offer discounts for schools?",
-      answer: "Yes! We offer special pricing for schools and educational institutions. Contact us at schools@eduai.com for a custom quote."
     },
   ];
 

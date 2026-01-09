@@ -10,6 +10,12 @@ interface Question {
   explanation: string;
 }
 
+interface QuizCardProps {
+  subject?: string;
+  difficulty?: string;
+  numQuestions?: number;
+}
+
 const sampleQuestions: Question[] = [
   {
     id: 1,
@@ -34,7 +40,7 @@ const sampleQuestions: Question[] = [
   },
 ];
 
-const QuizCard: React.FC = () => {
+const QuizCard: React.FC<QuizCardProps> = ({ subject = 'General', difficulty = 'Medium', numQuestions = 10 }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
@@ -107,8 +113,8 @@ const QuizCard: React.FC = () => {
               <Brain className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <h3 className="font-semibold">Quick Quiz</h3>
-              <p className="text-xs text-muted-foreground">Test your knowledge</p>
+              <h3 className="font-semibold">{subject} Quiz</h3>
+              <p className="text-xs text-muted-foreground">{difficulty} • {numQuestions} questions</p>
             </div>
           </div>
           <div className="text-sm font-medium">
