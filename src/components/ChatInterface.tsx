@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, User, Sparkles, Volume2, AlertCircle } from 'lucide-react';
+import { Send, Mic, MicOff, Brain, User, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -26,6 +26,8 @@ const ChatInterface: React.FC = () => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
   const [voiceUsesLeft, setVoiceUsesLeft] = useState(() => {
     const stored = localStorage.getItem('voiceUsesLeft');
     const storedDate = localStorage.getItem('voiceUsesDate');
@@ -38,6 +40,7 @@ const ChatInterface: React.FC = () => {
     return stored ? parseInt(stored) : 5;
   });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -47,18 +50,56 @@ const ChatInterface: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  // Cleanup speech synthesis on unmount
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis?.cancel();
+      recognitionRef.current?.abort();
+    };
+  }, []);
 
+  const speakText = (text: string): Promise<void> => {
+    return new Promise((resolve, reject) => {
+      if (!('speechSynthesis' in window)) {
+        reject(new Error('Speech synthesis not supported'));
+        return;
+      }
+      
+      window.speechSynthesis.cancel();
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = language === 'sw' ? 'sw-KE' : language === 'fr' ? 'fr-FR' : language === 'rw' ? 'rw-RW' : 'en-US';
+      utterance.rate = 1.1;
+      utterance.pitch = 1;
+      
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        resolve();
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        reject();
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    });
+  };
+
+  const stopSpeaking = () => {
+    window.speechSynthesis?.cancel();
+    setIsSpeaking(false);
+  };
+
+  const sendAndSpeak = async (userText: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: userText,
       timestamp: new Date(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
     setIsLoading(true);
 
     let assistantContent = '';
@@ -122,6 +163,15 @@ const ChatInterface: React.FC = () => {
           } catch {}
         }
       }
+
+      // If in voice mode, speak the response then listen again
+      if (voiceMode && assistantContent) {
+        await speakText(assistantContent);
+        // Continue listening after speaking
+        if (voiceMode && voiceUsesLeft > 0) {
+          startListening();
+        }
+      }
     } catch (error) {
       console.error('Chat error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to send message');
@@ -131,34 +181,84 @@ const ChatInterface: React.FC = () => {
     }
   };
 
-  const toggleRecording = () => {
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    const text = input;
+    setInput('');
+    await sendAndSpeak(text);
+  };
+
+  const startListening = () => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      toast.error('Voice not supported on this browser');
+      return;
+    }
+
+    const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognitionRef.current = recognition;
+    
+    recognition.lang = language === 'sw' ? 'sw-KE' : language === 'fr' ? 'fr-FR' : language === 'rw' ? 'rw-RW' : 'en-US';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    
+    recognition.onstart = () => setIsRecording(true);
+    
+    recognition.onresult = async (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setIsRecording(false);
+      
+      // Use voice credit
+      const newUses = voiceUsesLeft - 1;
+      setVoiceUsesLeft(newUses);
+      localStorage.setItem('voiceUsesLeft', String(newUses));
+      
+      if (newUses <= 0) {
+        setVoiceMode(false);
+        toast.info('Voice limit reached. Switching to text mode.');
+      }
+      
+      // Send message and get voice response
+      await sendAndSpeak(transcript);
+    };
+    
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error:', event.error);
+      setIsRecording(false);
+      if (event.error !== 'no-speech') {
+        toast.error('Could not hear you. Try again.');
+      }
+      // Restart listening if still in voice mode
+      if (voiceMode && voiceUsesLeft > 0 && event.error === 'no-speech') {
+        setTimeout(() => startListening(), 500);
+      }
+    };
+    
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+    
+    recognition.start();
+  };
+
+  const toggleVoiceMode = () => {
     if (voiceUsesLeft <= 0) {
       toast.error('Voice limit reached. Try again in 24 hours or upgrade to Pro.');
       return;
     }
-    
-    if (!isRecording) {
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
-        const recognition = new SpeechRecognition();
-        recognition.lang = language === 'sw' ? 'sw-KE' : language === 'fr' ? 'fr-FR' : language === 'rw' ? 'rw-RW' : 'en-US';
-        recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          setInput(transcript);
-          setIsRecording(false);
-          const newUses = voiceUsesLeft - 1;
-          setVoiceUsesLeft(newUses);
-          localStorage.setItem('voiceUsesLeft', String(newUses));
-        };
-        recognition.onerror = () => setIsRecording(false);
-        recognition.onend = () => setIsRecording(false);
-        recognition.start();
-        setIsRecording(true);
-      } else {
-        toast.error('Voice not supported on this browser');
-      }
+
+    if (!voiceMode) {
+      // Enter voice mode
+      setVoiceMode(true);
+      toast.success('Voice mode ON - Speak now!');
+      startListening();
     } else {
+      // Exit voice mode
+      setVoiceMode(false);
+      stopSpeaking();
+      recognitionRef.current?.abort();
       setIsRecording(false);
+      toast.info('Voice mode OFF');
     }
   };
 
@@ -256,26 +356,62 @@ const ChatInterface: React.FC = () => {
 
       {/* Input */}
       <div className="p-3 border-t border-border">
+        {/* Voice mode indicator */}
+        {voiceMode && (
+          <div className="mb-2 flex items-center justify-center gap-2 text-sm text-primary animate-pulse">
+            {isRecording ? (
+              <>
+                <Mic className="h-4 w-4" />
+                <span>Listening...</span>
+              </>
+            ) : isSpeaking ? (
+              <>
+                <Volume2 className="h-4 w-4" />
+                <span>Speaking...</span>
+              </>
+            ) : isLoading ? (
+              <>
+                <Brain className="h-4 w-4" />
+                <span>Thinking...</span>
+              </>
+            ) : null}
+          </div>
+        )}
+        
         <div className="flex gap-2">
           <Button
-            variant={isRecording ? 'destructive' : 'secondary'}
+            variant={voiceMode ? 'destructive' : isRecording ? 'destructive' : 'secondary'}
             size="icon"
-            onClick={toggleRecording}
-            className="flex-shrink-0 h-9 w-9"
-            disabled={isLoading}
+            onClick={toggleVoiceMode}
+            className={`flex-shrink-0 h-9 w-9 ${voiceMode ? 'animate-pulse' : ''}`}
+            disabled={isLoading && !voiceMode}
+            title={voiceMode ? 'Stop voice conversation' : 'Start voice conversation'}
           >
-            {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
           </Button>
+          
+          {isSpeaking && (
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={stopSpeaking}
+              className="flex-shrink-0 h-9 w-9"
+              title="Stop speaking"
+            >
+              <VolumeX className="h-4 w-4" />
+            </Button>
+          )}
+          
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder={t('chat.placeholder')}
-            disabled={isLoading}
+            placeholder={voiceMode ? 'Voice mode active...' : t('chat.placeholder')}
+            disabled={isLoading || voiceMode}
             className="flex-1 px-3 py-2 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm"
           />
-          <Button onClick={handleSend} disabled={!input.trim() || isLoading} className="flex-shrink-0 h-9 w-9" size="icon">
+          <Button onClick={handleSend} disabled={!input.trim() || isLoading || voiceMode} className="flex-shrink-0 h-9 w-9" size="icon">
             <Send className="h-4 w-4" />
           </Button>
         </div>
