@@ -59,6 +59,7 @@ Rules:
           { role: "system", content: "You are a quiz generator. Only respond with valid JSON. No markdown, no extra text." },
           { role: "user", content: prompt },
         ],
+        stream: false,
       }),
     });
 
@@ -77,20 +78,42 @@ Rules:
       });
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    
+    if (!responseText || responseText.trim() === '') {
+      console.error("Empty response from AI gateway");
+      throw new Error("Empty response from AI");
+    }
+
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error("Failed to parse AI response:", responseText.substring(0, 500));
+      throw new Error("Invalid response format from AI");
+    }
+
     const content = data.choices?.[0]?.message?.content;
     
     if (!content) {
+      console.error("No content in response:", JSON.stringify(data).substring(0, 500));
       throw new Error("No content in response");
     }
 
     // Parse the JSON from the response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.error("Could not extract JSON from content:", content.substring(0, 500));
       throw new Error("Invalid JSON response");
     }
 
-    const quizData = JSON.parse(jsonMatch[0]);
+    let quizData;
+    try {
+      quizData = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error("Failed to parse quiz JSON:", jsonMatch[0].substring(0, 500));
+      throw new Error("Invalid quiz data format");
+    }
 
     return new Response(JSON.stringify(quizData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
