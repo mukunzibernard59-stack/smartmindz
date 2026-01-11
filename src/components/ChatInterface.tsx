@@ -28,6 +28,7 @@ const ChatInterface: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(true); // Speak all responses
   const [voiceUsesLeft, setVoiceUsesLeft] = useState(() => {
     const stored = localStorage.getItem('voiceUsesLeft');
     const storedDate = localStorage.getItem('voiceUsesDate');
@@ -164,10 +165,10 @@ const ChatInterface: React.FC = () => {
         }
       }
 
-      // If in voice mode, speak the response then listen again
-      if (voiceMode && assistantContent) {
+      // Speak response if autoSpeak is on or in voice mode
+      if (assistantContent && (autoSpeak || voiceMode)) {
         await speakText(assistantContent);
-        // Continue listening after speaking
+        // Continue listening if in voice mode
         if (voiceMode && voiceUsesLeft > 0) {
           startListening();
         }
@@ -297,9 +298,22 @@ const ChatInterface: React.FC = () => {
             <p className="text-xs text-muted-foreground">Fast AI answers</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Mic className="h-3 w-3" />
-          <span>{voiceUsesLeft}/5</span>
+        <div className="flex items-center gap-3">
+          {/* Auto-speak toggle */}
+          <button
+            onClick={() => setAutoSpeak(!autoSpeak)}
+            className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs transition-colors ${
+              autoSpeak ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
+            }`}
+            title={autoSpeak ? 'Disable auto-speak' : 'Enable auto-speak'}
+          >
+            {autoSpeak ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+            <span className="hidden sm:inline">{autoSpeak ? 'Speaking' : 'Muted'}</span>
+          </button>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Mic className="h-3 w-3" />
+            <span>{voiceUsesLeft}/5</span>
+          </div>
         </div>
       </div>
 
