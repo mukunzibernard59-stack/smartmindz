@@ -241,17 +241,32 @@ const ChatInterface: React.FC = () => {
     recognition.start();
   };
 
-  const toggleVoiceMode = () => {
+  const toggleVoiceMode = async () => {
     if (voiceUsesLeft <= 0) {
       toast.error('Voice limit reached. Try again in 24 hours or upgrade to Pro.');
       return;
     }
 
     if (!voiceMode) {
-      // Enter voice mode
+      // Enter voice mode - greet the user first
       setVoiceMode(true);
-      toast.success('Voice mode ON - Speak now!');
-      startListening();
+      toast.success('Voice mode ON');
+      
+      // Speak greeting first, then start listening
+      const greeting = language === 'sw' ? 'Habari! Nikusaidie nini leo?' 
+        : language === 'fr' ? 'Bonjour! Comment puis-je vous aider aujourd\'hui?'
+        : language === 'rw' ? 'Muraho! Nakubwire iki uyu munsi?'
+        : 'Hi there! What can I help you with today?';
+      
+      try {
+        await speakText(greeting);
+        // After greeting, start listening
+        if (voiceUsesLeft > 0) {
+          startListening();
+        }
+      } catch {
+        startListening();
+      }
     } else {
       // Exit voice mode
       setVoiceMode(false);

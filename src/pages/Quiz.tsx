@@ -26,8 +26,9 @@ import {
 } from 'lucide-react';
 
 const Quiz: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+  const [customSubject, setCustomSubject] = useState<string>('');
   const [quizStarted, setQuizStarted] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [difficulty, setDifficulty] = useState<string>('Medium');
@@ -59,15 +60,41 @@ const Quiz: React.FC = () => {
     );
   }, [searchQuery]);
 
+  // Check if search query doesn't match any existing subject
+  const isCustomSubject = useMemo(() => {
+    if (!searchQuery.trim()) return false;
+    return !allSubjects.some(subject => 
+      subject.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
   const startQuiz = () => {
-    if (selectedSubject) {
+    if (selectedSubject || customSubject) {
       setQuizStarted(true);
     }
   };
 
+  const handleSearchAndSelect = () => {
+    if (searchQuery.trim() && isCustomSubject) {
+      setCustomSubject(searchQuery.trim());
+      setSelectedSubject(null);
+    }
+  };
+
+  const handleSubjectClick = (subjectId: string) => {
+    setSelectedSubject(subjectId);
+    setCustomSubject('');
+  };
+
+  const getQuizSubject = (): string => {
+    if (customSubject) return customSubject;
+    const subjectData = allSubjects.find(s => s.id === selectedSubject);
+    return subjectData?.name || 'General';
+  };
+
   const selectedSubjectData = allSubjects.find(s => s.id === selectedSubject);
 
-  if (quizStarted && selectedSubjectData) {
+  if (quizStarted && (selectedSubject || customSubject)) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -76,15 +103,19 @@ const Quiz: React.FC = () => {
             <div className="max-w-2xl mx-auto">
               <Button 
                 variant="ghost" 
-                onClick={() => setQuizStarted(false)}
+                onClick={() => {
+                  setQuizStarted(false);
+                  setCustomSubject('');
+                }}
                 className="mb-6"
               >
                 ← Back to subjects
               </Button>
               <QuizCard 
-                subject={selectedSubjectData.name}
+                subject={getQuizSubject()}
                 difficulty={difficulty}
                 numQuestions={numQuestions}
+                language={language}
               />
             </div>
           </div>
@@ -118,54 +149,115 @@ const Quiz: React.FC = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
               <Input
                 type="text"
-                placeholder="Search for any subject..."
+                placeholder="Search or type any subject you want to learn..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  // Reset selections when typing
+                  if (e.target.value.trim()) {
+                    setSelectedSubject(null);
+                    setCustomSubject('');
+                  }
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && isCustomSubject) {
+                    handleSearchAndSelect();
+                  }
+                }}
                 className="pl-12 h-14 text-lg rounded-2xl border-2 focus:border-primary"
               />
             </div>
 
-            {/* Subject Selection */}
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold mb-4 text-center">
-                {searchQuery ? `Results for "${searchQuery}"` : 'Choose a Subject'}
-              </h2>
-              {filteredSubjects.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">No subjects found for "{searchQuery}"</p>
-                  <p className="text-sm text-muted-foreground">Try a different search term or select from popular subjects below</p>
+            {/* Custom Subject Selection */}
+            {isCustomSubject && searchQuery.trim() && (
+              <div className="mb-8 max-w-xl mx-auto animate-fade-in">
+                <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-6 text-center">
+                  <Sparkles className="h-8 w-8 text-primary mx-auto mb-3" />
+                  <h3 className="font-semibold text-lg mb-2">Explore "{searchQuery}"</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Generate a quiz on any topic you want - our AI will create questions just for you!
+                  </p>
                   <Button 
-                    variant="outline" 
-                    className="mt-4"
-                    onClick={() => setSearchQuery('')}
+                    onClick={handleSearchAndSelect}
+                    variant="hero"
+                    size="lg"
                   >
-                    Clear Search
+                    <Brain className="h-4 w-4 mr-2" />
+                    Select this topic
                   </Button>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {filteredSubjects.map((subject) => (
-                    <button
-                      key={subject.id}
-                      onClick={() => setSelectedSubject(subject.id)}
-                      className={`p-4 rounded-2xl border-2 transition-all duration-200 ${
-                        selectedSubject === subject.id
-                          ? 'border-primary bg-primary/5 shadow-primary'
-                          : 'border-border hover:border-primary/50 bg-card'
-                      }`}
+              </div>
+            )}
+
+            {/* Subject Selection */}
+            {!isCustomSubject && (
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 text-center">
+                  {searchQuery ? `Results for "${searchQuery}"` : 'Choose a Subject'}
+                </h2>
+                {filteredSubjects.length === 0 ? (
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground mb-4">No subjects found for "{searchQuery}"</p>
+                    <Button 
+                      variant="outline" 
+                      className="mt-4"
+                      onClick={() => setSearchQuery('')}
                     >
-                      <div className={`w-12 h-12 rounded-xl ${subject.color} flex items-center justify-center mx-auto mb-3 border`}>
-                        <subject.icon className="h-6 w-6" />
-                      </div>
-                      <span className="font-medium text-sm">{subject.name}</span>
-                    </button>
-                  ))}
+                      Clear Search
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {filteredSubjects.map((subject) => (
+                      <button
+                        key={subject.id}
+                        onClick={() => handleSubjectClick(subject.id)}
+                        className={`p-4 rounded-2xl border-2 transition-all duration-200 ${
+                          selectedSubject === subject.id
+                            ? 'border-primary bg-primary/5 shadow-primary'
+                            : 'border-border hover:border-primary/50 bg-card'
+                        }`}
+                      >
+                        <div className={`w-12 h-12 rounded-xl ${subject.color} flex items-center justify-center mx-auto mb-3 border`}>
+                          <subject.icon className="h-6 w-6" />
+                        </div>
+                        <span className="font-medium text-sm">{subject.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Custom subject selected indicator */}
+            {customSubject && (
+              <div className="mb-8 max-w-xl mx-auto">
+                <div className="bg-primary/10 border border-primary/30 rounded-2xl p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <Brain className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{customSubject}</p>
+                      <p className="text-xs text-muted-foreground">Custom topic selected</p>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => {
+                      setCustomSubject('');
+                      setSearchQuery('');
+                    }}
+                  >
+                    Change
+                  </Button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Difficulty Selection */}
-            {selectedSubject && (
+            {(selectedSubject || customSubject) && (
               <div className="bg-card rounded-2xl border border-border p-6 mb-8 animate-fade-in max-w-xl mx-auto">
                 <h3 className="font-semibold mb-4">Quiz Settings</h3>
                 <div className="grid grid-cols-3 gap-3 mb-6">
