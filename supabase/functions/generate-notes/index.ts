@@ -25,38 +25,56 @@ serve(async (req) => {
       sw: "Swahili",
     };
 
-    const prompt = `Create comprehensive study notes about "${subject}" organized into exactly 5 pages/sections.
+const prompt = `Create comprehensive learning content about "${subject}" with structured sections.
 
 Respond ONLY with valid JSON in this exact format:
 {
-  "title": "Study Notes: ${subject}",
+  "title": "Learn: ${subject}",
+  "introduction": {
+    "what": "Clear explanation of what this subject is",
+    "why": "Why this subject is important",
+    "usage": "Real-world applications and where it's commonly used"
+  },
+  "terms": [
+    {"term": "Term Name", "definition": "Simple, clear explanation"},
+    {"term": "Term 2", "definition": "Definition 2"}
+  ],
+  "moreToKnow": {
+    "concepts": ["Key concept 1", "Key concept 2"],
+    "examples": ["Practical example 1", "Example 2"],
+    "commonMistakes": ["Common mistake 1", "Mistake 2"],
+    "facts": ["Interesting fact 1", "Fact 2"]
+  },
+  "quiz": [
+    {
+      "question": "Question text here?",
+      "options": {"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"},
+      "correct": "A",
+      "explanation": "Why A is correct"
+    }
+  ],
+  "resources": [
+    {"name": "Platform Name", "url": "https://official-url.com", "description": "Brief description"}
+  ],
   "pages": [
     {
       "pageNumber": 1,
       "title": "Introduction to ${subject}",
-      "content": "Detailed content for this section with multiple paragraphs, key concepts, and explanations. Make it educational and thorough.",
-      "keyPoints": ["Key point 1", "Key point 2", "Key point 3"]
-    },
-    {
-      "pageNumber": 2,
-      "title": "Core Concepts",
-      "content": "More detailed content...",
-      "keyPoints": ["Point 1", "Point 2", "Point 3"]
+      "content": "Detailed introduction content",
+      "keyPoints": ["Key point 1", "Key point 2"]
     }
   ]
 }
 
 Rules:
 - All content must be in ${languageMap[language] || 'English'}
-- Exactly 5 pages with progressive depth
-- Each page should have 2-3 paragraphs of content
-- Include 3-5 key points per page
-- Make content educational, clear, and suitable for students
-- Page 1: Introduction & basics
-- Page 2: Core concepts & fundamentals
-- Page 3: Advanced topics & details
-- Page 4: Practical applications & examples
-- Page 5: Summary & review questions`;
+- Provide a clear, beginner-friendly introduction with what/why/usage
+- Include 6-10 most important terms with simple definitions
+- Add 3-5 key concepts, practical examples, common mistakes, and interesting facts
+- Create 4-5 multiple-choice quiz questions based on the content
+- Include 3-5 official learning resources (use real, trusted URLs like MDN, Khan Academy, Coursera, official docs)
+- Also include 5 pages for detailed reading
+- Make content educational, clear, and suitable for students`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
