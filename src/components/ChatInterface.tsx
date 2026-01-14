@@ -195,6 +195,10 @@ const ChatInterface: React.FC = () => {
       return;
     }
 
+    // Cancel any ongoing speech before listening
+    window.speechSynthesis?.cancel();
+    setIsSpeaking(false);
+
     const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition;
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
@@ -205,7 +209,10 @@ const ChatInterface: React.FC = () => {
     
     recognition.onstart = () => setIsRecording(true);
     
+    let hasResult = false;
+    
     recognition.onresult = async (event: any) => {
+      hasResult = true;
       const transcript = event.results[0][0].transcript;
       setIsRecording(false);
       
@@ -217,26 +224,29 @@ const ChatInterface: React.FC = () => {
       if (newUses <= 0) {
         setVoiceMode(false);
         toast.info('Voice limit reached. Switching to text mode.');
+        return;
       }
       
-      // Send message and get voice response
+      // Send message and get voice response (loop continues in sendAndSpeak)
       await sendAndSpeak(transcript);
     };
     
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
       setIsRecording(false);
-      if (event.error !== 'no-speech') {
+      
+      // Only show error for non-silence errors
+      if (event.error !== 'no-speech' && event.error !== 'aborted') {
         toast.error('Could not hear you. Try again.');
-      }
-      // Restart listening if still in voice mode
-      if (voiceMode && voiceUsesLeft > 0 && event.error === 'no-speech') {
-        setTimeout(() => startListening(), 500);
       }
     };
     
     recognition.onend = () => {
       setIsRecording(false);
+      // If no result was captured and still in voice mode, keep listening
+      if (!hasResult && voiceMode && voiceUsesLeft > 0) {
+        setTimeout(() => startListening(), 300);
+      }
     };
     
     recognition.start();
