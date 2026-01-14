@@ -11,12 +11,22 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, language = 'en' } = await req.json();
+    const { messages, language = 'en', country, educationLevel } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+
+    // Get current date
+    const currentDate = new Date();
+    const formattedDate = currentDate.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    const currentYear = currentDate.getFullYear();
 
     const languageInstructions: Record<string, string> = {
       en: "Respond in English.",
@@ -25,7 +35,22 @@ serve(async (req) => {
       sw: "Jibu kwa Kiswahili.",
     };
 
+    const countryContext = country ? `User's country: ${country}. Follow the official curriculum for ${country}.` : "Country not specified - use internationally recognized standards.";
+    const levelContext = educationLevel ? `Education level: ${educationLevel}.` : "Education level not specified - adapt to the apparent level from the question.";
+
     const systemPrompt = `You are Smart Mind AI, an educational voice assistant. ${languageInstructions[language] || languageInstructions.en}
+
+CURRENT DATE & TIME CONTEXT:
+- Today's date: ${formattedDate}
+- Current year: ${currentYear}
+- Always use this real-world date when answering time-sensitive questions
+- Use the most up-to-date information available as of ${currentYear}
+
+CURRICULUM & LOCALIZATION:
+- ${countryContext}
+- ${levelContext}
+- If curriculum version or standards are unclear, state your assumption before answering
+- Follow the LATEST official curriculum and educational standards
 
 VOICE ASSISTANT BEHAVIOR:
 - Respond CONTINUOUSLY without pausing, stopping, or waiting for confirmation
