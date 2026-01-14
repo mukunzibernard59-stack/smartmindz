@@ -45,15 +45,15 @@ const Navbar: React.FC = () => {
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-1">
+            {/* Desktop Navigation - Tab Style */}
+            <div className="hidden md:flex items-center bg-secondary/50 rounded-full p-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  className={`px-5 py-2 rounded-full font-medium text-sm transition-all duration-200 ${
                     location.pathname === link.to
-                      ? 'text-primary bg-primary/10'
+                      ? 'text-primary-foreground bg-primary shadow-md'
                       : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                   }`}
                 >
