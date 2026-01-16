@@ -74,14 +74,14 @@ const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                <Link to="/privacy" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
+                <Link to="/terms" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
             <p className="text-xs text-muted-foreground mt-4">
