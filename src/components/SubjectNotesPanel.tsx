@@ -47,41 +47,43 @@ const SubjectNotesPanel: React.FC<SubjectNotesPanelProps> = ({ subject }) => {
     more: false
   });
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      setIsLoading(true);
-      setError(null);
+  const fetchNotes = async () => {
+    setIsLoading(true);
+    setError(null);
+    setNotes(null);
 
-      try {
-        const response = await fetch(NOTES_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ subject, language }),
-        });
+    try {
+      const response = await fetch(NOTES_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ subject, language }),
+      });
 
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'Failed to generate notes');
-        }
-
-        const data = await response.json();
-        if (data.pages && data.pages.length > 0) {
-          setNotes(data);
-        } else {
-          throw new Error('No notes generated');
-        }
-      } catch (err) {
-        console.error('Notes generation error:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load notes');
-        toast.error('Failed to generate notes. Please try again.');
-      } finally {
-        setIsLoading(false);
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to generate notes');
       }
-    };
 
+      const data = await response.json();
+      
+      // Validate we have at least introduction or terms
+      if (data.introduction || (data.terms && data.terms.length > 0)) {
+        setNotes(data);
+      } else {
+        throw new Error('Incomplete notes generated');
+      }
+    } catch (err) {
+      console.error('Notes generation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load notes');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (subject) {
       fetchNotes();
     }
@@ -122,21 +124,27 @@ const SubjectNotesPanel: React.FC<SubjectNotesPanelProps> = ({ subject }) => {
 
   if (isLoading) {
     return (
-      <div className="bg-card rounded-2xl border border-border p-6 text-center">
-        <Loader2 className="h-8 w-8 text-primary animate-spin mx-auto mb-3" />
-        <p className="text-muted-foreground text-sm">
-          Loading notes about <strong>{subject}</strong>...
+      <div className="bg-card rounded-2xl border border-border p-8 text-center">
+        <Loader2 className="h-10 w-10 text-primary animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground font-medium mb-2">
+          Generating notes for <strong>{subject}</strong>
         </p>
+        <p className="text-xs text-muted-foreground">This may take a few seconds...</p>
       </div>
     );
   }
 
   if (error || !notes) {
     return (
-      <div className="bg-card rounded-2xl border border-border p-6 text-center">
-        <p className="text-muted-foreground text-sm mb-3">Failed to load notes</p>
-        <Button onClick={() => window.location.reload()} variant="outline" size="sm">
-          Retry
+      <div className="bg-card rounded-2xl border border-destructive/30 p-6 text-center">
+        <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+          <BookOpen className="h-6 w-6 text-destructive" />
+        </div>
+        <p className="font-medium text-foreground mb-2">Failed to load notes</p>
+        <p className="text-sm text-muted-foreground mb-4">{error || 'Please try again'}</p>
+        <Button onClick={fetchNotes} variant="outline" size="sm" className="gap-2">
+          <Loader2 className="h-4 w-4" />
+          Try Again
         </Button>
       </div>
     );
