@@ -25,12 +25,12 @@ serve(async (req) => {
       sw: "Swahili",
     };
 
-const prompt = `Create learning content about "${subject}" in ${languageMap[language] || 'English'}.
+const prompt = `Create educational content about "${subject}" in ${languageMap[language] || 'English'}.
 
-Return ONLY valid JSON:
-{"title":"Learn: ${subject}","introduction":{"what":"What it is (2 sentences)","why":"Why important (2 sentences)","usage":"Where used (2 sentences)"},"terms":[{"term":"Term1","definition":"Def1"},{"term":"Term2","definition":"Def2"},{"term":"Term3","definition":"Def3"},{"term":"Term4","definition":"Def4"},{"term":"Term5","definition":"Def5"}],"moreToKnow":{"concepts":["Concept1","Concept2","Concept3"],"examples":["Example1","Example2"],"commonMistakes":["Mistake1","Mistake2"],"facts":["Fact1","Fact2"]},"quiz":[{"question":"Q1?","options":{"A":"A1","B":"B1","C":"C1","D":"D1"},"correct":"A","explanation":"Why A"},{"question":"Q2?","options":{"A":"A2","B":"B2","C":"C2","D":"D2"},"correct":"B","explanation":"Why B"},{"question":"Q3?","options":{"A":"A3","B":"B3","C":"C3","D":"D3"},"correct":"C","explanation":"Why C"}],"resources":[{"name":"Resource1","url":"https://example1.com","description":"Desc1"},{"name":"Resource2","url":"https://example2.com","description":"Desc2"}]}
+Return valid JSON only:
+{"title":"Learn: ${subject}","introduction":{"what":"Brief explanation of what this is (2-3 sentences)","why":"Why it's important (2-3 sentences)","usage":"Real-world applications (2-3 sentences)"},"terms":[{"term":"Term1","definition":"Definition1"},{"term":"Term2","definition":"Definition2"},{"term":"Term3","definition":"Definition3"},{"term":"Term4","definition":"Definition4"},{"term":"Term5","definition":"Definition5"}],"moreToKnow":{"concepts":["Concept1","Concept2","Concept3"],"examples":["Example1","Example2"],"commonMistakes":["Mistake1","Mistake2"],"facts":["Fact1","Fact2"]},"quiz":[{"question":"Question1?","options":{"A":"OptionA","B":"OptionB","C":"OptionC","D":"OptionD"},"correct":"A","explanation":"Why correct"},{"question":"Question2?","options":{"A":"OptionA","B":"OptionB","C":"OptionC","D":"OptionD"},"correct":"B","explanation":"Why correct"}],"resources":[{"name":"Resource1","url":"https://example.com","description":"Description"}],"pages":[{"pageNumber":1,"title":"Introduction","content":"Introduction content about the topic","keyPoints":["Point1","Point2"]}]}
 
-Keep responses concise. No markdown.`;
+Keep all content educational and accurate. No markdown or backticks.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
