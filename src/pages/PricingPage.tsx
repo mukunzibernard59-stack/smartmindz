@@ -21,7 +21,7 @@ const PricingPage: React.FC = () => {
     },
     {
       question: "What payment methods do you accept?",
-      answer: "We accept PayPal, all major credit/debit cards (Visa, Mastercard, Amex), and Mobile Money (M-Pesa, MTN Mobile Money, Airtel Money) for users in Africa."
+      answer: "We accept MTN Mobile Money for users in Rwanda. Simply dial *182#, choose 'Send Money', and pay to our number +250795401268. Your subscription activates after payment verification."
     },
     {
       question: "Is there a free trial for Pro?",
