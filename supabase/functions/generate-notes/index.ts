@@ -25,56 +25,12 @@ serve(async (req) => {
       sw: "Swahili",
     };
 
-const prompt = `Create comprehensive learning content about "${subject}" with structured sections.
+const prompt = `Create learning content about "${subject}" in ${languageMap[language] || 'English'}.
 
-Respond ONLY with valid JSON in this exact format:
-{
-  "title": "Learn: ${subject}",
-  "introduction": {
-    "what": "Clear explanation of what this subject is",
-    "why": "Why this subject is important",
-    "usage": "Real-world applications and where it's commonly used"
-  },
-  "terms": [
-    {"term": "Term Name", "definition": "Simple, clear explanation"},
-    {"term": "Term 2", "definition": "Definition 2"}
-  ],
-  "moreToKnow": {
-    "concepts": ["Key concept 1", "Key concept 2"],
-    "examples": ["Practical example 1", "Example 2"],
-    "commonMistakes": ["Common mistake 1", "Mistake 2"],
-    "facts": ["Interesting fact 1", "Fact 2"]
-  },
-  "quiz": [
-    {
-      "question": "Question text here?",
-      "options": {"A": "Option A", "B": "Option B", "C": "Option C", "D": "Option D"},
-      "correct": "A",
-      "explanation": "Why A is correct"
-    }
-  ],
-  "resources": [
-    {"name": "Platform Name", "url": "https://official-url.com", "description": "Brief description"}
-  ],
-  "pages": [
-    {
-      "pageNumber": 1,
-      "title": "Introduction to ${subject}",
-      "content": "Detailed introduction content",
-      "keyPoints": ["Key point 1", "Key point 2"]
-    }
-  ]
-}
+Return ONLY valid JSON:
+{"title":"Learn: ${subject}","introduction":{"what":"What it is (2 sentences)","why":"Why important (2 sentences)","usage":"Where used (2 sentences)"},"terms":[{"term":"Term1","definition":"Def1"},{"term":"Term2","definition":"Def2"},{"term":"Term3","definition":"Def3"},{"term":"Term4","definition":"Def4"},{"term":"Term5","definition":"Def5"}],"moreToKnow":{"concepts":["Concept1","Concept2","Concept3"],"examples":["Example1","Example2"],"commonMistakes":["Mistake1","Mistake2"],"facts":["Fact1","Fact2"]},"quiz":[{"question":"Q1?","options":{"A":"A1","B":"B1","C":"C1","D":"D1"},"correct":"A","explanation":"Why A"},{"question":"Q2?","options":{"A":"A2","B":"B2","C":"C2","D":"D2"},"correct":"B","explanation":"Why B"},{"question":"Q3?","options":{"A":"A3","B":"B3","C":"C3","D":"D3"},"correct":"C","explanation":"Why C"}],"resources":[{"name":"Resource1","url":"https://example1.com","description":"Desc1"},{"name":"Resource2","url":"https://example2.com","description":"Desc2"}]}
 
-Rules:
-- All content must be in ${languageMap[language] || 'English'}
-- Provide a clear, beginner-friendly introduction with what/why/usage
-- Include 6-10 most important terms with simple definitions
-- Add 3-5 key concepts, practical examples, common mistakes, and interesting facts
-- Create 4-5 multiple-choice quiz questions based on the content
-- Include 3-5 official learning resources (use real, trusted URLs like MDN, Khan Academy, Coursera, official docs)
-- Also include 5 pages for detailed reading
-- Make content educational, clear, and suitable for students`;
+Keep responses concise. No markdown.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -83,12 +39,13 @@ Rules:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are an educational content creator. Only respond with valid JSON. No markdown, no extra text." },
+          { role: "system", content: "You are an educational content creator. Return ONLY valid compact JSON. No markdown, no backticks, no explanation." },
           { role: "user", content: prompt },
         ],
         stream: false,
+        max_tokens: 4000,
       }),
     });
 
