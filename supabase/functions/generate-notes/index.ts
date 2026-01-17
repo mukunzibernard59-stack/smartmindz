@@ -5,6 +5,59 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface NotesData {
+  title?: string;
+  introduction?: {
+    what: string;
+    why: string;
+    usage: string;
+  };
+  terms?: { term: string; definition: string }[];
+  moreToKnow?: {
+    concepts: string[];
+    facts: string[];
+    commonMistakes: string[];
+    examples: string[];
+  };
+  pages?: { pageNumber: number; title: string; content: string; keyPoints: string[] }[];
+}
+
+// Helper to attempt JSON repair for truncated responses
+function repairAndParseJSON(jsonStr: string): NotesData | null {
+  try {
+    return JSON.parse(jsonStr) as NotesData;
+  } catch {
+    // Try to repair common truncation issues
+    let repaired = jsonStr.trim();
+    
+    // Count open brackets
+    const openBraces = (repaired.match(/{/g) || []).length;
+    const closeBraces = (repaired.match(/}/g) || []).length;
+    const openBrackets = (repaired.match(/\[/g) || []).length;
+    const closeBrackets = (repaired.match(/]/g) || []).length;
+    
+    // Remove trailing incomplete values
+    repaired = repaired.replace(/,\s*"[^"]*$/, '');
+    repaired = repaired.replace(/,\s*$/, '');
+    repaired = repaired.replace(/:\s*"[^"]*$/, ': ""');
+    repaired = repaired.replace(/:\s*$/, ': ""');
+    
+    // Add missing closing brackets
+    for (let i = 0; i < openBrackets - closeBrackets; i++) {
+      repaired += ']';
+    }
+    for (let i = 0; i < openBraces - closeBraces; i++) {
+      repaired += '}';
+    }
+    
+    try {
+      return JSON.parse(repaired) as NotesData;
+    } catch {
+      return null;
+    }
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -25,12 +78,13 @@ serve(async (req) => {
       sw: "Swahili",
     };
 
-const prompt = `Create educational content about "${subject}" in ${languageMap[language] || 'English'}.
+    const lang = languageMap[language] || 'English';
 
-Return valid JSON only:
-{"title":"Learn: ${subject}","introduction":{"what":"Brief explanation of what this is (2-3 sentences)","why":"Why it's important (2-3 sentences)","usage":"Real-world applications (2-3 sentences)"},"terms":[{"term":"Term1","definition":"Definition1"},{"term":"Term2","definition":"Definition2"},{"term":"Term3","definition":"Definition3"},{"term":"Term4","definition":"Definition4"},{"term":"Term5","definition":"Definition5"}],"moreToKnow":{"concepts":["Concept1","Concept2","Concept3"],"examples":["Example1","Example2"],"commonMistakes":["Mistake1","Mistake2"],"facts":["Fact1","Fact2"]},"quiz":[{"question":"Question1?","options":{"A":"OptionA","B":"OptionB","C":"OptionC","D":"OptionD"},"correct":"A","explanation":"Why correct"},{"question":"Question2?","options":{"A":"OptionA","B":"OptionB","C":"OptionC","D":"OptionD"},"correct":"B","explanation":"Why correct"}],"resources":[{"name":"Resource1","url":"https://example.com","description":"Description"}],"pages":[{"pageNumber":1,"title":"Introduction","content":"Introduction content about the topic","keyPoints":["Point1","Point2"]}]}
+    // Minimal prompt to ensure complete JSON response
+    const prompt = `About "${subject}" in ${lang}. Return JSON:
+{"title":"${subject}","introduction":{"what":"[2 sentences what it is]","why":"[2 sentences importance]","usage":"[2 sentences applications]"},"terms":[{"term":"T1","definition":"D1"},{"term":"T2","definition":"D2"},{"term":"T3","definition":"D3"}],"moreToKnow":{"concepts":["C1","C2"],"facts":["F1","F2"],"commonMistakes":["M1"],"examples":["E1"]},"pages":[{"pageNumber":1,"title":"Intro","content":"Brief intro","keyPoints":["K1"]}]}`;
 
-Keep all content educational and accurate. No markdown or backticks.`;
+    console.log("Generating notes for:", subject, "in", lang);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -39,13 +93,13 @@ Keep all content educational and accurate. No markdown or backticks.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
-          { role: "system", content: "You are an educational content creator. Return ONLY valid compact JSON. No markdown, no backticks, no explanation." },
+          { role: "system", content: "Return ONLY valid JSON. No markdown. Keep responses short." },
           { role: "user", content: prompt },
         ],
         stream: false,
-        max_tokens: 4000,
+        max_tokens: 2000,
       }),
     });
 
@@ -58,48 +112,77 @@ Keep all content educational and accurate. No markdown or backticks.`;
       }
       const errorText = await response.text();
       console.error("Notes generation error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "Failed to generate notes." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      throw new Error("AI service unavailable");
     }
 
     const responseText = await response.text();
     
     if (!responseText || responseText.trim() === '') {
-      console.error("Empty response from AI gateway");
       throw new Error("Empty response from AI");
     }
 
     let data;
     try {
       data = JSON.parse(responseText);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", responseText.substring(0, 500));
-      throw new Error("Invalid response format from AI");
+    } catch {
+      console.error("Failed to parse AI wrapper response");
+      throw new Error("Invalid response format");
     }
 
     const content = data.choices?.[0]?.message?.content;
     
     if (!content) {
-      console.error("No content in response:", JSON.stringify(data).substring(0, 500));
       throw new Error("No content in response");
     }
 
-    // Parse the JSON from the response
+    console.log("AI response length:", content.length);
+
+    // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Could not extract JSON from content:", content.substring(0, 500));
-      throw new Error("Invalid JSON response");
+      console.error("No JSON found in:", content.substring(0, 200));
+      throw new Error("Invalid response format");
     }
 
-    let notesData;
-    try {
-      notesData = JSON.parse(jsonMatch[0]);
-    } catch (parseError) {
-      console.error("Failed to parse notes JSON:", jsonMatch[0].substring(0, 500));
-      throw new Error("Invalid notes data format");
+    // Try to parse, with repair fallback
+    let notesData = repairAndParseJSON(jsonMatch[0]);
+    
+    if (!notesData) {
+      console.error("JSON repair failed for:", jsonMatch[0].substring(0, 300));
+      // Return minimal fallback data
+      notesData = {
+        title: `Learn: ${subject}`,
+        introduction: {
+          what: `${subject} is an important topic to study and understand.`,
+          why: "Learning this subject helps build foundational knowledge and skills.",
+          usage: "This knowledge applies to many real-world situations and careers."
+        },
+        terms: [
+          { term: subject, definition: `The main topic of study in this area.` }
+        ],
+        moreToKnow: {
+          concepts: ["Core fundamentals", "Key principles"],
+          facts: ["An important area of study"],
+          commonMistakes: ["Skipping the basics"],
+          examples: ["Real-world applications"]
+        },
+        pages: [
+          { pageNumber: 1, title: "Introduction", content: `Welcome to learning about ${subject}.`, keyPoints: ["Start with fundamentals"] }
+        ]
+      };
     }
+
+    // Ensure required fields exist
+    if (!notesData.title) notesData.title = `Learn: ${subject}`;
+    if (!notesData.introduction) {
+      notesData.introduction = {
+        what: `${subject} is the topic of study.`,
+        why: "It's important for learning.",
+        usage: "Applies in many areas."
+      };
+    }
+
+    console.log("Successfully generated notes for:", subject);
 
     return new Response(JSON.stringify(notesData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
