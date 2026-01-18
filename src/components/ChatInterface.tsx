@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, User, Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { Send, Mic, MicOff, Brain, User, Sparkles, Volume2, VolumeX, LogIn } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import LoginModal from '@/components/LoginModal';
 
 interface Message {
   id: string;
@@ -15,6 +17,8 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 const ChatInterface: React.FC = () => {
   const { t, language } = useLanguage();
+  const { user, isAuthenticated, getAccessToken } = useAuth();
+  const [loginOpen, setLoginOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -28,18 +32,8 @@ const ChatInterface: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(true); // Speak all responses
-  const [voiceUsesLeft, setVoiceUsesLeft] = useState(() => {
-    const stored = localStorage.getItem('voiceUsesLeft');
-    const storedDate = localStorage.getItem('voiceUsesDate');
-    const today = new Date().toDateString();
-    if (storedDate !== today) {
-      localStorage.setItem('voiceUsesDate', today);
-      localStorage.setItem('voiceUsesLeft', '5');
-      return 5;
-    }
-    return stored ? parseInt(stored) : 5;
-  });
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [usageInfo, setUsageInfo] = useState<{ usage_today: number; limit: number } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -92,7 +86,14 @@ const ChatInterface: React.FC = () => {
     setIsSpeaking(false);
   };
 
-  const sendAndSpeak = async (userText: string) => {
+  const sendAndSpeak = async (userText: string, isVoice: boolean = false) => {
+    // Require authentication
+    if (!isAuthenticated) {
+      toast.error('Please sign in to chat');
+      setLoginOpen(true);
+      return;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -106,11 +107,20 @@ const ChatInterface: React.FC = () => {
     let assistantContent = '';
 
     try {
+      const accessToken = await getAccessToken();
+      
+      if (!accessToken) {
+        toast.error('Session expired. Please sign in again.');
+        setLoginOpen(true);
+        setIsLoading(false);
+        return;
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           messages: [...messages.filter(m => m.id !== '1'), userMessage].map(m => ({
@@ -118,11 +128,28 @@ const ChatInterface: React.FC = () => {
             content: m.content,
           })),
           language,
+          isVoiceMode: isVoice || voiceMode,
         }),
       });
 
       if (!resp.ok) {
         const error = await resp.json();
+        
+        // Handle access limit reached
+        if (resp.status === 403 && error.error === 'ACCESS_LIMIT_REACHED') {
+          setVoiceMode(false);
+          stopSpeaking();
+          recognitionRef.current?.abort();
+          setUsageInfo({ usage_today: error.usage_today, limit: error.limit });
+          throw new Error(error.message);
+        }
+        
+        // Handle auth errors
+        if (resp.status === 401) {
+          setLoginOpen(true);
+          throw new Error(error.error || 'Please sign in to continue');
+        }
+        
         throw new Error(error.error || 'Failed to get response');
       }
 
@@ -168,8 +195,8 @@ const ChatInterface: React.FC = () => {
       // Speak response if autoSpeak is on or in voice mode
       if (assistantContent && (autoSpeak || voiceMode)) {
         await speakText(assistantContent);
-        // Continue listening if in voice mode
-        if (voiceMode && voiceUsesLeft > 0) {
+        // Continue listening if in voice mode and still has access
+        if (voiceMode && isAuthenticated) {
           startListening();
         }
       }
@@ -177,6 +204,13 @@ const ChatInterface: React.FC = () => {
       console.error('Chat error:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to send message');
       setMessages(prev => prev.slice(0, -1));
+      
+      // Stop voice mode on error
+      if (voiceMode) {
+        setVoiceMode(false);
+        stopSpeaking();
+        recognitionRef.current?.abort();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -216,19 +250,8 @@ const ChatInterface: React.FC = () => {
       const transcript = event.results[0][0].transcript;
       setIsRecording(false);
       
-      // Use voice credit
-      const newUses = voiceUsesLeft - 1;
-      setVoiceUsesLeft(newUses);
-      localStorage.setItem('voiceUsesLeft', String(newUses));
-      
-      if (newUses <= 0) {
-        setVoiceMode(false);
-        toast.info('Voice limit reached. Switching to text mode.');
-        return;
-      }
-      
-      // Send message and get voice response (loop continues in sendAndSpeak)
-      await sendAndSpeak(transcript);
+      // Send message and get voice response (access is checked server-side)
+      await sendAndSpeak(transcript, true);
     };
     
     recognition.onerror = (event: any) => {
@@ -244,7 +267,7 @@ const ChatInterface: React.FC = () => {
     recognition.onend = () => {
       setIsRecording(false);
       // If no result was captured and still in voice mode, keep listening
-      if (!hasResult && voiceMode && voiceUsesLeft > 0) {
+      if (!hasResult && voiceMode && isAuthenticated) {
         setTimeout(() => startListening(), 300);
       }
     };
@@ -253,8 +276,10 @@ const ChatInterface: React.FC = () => {
   };
 
   const toggleVoiceMode = async () => {
-    if (voiceUsesLeft <= 0) {
-      toast.error('Voice limit reached. Try again in 24 hours or upgrade to Pro.');
+    // Require authentication for voice mode
+    if (!isAuthenticated) {
+      toast.error('Please sign in to use voice mode');
+      setLoginOpen(true);
       return;
     }
 
@@ -271,10 +296,7 @@ const ChatInterface: React.FC = () => {
       
       try {
         await speakText(greeting);
-        // After greeting, start listening
-        if (voiceUsesLeft > 0) {
-          startListening();
-        }
+        startListening();
       } catch {
         startListening();
       }
@@ -320,10 +342,20 @@ const ChatInterface: React.FC = () => {
             {autoSpeak ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
             <span className="hidden sm:inline">{autoSpeak ? 'Speaking' : 'Muted'}</span>
           </button>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Mic className="h-3 w-3" />
-            <span>{voiceUsesLeft}/5</span>
-          </div>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <User className="h-3 w-3" />
+              <span className="hidden sm:inline">Signed in</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => setLoginOpen(true)}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
+            >
+              <LogIn className="h-3 w-3" />
+              <span>Sign in</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -455,6 +487,9 @@ const ChatInterface: React.FC = () => {
           </Button>
         </div>
       </div>
+      
+      {/* Login Modal */}
+      <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
     </div>
   );
 };

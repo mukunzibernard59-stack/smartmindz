@@ -132,12 +132,45 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_and_log_usage: {
+        Args: { _action_type: string; _free_limit?: number; _user_id: string }
+        Returns: Json
+      }
+      get_daily_usage: {
+        Args: { _action_type: string; _user_id: string }
+        Returns: number
+      }
+      get_user_plan: { Args: { _user_id: string }; Returns: string }
+      has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       payment_status: "pending" | "confirmed" | "failed"
