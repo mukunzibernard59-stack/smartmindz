@@ -1,9 +1,14 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Free tier limits
+const FREE_CHAT_LIMIT = 10;
+const FREE_VOICE_LIMIT = 5;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,7 +16,71 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, language = 'en', country, educationLevel } = await req.json();
+    const authHeader = req.headers.get("Authorization");
+    
+    // Require authentication
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.log("Chat: No auth header");
+      return new Response(
+        JSON.stringify({ error: "Authentication required. Please sign in to continue." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Verify the JWT and get user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.log("Chat: Invalid token", authError?.message);
+      return new Response(
+        JSON.stringify({ error: "Session expired. Please sign in again." }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { messages, language = 'en', country, educationLevel, isVoiceMode = false } = await req.json();
+    
+    const actionType = isVoiceMode ? 'voice' : 'chat';
+    const freeLimit = isVoiceMode ? FREE_VOICE_LIMIT : FREE_CHAT_LIMIT;
+
+    // Check and log usage
+    const { data: accessData, error: accessError } = await supabase.rpc("check_and_log_usage", {
+      _user_id: user.id,
+      _action_type: actionType,
+      _free_limit: freeLimit,
+    });
+
+    if (accessError) {
+      console.error("Chat: Usage check error", accessError);
+      return new Response(
+        JSON.stringify({ error: "Failed to verify access" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!accessData.allowed) {
+      console.log(`Chat: Access denied for ${user.id}, usage: ${accessData.usage_today}/${accessData.limit}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "ACCESS_LIMIT_REACHED",
+          message: isVoiceMode 
+            ? "Your voice access has ended. Please subscribe to continue."
+            : "You've reached your daily limit. Subscribe for unlimited access.",
+          usage_today: accessData.usage_today,
+          limit: accessData.limit,
+        }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Chat: Access granted for ${user.id}, plan: ${accessData.plan}, usage: ${accessData.usage_today}/${accessData.limit}`);
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {

@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Mail, Lock, User, Sparkles, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LoginModalProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab = 'login' }) => {
   const { t } = useLanguage();
+  const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(defaultTab === 'login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -28,17 +30,54 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!email || !password) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+    
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
+    
     setLoading(true);
 
-    // Simulate auth - replace with actual Supabase auth later
-    setTimeout(() => {
-      setLoading(false);
-      toast.success(isLogin ? 'Welcome back!' : 'Account created successfully!');
+    try {
+      if (isLogin) {
+        const { error } = await signIn(email, password);
+        if (error) {
+          if (error.message.includes('Invalid login credentials')) {
+            toast.error('Invalid email or password');
+          } else {
+            toast.error(error.message);
+          }
+          return;
+        }
+        toast.success('Welcome back!');
+      } else {
+        const { error } = await signUp(email, password, name);
+        if (error) {
+          if (error.message.includes('already registered')) {
+            toast.error('This email is already registered. Try signing in.');
+          } else {
+            toast.error(error.message);
+          }
+          return;
+        }
+        toast.success('Account created successfully!');
+      }
+      
       onOpenChange(false);
       setEmail('');
       setPassword('');
       setName('');
-    }, 1000);
+    } catch (error) {
+      toast.error('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
