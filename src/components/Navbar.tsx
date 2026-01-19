@@ -4,11 +4,23 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, Sparkles } from 'lucide-react';
+import { Menu, X, BookOpen, Sparkles, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
   const location = useLocation();
+  const { user, profile, isAuthenticated, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
@@ -28,6 +40,20 @@ const Navbar: React.FC = () => {
   const openSignup = () => {
     setSignupMode(true);
     setLoginModalOpen(true);
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast.error('Failed to sign out');
+    } else {
+      toast.success('Signed out successfully');
+    }
+  };
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
   return (
@@ -65,13 +91,50 @@ const Navbar: React.FC = () => {
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-3">
               <LanguageSelector />
-              <Button variant="ghost" size="sm" onClick={openLogin}>
-                {t('nav.login')}
-              </Button>
-              <Button variant="hero" size="sm" className="gap-2" onClick={openSignup}>
-                <Sparkles className="h-4 w-4" />
-                {t('nav.signup')}
-              </Button>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                      <Avatar className="h-10 w-10 border-2 border-primary/20">
+                        <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.full_name || 'User'} />
+                        <AvatarFallback className="bg-primary text-primary-foreground">
+                          {getInitials(profile?.full_name)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-popover" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{profile?.full_name || 'User'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link to="/pricing" className="cursor-pointer">
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        <span>Upgrade Plan</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sign out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <>
+                  <Button variant="ghost" size="sm" onClick={openLogin}>
+                    {t('nav.login')}
+                  </Button>
+                  <Button variant="hero" size="sm" className="gap-2" onClick={openSignup}>
+                    <Sparkles className="h-4 w-4" />
+                    {t('nav.signup')}
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -106,13 +169,35 @@ const Navbar: React.FC = () => {
                   </Link>
                 ))}
                 <div className="flex gap-2 mt-4 px-4">
-                  <Button variant="outline" className="flex-1" onClick={openLogin}>
-                    {t('nav.login')}
-                  </Button>
-                  <Button variant="hero" className="flex-1 gap-2" onClick={openSignup}>
-                    <Sparkles className="h-4 w-4" />
-                    {t('nav.signup')}
-                  </Button>
+                  {isAuthenticated ? (
+                    <div className="flex items-center justify-between w-full">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border-2 border-primary/20">
+                          <AvatarImage src={profile?.avatar_url || undefined} />
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {getInitials(profile?.full_name)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{profile?.full_name || 'User'}</p>
+                          <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        </div>
+                      </div>
+                      <Button variant="ghost" size="icon" onClick={handleSignOut}>
+                        <LogOut className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Button variant="outline" className="flex-1" onClick={openLogin}>
+                        {t('nav.login')}
+                      </Button>
+                      <Button variant="hero" className="flex-1 gap-2" onClick={openSignup}>
+                        <Sparkles className="h-4 w-4" />
+                        {t('nav.signup')}
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
