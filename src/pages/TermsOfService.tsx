@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { FileText, AlertCircle, CheckCircle, Ban, CreditCard, Calendar } from 'lucide-react';
+import { FileText, AlertCircle, CheckCircle, Ban, Calendar } from 'lucide-react';
 
 const TermsOfService: React.FC = () => {
   return (
@@ -80,15 +80,13 @@ const TermsOfService: React.FC = () => {
 
             <section className="bg-card rounded-xl p-6 border">
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-primary" />
-                Subscriptions & Payments
+                <CheckCircle className="h-5 w-5 text-primary" />
+                Service Access
               </h2>
               <ul className="space-y-2 text-muted-foreground">
-                <li><strong>Free Plan:</strong> Limited daily usage with ads.</li>
-                <li><strong>Pro Plan:</strong> $1.50/month with unlimited access and no ads.</li>
-                <li><strong>Refund Policy:</strong> 2-day money-back guarantee from purchase date.</li>
-                <li><strong>PDF Downloads:</strong> Free users limited to 2 downloads per 24 hours.</li>
-                <li>Subscriptions auto-renew unless cancelled before the billing cycle.</li>
+                <li>All features are provided free of charge to registered users.</li>
+                <li>You may use the service for personal educational purposes.</li>
+                <li>We reserve the right to modify features and functionality at any time.</li>
               </ul>
             </section>
 

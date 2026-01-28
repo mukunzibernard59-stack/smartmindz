@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, Sparkles, LogOut, User } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -29,7 +29,6 @@ const Navbar: React.FC = () => {
     { to: '/', label: t('nav.home') },
     { to: '/learn', label: t('nav.learn') },
     { to: '/quiz', label: t('nav.quiz') },
-    { to: '/pricing', label: t('nav.pricing') },
   ];
 
   const openLogin = () => {
@@ -111,13 +110,6 @@ const Navbar: React.FC = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/pricing" className="cursor-pointer">
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        <span>Upgrade Plan</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Sign out</span>
@@ -129,8 +121,7 @@ const Navbar: React.FC = () => {
                   <Button variant="ghost" size="sm" onClick={openLogin}>
                     {t('nav.login')}
                   </Button>
-                  <Button variant="hero" size="sm" className="gap-2" onClick={openSignup}>
-                    <Sparkles className="h-4 w-4" />
+                  <Button variant="hero" size="sm" onClick={openSignup}>
                     {t('nav.signup')}
                   </Button>
                 </>
@@ -192,8 +183,7 @@ const Navbar: React.FC = () => {
                       <Button variant="outline" className="flex-1" onClick={openLogin}>
                         {t('nav.login')}
                       </Button>
-                      <Button variant="hero" className="flex-1 gap-2" onClick={openSignup}>
-                        <Sparkles className="h-4 w-4" />
+                      <Button variant="hero" className="flex-1" onClick={openSignup}>
                         {t('nav.signup')}
                       </Button>
                     </>

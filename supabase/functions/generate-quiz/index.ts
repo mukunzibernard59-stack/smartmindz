@@ -41,34 +41,7 @@ serve(async (req) => {
     }
 
     const userId = claimsData.claims.sub as string;
-    console.log("Authenticated user:", userId);
-
-    // Check and log usage - enforce limits for free users
-    const { data: accessData, error: accessError } = await supabase.rpc("check_and_log_usage", {
-      _user_id: userId,
-      _action_type: "quiz",
-      _free_limit: 10
-    });
-
-    if (accessError) {
-      console.error("Usage check error:", accessError);
-      return new Response(
-        JSON.stringify({ error: "Failed to check access" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!accessData?.allowed) {
-      return new Response(
-        JSON.stringify({ 
-          error: "Daily limit reached",
-          message: accessData?.message || "ACCESS_LIMIT_REACHED",
-          usage_today: accessData?.usage_today,
-          limit: accessData?.limit
-        }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    console.log("Authenticated user:", userId, "- all features free");
 
     const { subject, difficulty, numQuestions, language = 'en', topic = '' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

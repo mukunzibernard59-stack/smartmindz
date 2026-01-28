@@ -33,7 +33,6 @@ const ChatInterface: React.FC = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
   const [autoSpeak, setAutoSpeak] = useState(true);
-  const [usageInfo, setUsageInfo] = useState<{ usage_today: number; limit: number } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
@@ -134,15 +133,6 @@ const ChatInterface: React.FC = () => {
 
       if (!resp.ok) {
         const error = await resp.json();
-        
-        // Handle access limit reached
-        if (resp.status === 403 && error.error === 'ACCESS_LIMIT_REACHED') {
-          setVoiceMode(false);
-          stopSpeaking();
-          recognitionRef.current?.abort();
-          setUsageInfo({ usage_today: error.usage_today, limit: error.limit });
-          throw new Error(error.message);
-        }
         
         // Handle auth errors
         if (resp.status === 401) {
