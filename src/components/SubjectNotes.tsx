@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   ChevronLeft, ChevronRight, BookOpen, Loader2, X, Volume2, VolumeX, 
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-
+import { useAuth } from '@/hooks/useAuth';
 interface Term {
   term: string;
   definition: string;
@@ -63,6 +63,7 @@ const NOTES_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-no
 
 const SubjectNotes: React.FC<SubjectNotesProps> = ({ subject, onClose }) => {
   const { language } = useLanguage();
+  const { getAccessToken, isAuthenticated } = useAuth();
   const [notes, setNotes] = useState<NotesData | null>(null);
   const [currentSection, setCurrentSection] = useState<ViewSection>('intro');
   const [currentPage, setCurrentPage] = useState(0);
@@ -76,43 +77,60 @@ const SubjectNotes: React.FC<SubjectNotesProps> = ({ subject, onClose }) => {
   const [showResult, setShowResult] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
 
-  useEffect(() => {
-    const fetchNotes = async () => {
-      setIsLoading(true);
-      setError(null);
+  const fetchNotes = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const response = await fetch(NOTES_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({ subject, language }),
-        });
-
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || 'Failed to generate notes');
-        }
-
-        const data = await response.json();
-        if (data.pages && data.pages.length > 0) {
-          setNotes(data);
-        } else {
-          throw new Error('No notes generated');
-        }
-      } catch (err) {
-        console.error('Notes generation error:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load notes');
-        toast.error('Failed to generate notes. Please try again.');
-      } finally {
-        setIsLoading(false);
+    try {
+      // Get user's JWT token for authentication
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        throw new Error('Please sign in to generate notes');
       }
-    };
 
+      const response = await fetch(NOTES_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ subject, language }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        if (response.status === 401) {
+          throw new Error('Please sign in to generate notes');
+        }
+        if (response.status === 403) {
+          throw new Error(err.error || 'Daily limit reached. Upgrade for unlimited access.');
+        }
+        throw new Error(err.error || 'Failed to generate notes');
+      }
+
+      const data = await response.json();
+      if (data.pages && data.pages.length > 0) {
+        setNotes(data);
+      } else {
+        throw new Error('No notes generated');
+      }
+    } catch (err) {
+      console.error('Notes generation error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load notes');
+      toast.error(err instanceof Error ? err.message : 'Failed to generate notes. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [subject, language, getAccessToken]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      setError('Please sign in to generate notes');
+      return;
+    }
     fetchNotes();
-  }, [subject, language]);
+  }, [subject, language, isAuthenticated, fetchNotes]);
 
   useEffect(() => {
     return () => {
