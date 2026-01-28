@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4">Product</h4>
             <ul className="space-y-2">
-              {['Features', 'Pricing', 'Subjects', 'Voice Mode', 'Mobile App'].map((item) => (
+              {['Features', 'Subjects', 'Voice Mode', 'Mobile App'].map((item) => (
                 <li key={item}>
                   <a href="#" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
                     {item}

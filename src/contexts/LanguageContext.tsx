@@ -112,10 +112,10 @@ const translations: Translations = {
     sw: 'Hali ya Sauti',
   },
   'features.voice.desc': {
-    en: 'Talk to Smart Mind using your voice - 5 free uses daily',
-    fr: 'Parlez à Smart Mind par la voix - 5 utilisations gratuites par jour',
-    rw: 'Vugana na Smart Mind ukoresha ijwi - 5 ku munsi',
-    sw: 'Zungumza na Smart Mind kwa sauti - matumizi 5 bure kwa siku',
+    en: 'Talk to Smart Mind using your voice - unlimited access',
+    fr: 'Parlez à Smart Mind par la voix - accès illimité',
+    rw: 'Vugana na Smart Mind ukoresha ijwi - nta mpaka',
+    sw: 'Zungumza na Smart Mind kwa sauti - upatikanaji usio na kikomo',
   },
   'features.quiz.title': {
     en: 'Smart Quizzes',
@@ -160,10 +160,10 @@ const translations: Translations = {
     sw: 'Maelezo ya PDF',
   },
   'features.pdf.desc': {
-    en: 'Download study notes as PDF - 2 free downloads daily',
-    fr: 'Téléchargez les notes en PDF - 2 téléchargements gratuits par jour',
-    rw: 'Kuramo inyandiko PDF - 2 ku munsi',
-    sw: 'Pakua maelezo kama PDF - upakuaji 2 bure kwa siku',
+    en: 'Download study notes as PDF - unlimited downloads',
+    fr: 'Téléchargez les notes en PDF - téléchargements illimités',
+    rw: 'Kuramo inyandiko PDF - nta mpaka',
+    sw: 'Pakua maelezo kama PDF - upakuaji usio na kikomo',
   },
   // Subjects
   'subjects.title': {

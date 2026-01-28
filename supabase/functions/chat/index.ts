@@ -6,10 +6,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Free tier limits
-const FREE_CHAT_LIMIT = 10;
-const FREE_VOICE_LIMIT = 5;
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -46,40 +42,7 @@ serve(async (req) => {
 
     const { messages, language = 'en', country, educationLevel, isVoiceMode = false } = await req.json();
     
-    const actionType = isVoiceMode ? 'voice' : 'chat';
-    const freeLimit = isVoiceMode ? FREE_VOICE_LIMIT : FREE_CHAT_LIMIT;
-
-    // Check and log usage
-    const { data: accessData, error: accessError } = await supabase.rpc("check_and_log_usage", {
-      _user_id: user.id,
-      _action_type: actionType,
-      _free_limit: freeLimit,
-    });
-
-    if (accessError) {
-      console.error("Chat: Usage check error", accessError);
-      return new Response(
-        JSON.stringify({ error: "Failed to verify access" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!accessData.allowed) {
-      console.log(`Chat: Access denied for ${user.id}, usage: ${accessData.usage_today}/${accessData.limit}`);
-      return new Response(
-        JSON.stringify({ 
-          error: "ACCESS_LIMIT_REACHED",
-          message: isVoiceMode 
-            ? "Your voice access has ended. Please subscribe to continue."
-            : "You've reached your daily limit. Subscribe for unlimited access.",
-          usage_today: accessData.usage_today,
-          limit: accessData.limit,
-        }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    console.log(`Chat: Access granted for ${user.id}, plan: ${accessData.plan}, usage: ${accessData.usage_today}/${accessData.limit}`);
+    console.log(`Chat: Access granted for ${user.id} - all features free`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     

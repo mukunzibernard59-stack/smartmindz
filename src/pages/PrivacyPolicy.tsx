@@ -64,7 +64,6 @@ const PrivacyPolicy: React.FC = () => {
               <ul className="space-y-2 text-muted-foreground">
                 <li><strong>AI Service Providers:</strong> To process your learning queries (data is anonymized).</li>
                 <li><strong>Analytics Services:</strong> To understand usage patterns and improve the platform.</li>
-                <li><strong>Payment Processors:</strong> To handle subscription payments securely.</li>
               </ul>
             </section>
 

@@ -102,9 +102,6 @@ const SubjectNotes: React.FC<SubjectNotesProps> = ({ subject, onClose }) => {
         if (response.status === 401) {
           throw new Error('Please sign in to generate notes');
         }
-        if (response.status === 403) {
-          throw new Error(err.error || 'Daily limit reached. Upgrade for unlimited access.');
-        }
         throw new Error(err.error || 'Failed to generate notes');
       }
 

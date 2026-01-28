@@ -67,9 +67,6 @@ const QuizCard: React.FC<QuizCardProps> = ({
         if (response.status === 401) {
           throw new Error('Please sign in to generate quizzes');
         }
-        if (response.status === 403) {
-          throw new Error(error.error || 'Daily limit reached. Upgrade for unlimited access.');
-        }
         throw new Error(error.error || 'Failed to generate quiz');
       }
 
