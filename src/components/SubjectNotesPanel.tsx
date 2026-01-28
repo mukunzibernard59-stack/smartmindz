@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { 
   BookOpen, Loader2, Volume2, VolumeX, 
@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
-
+import { useAuth } from '@/hooks/useAuth';
 interface Term {
   term: string;
   definition: string;
@@ -37,6 +37,7 @@ const NOTES_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-no
 
 const SubjectNotesPanel: React.FC<SubjectNotesPanelProps> = ({ subject }) => {
   const { language } = useLanguage();
+  const { getAccessToken, isAuthenticated } = useAuth();
   const [notes, setNotes] = useState<NotesData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,23 +48,35 @@ const SubjectNotesPanel: React.FC<SubjectNotesPanelProps> = ({ subject }) => {
     more: false
   });
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     setNotes(null);
 
     try {
+      // Get user's JWT token for authentication
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        throw new Error('Please sign in to generate notes');
+      }
+
       const response = await fetch(NOTES_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ subject, language }),
       });
 
       if (!response.ok) {
         const err = await response.json();
+        if (response.status === 401) {
+          throw new Error('Please sign in to generate notes');
+        }
+        if (response.status === 403) {
+          throw new Error(err.error || 'Daily limit reached. Upgrade for unlimited access.');
+        }
         throw new Error(err.error || 'Failed to generate notes');
       }
 
@@ -81,13 +94,18 @@ const SubjectNotesPanel: React.FC<SubjectNotesPanelProps> = ({ subject }) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [subject, language, getAccessToken]);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoading(false);
+      setError('Please sign in to generate notes');
+      return;
+    }
     if (subject) {
       fetchNotes();
     }
-  }, [subject, language]);
+  }, [subject, language, isAuthenticated, fetchNotes]);
 
   useEffect(() => {
     return () => {
