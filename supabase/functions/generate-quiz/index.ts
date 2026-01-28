@@ -1,8 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -11,6 +12,64 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Authentication required" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    
+    // Create Supabase client with user's token for authentication
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } }
+    });
+
+    // Verify user token using getClaims
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      console.error("Auth error:", claimsError);
+      return new Response(
+        JSON.stringify({ error: "Invalid or expired token" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const userId = claimsData.claims.sub as string;
+    console.log("Authenticated user:", userId);
+
+    // Check and log usage - enforce limits for free users
+    const { data: accessData, error: accessError } = await supabase.rpc("check_and_log_usage", {
+      _user_id: userId,
+      _action_type: "quiz",
+      _free_limit: 10
+    });
+
+    if (accessError) {
+      console.error("Usage check error:", accessError);
+      return new Response(
+        JSON.stringify({ error: "Failed to check access" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    if (!accessData?.allowed) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Daily limit reached",
+          message: accessData?.message || "ACCESS_LIMIT_REACHED",
+          usage_today: accessData?.usage_today,
+          limit: accessData?.limit
+        }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { subject, difficulty, numQuestions, language = 'en', topic = '' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
@@ -46,6 +105,8 @@ Rules:
 - "correct" is the 0-indexed position of the correct answer
 - Explanations should be educational and brief
 - Vary question types and difficulty appropriately`;
+
+    console.log("Generating quiz for:", subject, "user:", userId);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -114,6 +175,8 @@ Rules:
       console.error("Failed to parse quiz JSON:", jsonMatch[0].substring(0, 500));
       throw new Error("Invalid quiz data format");
     }
+
+    console.log("Successfully generated quiz for:", subject, "user:", userId);
 
     return new Response(JSON.stringify(quizData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

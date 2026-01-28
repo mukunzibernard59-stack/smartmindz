@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Check, X, ArrowRight, Trophy, Brain, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Question {
   id: number;
@@ -26,6 +27,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
   numQuestions = 10,
   language = 'en'
 }) => {
+  const { getAccessToken, isAuthenticated } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -35,49 +37,66 @@ const QuizCard: React.FC<QuizCardProps> = ({
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  useEffect(() => {
-    const fetchQuiz = async () => {
-      setIsLoadingQuiz(true);
-      setLoadError(null);
-      
-      try {
-        const response = await fetch(QUIZ_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          },
-          body: JSON.stringify({
-            subject,
-            difficulty,
-            numQuestions,
-            language,
-          }),
-        });
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.error || 'Failed to generate quiz');
-        }
-
-        const data = await response.json();
-        
-        if (data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
-          setQuestions(data.questions);
-        } else {
-          throw new Error('No questions generated');
-        }
-      } catch (error) {
-        console.error('Quiz generation error:', error);
-        setLoadError(error instanceof Error ? error.message : 'Failed to load quiz');
-        toast.error('Failed to generate quiz. Please try again.');
-      } finally {
-        setIsLoadingQuiz(false);
+  const fetchQuiz = useCallback(async () => {
+    setIsLoadingQuiz(true);
+    setLoadError(null);
+    
+    try {
+      // Get user's JWT token for authentication
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        throw new Error('Please sign in to generate quizzes');
       }
-    };
 
+      const response = await fetch(QUIZ_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          subject,
+          difficulty,
+          numQuestions,
+          language,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        if (response.status === 401) {
+          throw new Error('Please sign in to generate quizzes');
+        }
+        if (response.status === 403) {
+          throw new Error(error.error || 'Daily limit reached. Upgrade for unlimited access.');
+        }
+        throw new Error(error.error || 'Failed to generate quiz');
+      }
+
+      const data = await response.json();
+      
+      if (data.questions && Array.isArray(data.questions) && data.questions.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        throw new Error('No questions generated');
+      }
+    } catch (error) {
+      console.error('Quiz generation error:', error);
+      setLoadError(error instanceof Error ? error.message : 'Failed to load quiz');
+      toast.error(error instanceof Error ? error.message : 'Failed to generate quiz. Please try again.');
+    } finally {
+      setIsLoadingQuiz(false);
+    }
+  }, [subject, difficulty, numQuestions, language, getAccessToken]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setIsLoadingQuiz(false);
+      setLoadError('Please sign in to generate quizzes');
+      return;
+    }
     fetchQuiz();
-  }, [subject, difficulty, numQuestions, language]);
+  }, [isAuthenticated, fetchQuiz]);
 
   const question = questions[currentQuestion];
 
@@ -139,7 +158,7 @@ const QuizCard: React.FC<QuizCardProps> = ({
         </div>
         <h3 className="text-xl font-bold mb-2">Failed to Load Quiz</h3>
         <p className="text-muted-foreground mb-6">{loadError}</p>
-        <Button onClick={() => window.location.reload()} variant="hero">
+        <Button onClick={() => fetchQuiz()} variant="hero">
           Try Again
         </Button>
       </div>
