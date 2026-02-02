@@ -113,7 +113,7 @@ const Navbar: React.FC = () => {
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Install App</p>
+                      <p>Install Smart Mind — Think Smarter Instantly</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
