@@ -54,10 +54,10 @@ const Hero: React.FC = () => {
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-3 animate-slide-up" style={{ animationDelay: '0.4s' }}>
             {[
-              { icon: MessageCircle, label: 'AI Chat' },
-              { icon: Mic, label: 'Voice Mode' },
-              { icon: Brain, label: 'Smart Quizzes' },
-              { icon: BookOpen, label: '100+ Subjects' },
+              { icon: Brain, label: 'Focus & Clarity' },
+              { icon: MessageCircle, label: 'AI Productivity' },
+              { icon: Mic, label: 'Voice Learning' },
+              { icon: BookOpen, label: 'Mental Growth' },
             ].map((item, index) => (
               <div
                 key={item.label}
@@ -68,6 +68,11 @@ const Hero: React.FC = () => {
               </div>
             ))}
           </div>
+
+          {/* SEO Tagline */}
+          <p className="mt-8 text-sm text-muted-foreground font-medium animate-slide-up" style={{ animationDelay: '0.5s' }}>
+            🚀 Think Faster. Learn Smarter. Perform Better.
+          </p>
         </div>
 
         {/* Floating Cards Preview */}
