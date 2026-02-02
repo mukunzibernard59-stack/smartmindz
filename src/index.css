@@ -239,3 +239,13 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--muted-foreground) / 0.5);
 }
+
+/* Hide Lovable Badge */
+a[href*="lovable.dev"][target="_blank"],
+div[class*="lovable"],
+iframe[src*="lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

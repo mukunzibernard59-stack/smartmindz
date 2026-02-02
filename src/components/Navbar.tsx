@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, User } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, Download } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { usePWAInstall } from '@/hooks/usePWAInstall';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
@@ -24,6 +26,14 @@ const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
+  const { isInstallable, install } = usePWAInstall();
+
+  const handleInstall = async () => {
+    const installed = await install();
+    if (installed) {
+      toast.success('App installed successfully!');
+    }
+  };
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
@@ -89,6 +99,25 @@ const Navbar: React.FC = () => {
 
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-3">
+              {isInstallable && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={handleInstall}
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        <Download className="h-5 w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Install App</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               <LanguageSelector />
               {isAuthenticated ? (
                 <DropdownMenu>
