@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Twitter, Facebook, Instagram, Youtube } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -17,20 +17,9 @@ const Footer: React.FC = () => {
                 Smart<span className="text-primary">Mind</span>
               </span>
             </Link>
-            <p className="text-muted-foreground text-sm mb-4">
+            <p className="text-muted-foreground text-sm">
               Fast AI learning - direct answers for all subjects.
             </p>
-            <div className="flex gap-3">
-              {[Twitter, Facebook, Instagram, Youtube].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="w-9 h-9 rounded-lg bg-secondary flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Links */}
