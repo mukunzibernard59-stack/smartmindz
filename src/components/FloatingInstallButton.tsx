@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download } from 'lucide-react';
+import { MonitorDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { toast } from 'sonner';
@@ -27,7 +27,7 @@ const FloatingInstallButton: React.FC = () => {
             className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground animate-bounce-soft"
             aria-label="Install Smart Mind"
           >
-            <Download className="h-6 w-6" />
+            <MonitorDown className="h-6 w-6" />
           </Button>
         </TooltipTrigger>
         <TooltipContent side="left" className="bg-foreground text-background">

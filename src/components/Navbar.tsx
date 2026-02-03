@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, Download } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
                         onClick={handleInstall}
                         className="text-muted-foreground hover:text-primary"
                       >
-                        <Download className="h-5 w-5" />
+                        <MonitorDown className="h-5 w-5" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
