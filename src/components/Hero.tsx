@@ -21,18 +21,20 @@ const Hero: React.FC = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm mb-8 animate-slide-up">
             <Sparkles className="h-4 w-4" />
-            {t('hero.badge')}
+            #1 AI-Powered Fast Learning Platform
           </div>
 
-          {/* Main Heading */}
+          {/* Main Heading - SEO optimized H1 */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            {t('hero.title')}{' '}
-            <span className="text-gradient-primary">{t('hero.titleAccent')}</span>
+            Smart Mind App:{' '}
+            <span className="text-gradient-primary">Learn Faster with AI</span>
           </h1>
 
-          {/* Subtitle */}
+          {/* Subtitle - SEO optimized intro */}
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            {t('hero.subtitle')}
+            The <strong>Smart Mind app</strong> is your ultimate <strong>fast learning platform</strong> powered by AI. 
+            Learn faster online with personalized lessons, boost your memory, improve focus, and master new skills 
+            efficiently. Perfect for students, professionals, and lifelong learners.
           </p>
 
           {/* CTA Buttons */}
@@ -54,10 +56,10 @@ const Hero: React.FC = () => {
           {/* Feature Pills */}
           <div className="flex flex-wrap justify-center gap-3 animate-slide-up" style={{ animationDelay: '0.4s' }}>
             {[
-              { icon: Brain, label: 'Focus & Clarity' },
-              { icon: MessageCircle, label: 'AI Productivity' },
-              { icon: Mic, label: 'Voice Learning' },
-              { icon: BookOpen, label: 'Mental Growth' },
+              { icon: Brain, label: 'AI Learning App' },
+              { icon: MessageCircle, label: 'Personalized Learning' },
+              { icon: Mic, label: 'Voice-Powered Study' },
+              { icon: BookOpen, label: 'Skill Mastery' },
             ].map((item, index) => (
               <div
                 key={item.label}
@@ -71,7 +73,7 @@ const Hero: React.FC = () => {
 
           {/* SEO Tagline */}
           <p className="mt-8 text-sm text-muted-foreground font-medium animate-slide-up" style={{ animationDelay: '0.5s' }}>
-            🚀 Think Faster. Learn Smarter. Perform Better.
+            🚀 The smart learning app trusted by thousands to learn new skills faster
           </p>
         </div>
 
