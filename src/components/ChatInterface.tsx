@@ -182,8 +182,9 @@ const ChatInterface: React.FC = () => {
         }
       }
 
-      // Speak response if autoSpeak is on or in voice mode
-      if (assistantContent && (autoSpeak || voiceMode)) {
+      // Only speak response if this was a voice input AND (autoSpeak is on or in voice mode)
+      // Text input should NOT trigger read-aloud
+      if (assistantContent && isVoice && (autoSpeak || voiceMode)) {
         await speakText(assistantContent);
         // Continue listening if in voice mode and still has access
         if (voiceMode && isAuthenticated) {
@@ -208,9 +209,15 @@ const ChatInterface: React.FC = () => {
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
+    
+    // Stop any ongoing speech when user sends text
+    stopSpeaking();
+    
     const text = input;
     setInput('');
-    await sendAndSpeak(text);
+    
+    // Send message but don't auto-speak response (text input = no read aloud)
+    await sendAndSpeak(text, false);
   };
 
   const startListening = () => {
@@ -466,8 +473,20 @@ const ChatInterface: React.FC = () => {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              // Stop any ongoing speech when user starts typing
+              if (e.target.value && isSpeaking) {
+                stopSpeaking();
+              }
+            }}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+            onFocus={() => {
+              // Stop speech when user focuses on input (intends to type)
+              if (isSpeaking) {
+                stopSpeaking();
+              }
+            }}
             placeholder={voiceMode ? 'Voice mode active...' : t('chat.placeholder')}
             disabled={isLoading || voiceMode}
             className="flex-1 px-3 py-2 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm"
