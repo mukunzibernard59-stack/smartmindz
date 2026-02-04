@@ -4,7 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, MonitorDown } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown, Code2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -39,6 +39,7 @@ const Navbar: React.FC = () => {
     { to: '/', label: t('nav.home') },
     { to: '/learn', label: t('nav.learn') },
     { to: '/quiz', label: t('nav.quiz') },
+    { to: '/dev', label: 'Dev Mode', icon: Code2 },
   ];
 
   const openLogin = () => {
