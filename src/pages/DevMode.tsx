@@ -98,6 +98,38 @@ const DevMode: React.FC = () => {
     setShowTerminal(false);
   };
 
+  const handleFinishLesson = () => {
+    if (!selectedLanguage) return;
+    
+    // Mark lesson as complete and award XP
+    completeLesson(selectedLanguage.id, currentLessonId, 25);
+    
+    toast({
+      title: "Lesson Complete! 🎉",
+      description: "Great job! Moving to the next lesson.",
+    });
+    
+    // Auto-navigate to next lesson
+    const currentTopicLessons = currentTopic?.lessons || [];
+    const currentLessonIndex = currentTopicLessons.findIndex(l => l.id === currentLessonId);
+    
+    if (currentLessonIndex < currentTopicLessons.length - 1) {
+      // Go to next lesson in same topic
+      const nextLesson = currentTopicLessons[currentLessonIndex + 1];
+      setCurrentLessonId(nextLesson.id);
+    } else {
+      // Go to first lesson of next topic
+      const currentTopicIndex = topics.findIndex(t => t.id === currentTopicId);
+      if (currentTopicIndex < topics.length - 1) {
+        const nextTopic = topics[currentTopicIndex + 1];
+        setCurrentTopicId(nextTopic.id);
+        if (nextTopic.lessons.length > 0) {
+          setCurrentLessonId(nextTopic.lessons[0].id);
+        }
+      }
+    }
+  };
+
   const handleCodeExecute = (code: string, output: string, aiFeedback?: AIFeedback[]) => {
     if (!selectedLanguage) return;
 
@@ -342,6 +374,7 @@ const DevMode: React.FC = () => {
                           content={lessonContent}
                           languageName={selectedLanguage.name}
                           onRunCode={handleOpenTerminal}
+                          onFinish={handleFinishLesson}
                           isActive
                         />
                       )}
