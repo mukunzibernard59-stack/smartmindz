@@ -9,11 +9,13 @@ import Challenges from '@/components/devmode/Challenges';
 import CareerGuidance from '@/components/devmode/CareerGuidance';
 import Portfolio from '@/components/devmode/Portfolio';
 import CrossLanguageTranslator from '@/components/devmode/CrossLanguageTranslator';
+import LessonNotes from '@/components/devmode/LessonNotes';
 import { useDevMode } from '@/hooks/useDevMode';
 import { getTopicsForLanguage } from '@/data/curriculum';
+import { getLessonContent } from '@/data/lessonContent';
 import { ProgrammingLanguage, AIFeedback, Challenge } from '@/types/devMode';
 import { 
-  Code, BookOpen, Trophy, Clock, Target, Folder, ArrowLeftRight, 
+  Code, BookOpen, Trophy, Clock, Target, Folder, ArrowLeftRight,
   Compass, ChevronLeft, Menu, X, Sparkles, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,6 +31,8 @@ const DevMode: React.FC = () => {
   const [currentLessonId, setCurrentLessonId] = useState('intro');
   const [activeTab, setActiveTab] = useState('learn');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [terminalCode, setTerminalCode] = useState('');
   const { toast } = useToast();
 
   const {
@@ -49,6 +53,9 @@ const DevMode: React.FC = () => {
 
   const topics = selectedLanguage ? getTopicsForLanguage(selectedLanguage.id) : [];
   const currentProgress = selectedLanguage ? progress[selectedLanguage.id] : null;
+  const lessonContent = selectedLanguage ? getLessonContent(selectedLanguage.id, currentLessonId) : null;
+  const currentTopic = topics.find(t => t.id === currentTopicId);
+  const currentLesson = currentTopic?.lessons.find(l => l.id === currentLessonId);
 
   useEffect(() => {
     if (selectedLanguage) {
@@ -56,9 +63,17 @@ const DevMode: React.FC = () => {
     }
   }, [selectedLanguage, initializeLanguageProgress]);
 
+  useEffect(() => {
+    setShowTerminal(false);
+    if (lessonContent) {
+      setTerminalCode(lessonContent.starterCode);
+    }
+  }, [currentLessonId, lessonContent?.starterCode]);
+
   const handleSelectLanguage = (language: ProgrammingLanguage) => {
     setSelectedLanguage(language);
     setActiveTab('learn');
+    setShowTerminal(false);
     toast({
       title: `Welcome to ${language.name}!`,
       description: "Let's start your coding journey",
@@ -69,6 +84,18 @@ const DevMode: React.FC = () => {
     setCurrentTopicId(topicId);
     setCurrentLessonId(lessonId);
     setSidebarOpen(false);
+    setShowTerminal(false);
+  };
+
+  const handleOpenTerminal = () => {
+    if (lessonContent) {
+      setTerminalCode(lessonContent.starterCode);
+    }
+    setShowTerminal(true);
+  };
+
+  const handleBackToNotes = () => {
+    setShowTerminal(false);
   };
 
   const handleCodeExecute = (code: string, output: string, aiFeedback?: AIFeedback[]) => {
@@ -293,22 +320,97 @@ const DevMode: React.FC = () => {
               </TabsList>
 
               <TabsContent value="learn" className="space-y-4">
-                <div className="grid lg:grid-cols-3 gap-4">
-                  <div className="lg:col-span-2">
-                    <CodeEditor
-                      language={selectedLanguage.id}
-                      onExecute={handleCodeExecute}
-                    />
-                  </div>
-                  <div>
-                    {currentProgress && (
-                      <ProgressTracker
-                        progress={currentProgress}
-                        languageName={selectedLanguage.name}
-                      />
-                    )}
-                  </div>
+                {/* Breadcrumb navigation */}
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>{currentTopic?.title || 'Topic'}</span>
+                  <span>→</span>
+                  <span className="text-foreground font-medium">{currentLesson?.title || 'Lesson'}</span>
+                  {showTerminal && (
+                    <>
+                      <span>→</span>
+                      <span className="text-primary font-medium">Practice</span>
+                    </>
+                  )}
                 </div>
+
+                {!showTerminal ? (
+                  /* Notes View */
+                  <div className="grid lg:grid-cols-3 gap-4">
+                    <div className="lg:col-span-2">
+                      {lessonContent && (
+                        <LessonNotes
+                          content={lessonContent}
+                          languageName={selectedLanguage.name}
+                          onRunCode={handleOpenTerminal}
+                          isActive
+                        />
+                      )}
+                    </div>
+                    <div>
+                      {currentProgress && (
+                        <ProgressTracker
+                          progress={currentProgress}
+                          languageName={selectedLanguage.name}
+                        />
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* Terminal View */
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleBackToNotes}
+                        className="gap-2"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                        Back to Notes
+                      </Button>
+                      <Badge variant="secondary" className="gap-1">
+                        <Code className="h-3 w-3" />
+                        Practice Mode
+                      </Badge>
+                    </div>
+                    <div className="grid lg:grid-cols-3 gap-4">
+                      <div className="lg:col-span-2">
+                        <CodeEditor
+                          language={selectedLanguage.id}
+                          onExecute={handleCodeExecute}
+                          initialCode={terminalCode}
+                        />
+                      </div>
+                      <div className="space-y-4">
+                        {currentProgress && (
+                          <ProgressTracker
+                            progress={currentProgress}
+                            languageName={selectedLanguage.name}
+                          />
+                        )}
+                        {/* Quick reference from notes */}
+                        {lessonContent && (
+                          <Card>
+                            <CardContent className="p-4">
+                              <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                <BookOpen className="h-4 w-4 text-primary" />
+                                Quick Reference
+                              </h4>
+                              <ul className="text-xs text-muted-foreground space-y-1">
+                                {lessonContent.keyPoints.slice(0, 3).map((point, i) => (
+                                  <li key={i} className="flex items-start gap-2">
+                                    <span className="text-primary">•</span>
+                                    {point}
+                                  </li>
+                                ))}
+                              </ul>
+                            </CardContent>
+                          </Card>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="challenges">

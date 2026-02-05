@@ -11,10 +11,11 @@ interface CodeEditorProps {
   language: string;
   onExecute: (code: string, output: string, aiFeedback?: AIFeedback[]) => void;
   onAIFeedback?: (feedback: AIFeedback[]) => void;
+  initialCode?: string;
 }
 
-const CodeEditor: React.FC<CodeEditorProps> = ({ language, onExecute, onAIFeedback }) => {
-  const [code, setCode] = useState('');
+const CodeEditor: React.FC<CodeEditorProps> = ({ language, onExecute, onAIFeedback, initialCode }) => {
+  const [code, setCode] = useState(initialCode || '');
   const [output, setOutput] = useState('');
   const [isExecuting, setIsExecuting] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -47,10 +48,10 @@ const CodeEditor: React.FC<CodeEditorProps> = ({ language, onExecute, onAIFeedba
   };
 
   useEffect(() => {
-    setCode(getStarterCode(language));
+    setCode(initialCode || getStarterCode(language));
     setOutput('');
     setAiFeedback([]);
-  }, [language]);
+  }, [language, initialCode]);
 
   const executeCode = async () => {
     if (!code.trim()) {
