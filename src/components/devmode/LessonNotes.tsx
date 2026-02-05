@@ -10,10 +10,13 @@
    content: LessonContent;
    languageName: string;
    onRunCode: () => void;
+  onFinish: () => void;
    isActive?: boolean;
  }
  
- const LessonNotes: React.FC<LessonNotesProps> = ({ content, languageName, onRunCode, isActive }) => {
+const LessonNotes: React.FC<LessonNotesProps> = ({ content, languageName, onRunCode, onFinish, isActive }) => {
+  const hasPractice = content.hasPractice !== false && content.starterCode.trim().length > 0;
+  
    return (
      <Card className={`h-full flex flex-col ${isActive ? 'ring-2 ring-primary' : ''}`}>
        <CardHeader className="pb-3 border-b border-border">
@@ -87,37 +90,71 @@
                </section>
              )}
  
-             {/* Code Preview */}
-             <section>
-               <h3 className="text-sm font-semibold text-success mb-3 flex items-center gap-2">
-                 <Code2 className="h-4 w-4" />
-                 Code Example Preview
-               </h3>
-               <div className="bg-muted rounded-lg p-3 overflow-x-auto">
-                 <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap">
-                   {content.starterCode.slice(0, 200)}
-                   {content.starterCode.length > 200 && '...'}
-                 </pre>
-               </div>
-             </section>
+            {/* Code Preview - only show if has practice */}
+            {hasPractice && (
+              <section>
+                <h3 className="text-sm font-semibold text-success mb-3 flex items-center gap-2">
+                  <Code2 className="h-4 w-4" />
+                  Code Example Preview
+                </h3>
+                <div className="bg-muted rounded-lg p-3 overflow-x-auto">
+                  <pre className="text-xs font-mono text-muted-foreground whitespace-pre-wrap">
+                    {content.starterCode.slice(0, 200)}
+                    {content.starterCode.length > 200 && '...'}
+                  </pre>
+                </div>
+              </section>
+            )}
+
+            {/* Next Steps for theory-only lessons */}
+            {!hasPractice && (
+              <section>
+                <h3 className="text-sm font-semibold text-success mb-3 flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Ready to Continue
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Great job reading through this introduction! Click "Finish" below to mark this lesson complete and move to the next topic where you'll start coding.
+                </p>
+              </section>
+            )}
            </div>
          </ScrollArea>
        </CardContent>
  
-       {/* Run Code Button */}
+      {/* Action Button - Run Code or Finish */}
        <div className="p-4 border-t border-border bg-secondary/30">
-         <Button 
-           onClick={onRunCode} 
-           className="w-full gap-2" 
-           variant="hero"
-           size="lg"
-         >
-           <Play className="h-4 w-4" />
-           Open Terminal & Practice
-         </Button>
-         <p className="text-xs text-center text-muted-foreground mt-2">
-           Start coding with the example above
-         </p>
+        {hasPractice ? (
+          <>
+            <Button 
+              onClick={onRunCode} 
+              className="w-full gap-2" 
+              variant="hero"
+              size="lg"
+            >
+              <Play className="h-4 w-4" />
+              Open Terminal & Practice
+            </Button>
+            <p className="text-xs text-center text-muted-foreground mt-2">
+              Start coding with the example above
+            </p>
+          </>
+        ) : (
+          <>
+            <Button 
+              onClick={onFinish} 
+              className="w-full gap-2" 
+              variant="default"
+              size="lg"
+            >
+              <CheckCircle2 className="h-4 w-4" />
+              Finish & Continue
+            </Button>
+            <p className="text-xs text-center text-muted-foreground mt-2">
+              Mark as complete and proceed to next lesson
+            </p>
+          </>
+        )}
        </div>
      </Card>
    );

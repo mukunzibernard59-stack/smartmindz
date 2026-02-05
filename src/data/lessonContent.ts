@@ -8,6 +8,7 @@
    starterCode: string;
    expectedOutput?: string;
    tips?: string[];
+  hasPractice?: boolean;
  }
  
  export const getLessonContent = (languageId: string, lessonId: string): LessonContent => {
@@ -73,6 +74,7 @@
      ],
      starterCode: getStarterCodeForLesson(languageId, lessonId),
      tips: ['Take your time to understand each concept', 'Try modifying the code to see different results'],
+    hasPractice: lessonId !== 'intro',
    };
  };
  
@@ -144,16 +146,17 @@
        keyPoints: [
          'JavaScript runs in web browsers and on servers',
          'It makes websites interactive and dynamic',
-         'You can use console.log() to print output',
+        'Created in 1995 by Brendan Eich',
          'JavaScript files end with .js extension',
+        'Used by 97.8% of all websites',
        ],
-       starterCode: '// Welcome to JavaScript!\n// Let\'s write your first program\n\n// Use console.log() to print messages\nconsole.log("Hello, World!");\n\n// Try printing your name below:\nconsole.log("My name is ___");',
-       expectedOutput: 'Hello, World!\nMy name is ___',
+      starterCode: '',
        tips: [
-         'Press Run Code to see the output',
-         'Try changing the message inside the quotes',
-         'Strings (text) must be wrapped in quotes',
+        'JavaScript is beginner-friendly and powerful',
+        'You will start coding in the next lesson',
+        'No prior programming experience needed',
        ],
+      hasPractice: false,
      },
      vars: {
        lessonId: 'vars',
