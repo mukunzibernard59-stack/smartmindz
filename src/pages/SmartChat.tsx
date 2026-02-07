@@ -322,6 +322,9 @@ const SmartChat: React.FC = () => {
       summarize: 'Please summarize: ',
       translate: 'Please translate to [language]: ',
       solve: 'Please solve this step by step: ',
+      brainstorm: 'Please brainstorm ideas for: ',
+      rewrite: 'Please rewrite this text to be clearer: ',
+      simplify: 'Please simplify this so it is easier to understand: ',
     };
 
     setInput(actionPrompts[action] || '');

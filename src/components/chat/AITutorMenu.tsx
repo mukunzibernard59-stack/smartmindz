@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Brain,
   Image,
@@ -8,6 +8,10 @@ import {
   BookOpen,
   ChevronDown,
   Sparkles,
+  Wand2,
+  PenTool,
+  MessageCircle,
+  Lightbulb,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuGroup,
 } from '@/components/ui/dropdown-menu';
 
 interface AITutorMenuProps {
@@ -24,7 +29,7 @@ interface AITutorMenuProps {
   onOpenImageGenerator: () => void;
 }
 
-const AI_ACTIONS = [
+const QUICK_ACTIONS = [
   {
     id: 'explain',
     label: 'Explain This',
@@ -38,16 +43,37 @@ const AI_ACTIONS = [
     description: 'Create a brief summary',
   },
   {
+    id: 'solve',
+    label: 'Solve Problem',
+    icon: Calculator,
+    description: 'Step-by-step solution',
+  },
+];
+
+const MORE_TOOLS = [
+  {
     id: 'translate',
     label: 'Translate',
     icon: Languages,
     description: 'Translate to another language',
   },
   {
-    id: 'solve',
-    label: 'Solve Problem',
-    icon: Calculator,
-    description: 'Step-by-step solution',
+    id: 'brainstorm',
+    label: 'Brainstorm Ideas',
+    icon: Lightbulb,
+    description: 'Generate creative ideas',
+  },
+  {
+    id: 'rewrite',
+    label: 'Rewrite Text',
+    icon: PenTool,
+    description: 'Improve or rephrase text',
+  },
+  {
+    id: 'simplify',
+    label: 'Simplify',
+    icon: MessageCircle,
+    description: 'Make it easier to understand',
   },
 ];
 
@@ -64,32 +90,58 @@ const AITutorMenu: React.FC<AITutorMenuProps> = ({
           <ChevronDown className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-56">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="flex items-center gap-2">
           <Brain className="h-4 w-4 text-primary" />
-          AI Assistant Actions
+          Quick Actions
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {AI_ACTIONS.map((action) => (
-          <DropdownMenuItem
-            key={action.id}
-            onClick={() => onSelectAction(action.id)}
-            className="flex items-start gap-3 py-2"
-          >
-            <action.icon className="h-4 w-4 mt-0.5 text-muted-foreground" />
-            <div>
-              <p className="font-medium text-sm">{action.label}</p>
-              <p className="text-xs text-muted-foreground">{action.description}</p>
-            </div>
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuGroup>
+          {QUICK_ACTIONS.map((action) => (
+            <DropdownMenuItem
+              key={action.id}
+              onClick={() => onSelectAction(action.id)}
+              className="flex items-start gap-3 py-2 cursor-pointer"
+            >
+              <action.icon className="h-4 w-4 mt-0.5 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">{action.label}</p>
+                <p className="text-xs text-muted-foreground">{action.description}</p>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel className="flex items-center gap-2">
+          <Wand2 className="h-4 w-4 text-primary" />
+          More Tools
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          {MORE_TOOLS.map((action) => (
+            <DropdownMenuItem
+              key={action.id}
+              onClick={() => onSelectAction(action.id)}
+              className="flex items-start gap-3 py-2 cursor-pointer"
+            >
+              <action.icon className="h-4 w-4 mt-0.5 text-muted-foreground" />
+              <div>
+                <p className="font-medium text-sm">{action.label}</p>
+                <p className="text-xs text-muted-foreground">{action.description}</p>
+              </div>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
 
         <DropdownMenuSeparator />
 
         <DropdownMenuItem
           onClick={onOpenImageGenerator}
-          className="flex items-start gap-3 py-2"
+          className="flex items-start gap-3 py-2 cursor-pointer"
         >
           <Image className="h-4 w-4 mt-0.5 text-primary" />
           <div>
