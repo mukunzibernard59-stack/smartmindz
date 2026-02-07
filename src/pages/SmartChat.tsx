@@ -11,7 +11,7 @@ import LoginModal from '@/components/LoginModal';
 import ChatHistorySidebar from '@/components/chat/ChatHistorySidebar';
 import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
-import AITutorMenu from '@/components/chat/AITutorMenu';
+
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
@@ -409,11 +409,6 @@ const SmartChat: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <AITutorMenu
-              onSelectAction={handleAIAction}
-              onOpenImageGenerator={() => setImageGenOpen(true)}
-            />
-
             <button
               onClick={() => setAutoSpeak(!autoSpeak)}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors ${
