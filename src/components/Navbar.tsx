@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
     { to: '/', label: t('nav.home') },
     { to: '/learn', label: t('nav.learn') },
     { to: '/quiz', label: t('nav.quiz') },
-    { to: '/chat', label: 'AI Chat', icon: MessageSquare },
+    { to: '/chat', label: 'AI Tutor', icon: MessageSquare },
     { to: '/dev', label: 'Dev Mode', icon: Code2 },
   ];
 
