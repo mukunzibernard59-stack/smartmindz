@@ -3,12 +3,14 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import SEOContent from '@/components/SEOContent';
 import Footer from '@/components/Footer';
+import ParticlesBackground from '@/components/ParticlesBackground';
 
 const Index: React.FC = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <ParticlesBackground />
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <Hero />
         <SEOContent />
       </main>
