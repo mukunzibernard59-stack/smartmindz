@@ -2,130 +2,225 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Play, Sparkles, BookOpen, Brain, MessageCircle, Mic } from 'lucide-react';
+import { ArrowRight, Brain, Sparkles, BookOpen, MessageCircle, Mic, FlaskConical, Atom, Box } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Spotlight } from '@/components/ui/spotlight';
 
 const Hero: React.FC = () => {
   const { t } = useLanguage();
 
+  const subjectCards = [
+    { icon: '📐', label: 'Mathematics', color: 'from-cyan-500/20 to-cyan-600/10' },
+    { icon: '🔬', label: 'Science', color: 'from-teal-500/20 to-teal-600/10' },
+    { icon: '📖', label: 'English', color: 'from-sky-500/20 to-sky-600/10' },
+    { icon: '🏛️', label: 'History', color: 'from-indigo-500/20 to-indigo-600/10' },
+  ];
+
   return (
-    <section className="relative min-h-[90vh] flex items-center pt-20 pb-16 overflow-hidden gradient-hero">
-      {/* Background decorations */}
+    <section className="relative min-h-screen flex items-center pt-20 pb-16 overflow-hidden">
+      {/* Space background effects */}
+      <div className="absolute inset-0 gradient-hero" />
+      
+      {/* Animated glow orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-soft" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-soft" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute top-20 left-[10%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] animate-pulse-soft" />
+        <div className="absolute bottom-20 right-[10%] w-[400px] h-[400px] bg-accent/5 rounded-full blur-[100px] animate-pulse-soft" style={{ animationDelay: '1.5s' }} />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/3 rounded-full blur-[150px]" />
+        
+        {/* Light streaks */}
+        <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent" />
+        <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-accent/8 to-transparent" />
+      </div>
+
+      {/* Floating science icons */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          animate={{ y: [-10, 10, -10], rotate: [0, 10, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[15%] right-[15%] text-primary/20"
+        >
+          <Atom className="h-12 w-12" />
+        </motion.div>
+        <motion.div
+          animate={{ y: [10, -10, 10], rotate: [0, -10, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute top-[25%] left-[8%] text-accent/20"
+        >
+          <FlaskConical className="h-10 w-10" />
+        </motion.div>
+        <motion.div
+          animate={{ y: [-8, 12, -8], rotate: [0, 15, 0] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          className="absolute bottom-[30%] right-[8%] text-primary/15"
+        >
+          <Box className="h-8 w-8" />
+        </motion.div>
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium text-sm mb-8 animate-slide-up">
-            <Sparkles className="h-4 w-4" />
-            #1 AI-Powered Fast Learning Platform
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          {/* Left content */}
+          <div className="max-w-2xl">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/20 text-primary font-medium text-sm mb-8"
+            >
+              <Sparkles className="h-4 w-4" />
+              #1 AI-Powered Fast Learning Platform
+            </motion.div>
+
+            {/* Main Heading */}
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Learn Smarter.{' '}
+              <span className="text-gradient-primary text-glow">Think Faster.</span>{' '}
+              <span className="inline-block">🚀</span>
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-lg sm:text-xl text-muted-foreground max-w-xl mb-10 leading-relaxed"
+            >
+              Get instant answers for <strong className="text-foreground">Math, Science, English</strong>, and more 
+              with the power of AI. Your personal tutor that never sleeps.
+            </motion.p>
+
+            {/* CTA Buttons - Glassmorphism */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 mb-12"
+            >
+              <Link to="/learn">
+                <Button variant="hero" size="xl" className="gap-2 w-full sm:w-auto glow-cyan hover:scale-[1.05] transition-all duration-300">
+                  {t('hero.cta')}
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
+              <Link to="/quiz">
+                <Button 
+                  size="xl" 
+                  className="gap-2 w-full sm:w-auto glass border-primary/20 text-foreground hover:border-primary/40 hover:scale-[1.05] transition-all duration-300"
+                >
+                  <Brain className="h-5 w-5 text-primary" />
+                  {t('hero.ctaSecondary')}
+                </Button>
+              </Link>
+            </motion.div>
+
+            {/* Feature Pills */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-wrap gap-3"
+            >
+              {[
+                { icon: Brain, label: 'AI Learning' },
+                { icon: MessageCircle, label: 'Personalized' },
+                { icon: Mic, label: 'Voice Study' },
+                { icon: BookOpen, label: 'All Subjects' },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm"
+                >
+                  <item.icon className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-muted-foreground font-medium">{item.label}</span>
+                </div>
+              ))}
+            </motion.div>
           </div>
 
-          {/* Main Heading - SEO optimized H1 */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Smart Mind App:{' '}
-            <span className="text-gradient-primary">Learn Faster with AI</span>
-          </h1>
-
-          {/* Subtitle - SEO optimized intro */}
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-            The <strong>Smart Mind app</strong> is your ultimate <strong>fast learning platform</strong> powered by AI. 
-            Learn faster online with personalized lessons, boost your memory, improve focus, and master new skills 
-            efficiently. Perfect for students, professionals, and lifelong learners.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-            <Link to="/learn">
-              <Button variant="hero" size="xl" className="gap-2 w-full sm:w-auto">
-                {t('hero.cta')}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/quiz">
-              <Button variant="hero-secondary" size="xl" className="gap-2 w-full sm:w-auto">
-                <Brain className="h-5 w-5" />
-                {t('hero.ctaSecondary')}
-              </Button>
-            </Link>
-          </div>
-
-          {/* Feature Pills */}
-          <div className="flex flex-wrap justify-center gap-3 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-            {[
-              { icon: Brain, label: 'AI Learning App' },
-              { icon: MessageCircle, label: 'Personalized Learning' },
-              { icon: Mic, label: 'Voice-Powered Study' },
-              { icon: BookOpen, label: 'Skill Mastery' },
-            ].map((item, index) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-border shadow-sm"
+          {/* Right - 3D Brain Orb */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.3 }}
+            className="relative hidden lg:flex items-center justify-center"
+          >
+            <Spotlight size={400} className="z-10" />
+            
+            {/* Glowing orb */}
+            <div className="relative w-[400px] h-[400px]">
+              {/* Outer glow ring */}
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 via-accent/10 to-transparent animate-pulse-soft blur-xl" />
+              
+              {/* Main orb */}
+              <motion.div
+                animate={{ y: [-10, 10, -10] }}
+                transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-8 rounded-full bg-gradient-to-br from-primary/30 via-card to-accent/20 border border-primary/20 flex items-center justify-center shadow-[0_0_80px_-10px_hsl(187_85%_53%/0.4)]"
               >
-                <item.icon className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">{item.label}</span>
-              </div>
-            ))}
-          </div>
+                <Brain className="h-24 w-24 text-primary animate-pulse-soft" />
+              </motion.div>
 
-          {/* SEO Tagline */}
-          <p className="mt-8 text-sm text-muted-foreground font-medium animate-slide-up" style={{ animationDelay: '0.5s' }}>
-            🚀 The smart learning app trusted by thousands to learn new skills faster
-          </p>
+              {/* Orbiting particles */}
+              {[0, 1, 2, 3, 4, 5].map((i) => (
+                <motion.div
+                  key={i}
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 10 + i * 2, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-0"
+                  style={{ transform: `rotate(${i * 60}deg)` }}
+                >
+                  <div
+                    className="absolute w-2 h-2 rounded-full bg-primary/60"
+                    style={{ top: '5%', left: '50%', boxShadow: '0 0 10px hsl(187 85% 53% / 0.5)' }}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Floating Cards Preview */}
-        <div className="relative mt-16 max-w-5xl mx-auto">
-          <div className="relative bg-card rounded-3xl border border-border shadow-lg overflow-hidden">
-            {/* Chat Preview Header */}
-            <div className="flex items-center gap-3 px-6 py-4 border-b border-border bg-secondary/30">
-              <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-destructive/60" />
-                <div className="w-3 h-3 rounded-full bg-warning/60" />
-                <div className="w-3 h-3 rounded-full bg-success/60" />
+        {/* Subject Cards - Glassmorphism */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20"
+        >
+          {subjectCards.map((card, index) => (
+            <motion.div
+              key={card.label}
+              whileHover={{ y: -8, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 300 }}
+              className={`relative p-6 rounded-2xl glass cursor-pointer group overflow-hidden`}
+            >
+              {/* Inner glow */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
+              
+              <div className="relative z-10">
+                <span className="text-3xl mb-3 block">{card.icon}</span>
+                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">{card.label}</h3>
+                <p className="text-xs text-muted-foreground mt-1">AI-Powered Lessons</p>
               </div>
-              <span className="text-sm font-medium text-muted-foreground">Smart Mind Chat</span>
-            </div>
+            </motion.div>
+          ))}
+        </motion.div>
 
-            {/* Chat Preview Content */}
-            <div className="p-6 space-y-4">
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Brain className="h-4 w-4 text-primary" />
-                </div>
-                <div className="bg-secondary rounded-2xl rounded-tl-md px-4 py-3 max-w-md">
-                  <p className="text-sm">{t('chat.welcome')}</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 justify-end">
-                <div className="bg-primary text-primary-foreground rounded-2xl rounded-tr-md px-4 py-3 max-w-md">
-                  <p className="text-sm">How do I solve quadratic equations?</p>
-                </div>
-              </div>
-
-              <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                  <Brain className="h-4 w-4 text-primary" />
-                </div>
-                <div className="bg-secondary rounded-2xl rounded-tl-md px-4 py-3 max-w-lg">
-                  <p className="text-sm">Great question! A quadratic equation has the form ax² + bx + c = 0. Let me show you the steps...</p>
-                  <div className="mt-2 flex gap-2">
-                    <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-md">Step-by-step</span>
-                    <span className="px-2 py-1 bg-success/10 text-success text-xs font-medium rounded-md">Examples included</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Decorative floating elements */}
-          <div className="absolute -top-6 -right-6 bg-accent/20 w-24 h-24 rounded-2xl rotate-12 animate-float hidden lg:block" />
-          <div className="absolute -bottom-6 -left-6 bg-primary/20 w-32 h-32 rounded-2xl -rotate-12 animate-float hidden lg:block" style={{ animationDelay: '0.5s' }} />
-        </div>
+        {/* SEO Tagline */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-10 text-center text-sm text-muted-foreground font-medium"
+        >
+          🚀 The smart learning app trusted by thousands to learn new skills faster
+        </motion.p>
       </div>
     </section>
   );
