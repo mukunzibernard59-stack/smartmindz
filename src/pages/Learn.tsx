@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import ChatInterface from '@/components/ChatInterface';
 import SubjectNotes from '@/components/SubjectNotes';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { BookOpen, Brain, Lightbulb, Target, Search, ArrowRight, ArrowLeft } from 'lucide-react';
+import { BookOpen, Brain, Lightbulb, Target, Search, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Learn: React.FC = () => {
-  const navigate = useNavigate();
   const { t } = useLanguage();
   const [subjectSearch, setSubjectSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
@@ -43,12 +41,7 @@ const Learn: React.FC = () => {
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            {/* Back + Header */}
-            <div className="mb-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-            </div>
+            {/* Header */}
             <div className="text-center mb-8">
               <h1 className="text-3xl sm:text-4xl font-bold mb-3">
                 {t('nav.learn')}

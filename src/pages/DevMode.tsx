@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import LanguageSelector from '@/components/devmode/LanguageSelector';
 import LessonSidebar from '@/components/devmode/LessonSidebar';
@@ -17,7 +16,7 @@ import { getLessonContent } from '@/data/lessonContent';
 import { ProgrammingLanguage, AIFeedback, Challenge } from '@/types/devMode';
 import { 
   Code, BookOpen, Trophy, Clock, Target, Folder, ArrowLeftRight,
-  Compass, ChevronLeft, Menu, X, Sparkles, Zap, ArrowLeft
+  Compass, ChevronLeft, Menu, X, Sparkles, Zap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,7 +26,6 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useToast } from '@/hooks/use-toast';
 
 const DevMode: React.FC = () => {
-  const navigate = useNavigate();
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage | null>(null);
   const [currentTopicId, setCurrentTopicId] = useState('basics');
   const [currentLessonId, setCurrentLessonId] = useState('intro');
@@ -162,11 +160,6 @@ const DevMode: React.FC = () => {
         <Navbar />
         <main className="pt-24 pb-12">
           <div className="container mx-auto px-4">
-            <div className="mb-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-            </div>
             {/* Hero Section */}
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6">

@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import QuizCard from '@/components/QuizCard';
 import SubjectNotesPanel from '@/components/SubjectNotesPanel';
@@ -27,12 +26,10 @@ import {
   Landmark,
   TrendingUp,
   BookOpen,
-  ArrowRight,
-  ArrowLeft
+  ArrowRight
 } from 'lucide-react';
 
 const Quiz: React.FC = () => {
-  const navigate = useNavigate();
   const { t, language } = useLanguage();
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [customSubject, setCustomSubject] = useState<string>('');
@@ -157,12 +154,6 @@ const Quiz: React.FC = () => {
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            {/* Back Button */}
-            <div className="mb-4">
-              <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2">
-                <ArrowLeft className="h-4 w-4" /> Back
-              </Button>
-            </div>
             {/* Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent font-medium text-sm mb-4">

@@ -1,22 +1,14 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { FileText, AlertCircle, CheckCircle, Ban, Calendar, ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { FileText, AlertCircle, CheckCircle, Ban, Calendar } from 'lucide-react';
 
 const TermsOfService: React.FC = () => {
-  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-1 py-16 px-4">
         <div className="container mx-auto max-w-4xl">
-          <div className="mb-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2">
-              <ArrowLeft className="h-4 w-4" /> Back
-            </Button>
-          </div>
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <FileText className="h-6 w-6 text-primary" />
