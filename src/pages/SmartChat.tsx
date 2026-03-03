@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
+import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -11,13 +11,14 @@ import LoginModal from '@/components/LoginModal';
 import ChatHistorySidebar from '@/components/chat/ChatHistorySidebar';
 import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
-import AITutorMenu from '@/components/chat/AITutorMenu';
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
+import { useNavigate } from 'react-router-dom';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-image`;
 
 const SmartChat: React.FC = () => {
+  const navigate = useNavigate();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, getAccessToken } = useAuth();
   const {
@@ -412,6 +413,15 @@ const SmartChat: React.FC = () => {
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => navigate(-1)}
+              className="h-9 w-9"
+              title="Go back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="md:hidden"
             >
@@ -427,10 +437,6 @@ const SmartChat: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <AITutorMenu
-              onSelectAction={handleAIAction}
-              onOpenImageGenerator={() => setImageGenOpen(true)}
-            />
 
             <button
               onClick={() => setAutoSpeak(!autoSpeak)}
