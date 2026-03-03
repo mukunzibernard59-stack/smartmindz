@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import FloatingInstallButton from "@/components/FloatingInstallButton";
+import UpdateNotification from "@/components/UpdateNotification";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
@@ -23,6 +24,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <FloatingInstallButton />
+        <UpdateNotification />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

@@ -331,29 +331,47 @@ const SmartChat: React.FC = () => {
   };
 
   const handleGenerateImage = async (prompt: string, style: string): Promise<string | null> => {
-    try {
-      const accessToken = await getAccessToken();
+    const MAX_RETRIES = 3;
+    let lastError: Error | null = null;
 
-      const resp = await fetch(IMAGE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken || ''}`,
-        },
-        body: JSON.stringify({ prompt, style }),
-      });
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const accessToken = await getAccessToken();
 
-      if (!resp.ok) {
-        const error = await resp.json();
-        throw new Error(error.error || 'Failed to generate image');
+        const resp = await fetch(IMAGE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken || ''}`,
+          },
+          body: JSON.stringify({ prompt, style }),
+        });
+
+        if (!resp.ok) {
+          const error = await resp.json();
+          // Don't retry on 401/402 (auth/billing issues)
+          if (resp.status === 401 || resp.status === 402) {
+            throw new Error(error.error || 'Failed to generate image');
+          }
+          throw new Error(error.error || 'Failed to generate image');
+        }
+
+        const data = await resp.json();
+        return data.imageUrl;
+      } catch (error) {
+        lastError = error instanceof Error ? error : new Error('Unknown error');
+        console.warn(`Image generation attempt ${attempt}/${MAX_RETRIES} failed:`, lastError.message);
+
+        if (attempt < MAX_RETRIES) {
+          // Exponential backoff: 1s, 2s
+          await new Promise(r => setTimeout(r, attempt * 1000));
+          toast.info(`Retrying image generation (${attempt + 1}/${MAX_RETRIES})...`);
+        }
       }
-
-      const data = await resp.json();
-      return data.imageUrl;
-    } catch (error) {
-      console.error('Image generation error:', error);
-      throw error;
     }
+
+    console.error('Image generation failed after all retries');
+    throw lastError || new Error('Image generation failed. Please try again.');
   };
 
   const handlePasteText = (text: string) => {
