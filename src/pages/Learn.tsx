@@ -5,6 +5,7 @@ import SubjectNotes from '@/components/SubjectNotes';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { BookOpen, Brain, Lightbulb, Target, Search, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import BackButton from '@/components/BackButton';
 
 const Learn: React.FC = () => {
   const { t } = useLanguage();
@@ -40,6 +41,9 @@ const Learn: React.FC = () => {
       <Navbar />
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <div className="max-w-4xl mx-auto">
             {/* Header */}
             <div className="text-center mb-8">
