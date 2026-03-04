@@ -10,7 +10,7 @@ import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
 import DevMode from "./pages/DevMode";
-import SmartChat from "./pages/SmartChat";
+// SmartChat merged into Learn
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
