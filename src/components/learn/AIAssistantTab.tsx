@@ -314,7 +314,7 @@ const AIAssistantTab: React.FC = () => {
             </div>
           )}
           <div className="flex gap-2">
-            <FileUploadMenu onUploadFiles={uploadFiles} onPasteText={handlePasteText} isProcessing={isProcessing} />
+            <FileUploadMenu files={files} isProcessing={isProcessing} onUpload={(fl) => uploadFiles(fl)} onRemoveFile={removeFile} onPasteText={handlePasteText} />
             <Button variant={voiceMode ? 'destructive' : 'secondary'} size="icon"
               onClick={toggleVoiceMode} className={`h-9 w-9 ${voiceMode ? 'animate-pulse' : ''}`}
               disabled={isLoading && !voiceMode}>
@@ -332,7 +332,7 @@ const AIAssistantTab: React.FC = () => {
         </div>
       </div>
 
-      <AIImageGenerator open={imageGenOpen} onOpenChange={setImageGenOpen} onGenerate={handleGenerateImage} />
+      <AIImageGenerator isOpen={imageGenOpen} onClose={() => setImageGenOpen(false)} onGenerate={handleGenerateImage} />
       <LoginModal open={loginOpen} onOpenChange={setLoginOpen} defaultTab="login" />
     </div>
   );
