@@ -11,6 +11,7 @@ import {
   PenTool,
   MessageCircle,
   Lightbulb,
+  Video,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -119,6 +120,17 @@ const AITutorMenu: React.FC<AITutorMenuProps> = ({
           <div>
             <p className="font-medium text-sm">Generate Image</p>
             <p className="text-xs text-muted-foreground">Create AI images from text</p>
+          </div>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => onSelectAction('video')}
+          className="flex items-start gap-3 py-2 cursor-pointer hover:bg-accent"
+        >
+          <Video className="h-4 w-4 mt-0.5 text-primary" />
+          <div>
+            <p className="font-medium text-sm">Generate Video</p>
+            <p className="text-xs text-muted-foreground">Create video scripts & plans</p>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>

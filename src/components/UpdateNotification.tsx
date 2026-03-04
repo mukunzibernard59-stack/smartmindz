@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const APP_VERSION = '2.6.0';
+const APP_VERSION = '3.0.0';
 const VERSION_KEY = 'smartmind_last_seen_version';
 
 const UPDATES = [
-  'Back button added on every page for easy navigation',
-  'Improved page transitions and layout',
-  'Enhanced update notification system',
+  'Navigation simplified: Home, Learn, Quizzes, Dev Mode',
+  'AI Assistant & AI Tutor merged into Learn workspace',
+  'New Generate Video feature with full script production',
+  'Intelligent retry logic for stable AI responses',
+  'Enhanced Dev Mode with improved IDE experience',
 ];
 
 const UpdateNotification: React.FC = () => {
