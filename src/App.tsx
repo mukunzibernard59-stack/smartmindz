@@ -31,7 +31,7 @@ const App = () => (
             <Route path="/learn" element={<Learn />} />
             <Route path="/quiz" element={<Quiz />} />
             <Route path="/dev" element={<DevMode />} />
-            <Route path="/chat" element={<SmartChat />} />
+            <Route path="/chat" element={<Learn />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
