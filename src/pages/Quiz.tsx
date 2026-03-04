@@ -5,6 +5,7 @@ import SubjectNotesPanel from '@/components/SubjectNotesPanel';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import BackButton from '@/components/BackButton';
 import { 
   Calculator, 
   FlaskConical, 
@@ -153,6 +154,9 @@ const Quiz: React.FC = () => {
       <Navbar />
       <main className="pt-24 pb-12">
         <div className="container mx-auto px-4">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <div className="max-w-6xl mx-auto">
             {/* Header */}
             <div className="text-center mb-8">

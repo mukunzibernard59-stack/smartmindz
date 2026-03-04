@@ -1,14 +1,18 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import BackButton from '@/components/BackButton';
 import { Shield, Eye, Lock, Users, Mail, Calendar } from 'lucide-react';
 
 const PrivacyPolicy: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-1 py-16 px-4">
+      <main className="flex-1 pt-24 py-16 px-4">
         <div className="container mx-auto max-w-4xl">
+          <div className="mb-4">
+            <BackButton />
+          </div>
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Shield className="h-6 w-6 text-primary" />

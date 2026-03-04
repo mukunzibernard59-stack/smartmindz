@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
+import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useChatHistory } from '@/hooks/useChatHistory';
@@ -18,6 +19,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const IMAGE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-image`;
 
 const SmartChat: React.FC = () => {
+  const navigate = useNavigate();
   const { t, language } = useLanguage();
   const { user, isAuthenticated, getAccessToken } = useAuth();
   const {
@@ -409,6 +411,14 @@ const SmartChat: React.FC = () => {
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
           <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import BackButton from '@/components/BackButton';
 import Navbar from '@/components/Navbar';
 import LanguageSelector from '@/components/devmode/LanguageSelector';
 import LessonSidebar from '@/components/devmode/LessonSidebar';
@@ -160,6 +161,9 @@ const DevMode: React.FC = () => {
         <Navbar />
         <main className="pt-24 pb-12">
           <div className="container mx-auto px-4">
+            <div className="mb-4">
+              <BackButton />
+            </div>
             {/* Hero Section */}
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6">

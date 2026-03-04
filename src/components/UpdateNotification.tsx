@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const APP_VERSION = '2.5.0';
+const APP_VERSION = '2.6.0';
 const VERSION_KEY = 'smartmind_last_seen_version';
 
 const UPDATES = [
-  'Unified AI Tutor & Chat in one menu',
-  'Image generation with smart retry',
-  'Futuristic space-themed redesign',
+  'Back button added on every page for easy navigation',
+  'Improved page transitions and layout',
+  'Enhanced update notification system',
 ];
 
 const UpdateNotification: React.FC = () => {
