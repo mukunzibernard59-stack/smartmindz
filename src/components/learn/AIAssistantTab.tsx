@@ -187,6 +187,13 @@ const AIAssistantTab: React.FC = () => {
       translate: 'Please translate to [language]: ', solve: 'Please solve step by step: ',
       brainstorm: 'Please brainstorm ideas for: ', rewrite: 'Please rewrite clearly: ',
       simplify: 'Please simplify: ',
+      'build-app': 'Generate a detailed app-building prompt for: ',
+      'design-letter': 'Write a professional letter for: ',
+      'video-text': 'Create a text-to-video prompt for: ',
+      'video-image': 'Describe an image-to-video animation for: ',
+      'video-animation': 'Create an AI animation concept for: ',
+      'video-script': 'Write a detailed video script for: ',
+      'video-cinematic': 'Create a cinematic video production plan for: ',
     };
     setInput(prompts[action] || '');
   };
