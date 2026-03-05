@@ -20,10 +20,10 @@ const translations: Translations = {
     sw: 'Nyumbani',
   },
   'nav.learn': {
-    en: 'AI Tutor',
-    fr: 'Tuteur IA',
-    rw: 'Umwarimu AI',
-    sw: 'Mwalimu AI',
+    en: 'Learn',
+    fr: 'Apprendre',
+    rw: 'Kwiga',
+    sw: 'Jifunze',
   },
   'nav.quiz': {
     en: 'Quizzes',
