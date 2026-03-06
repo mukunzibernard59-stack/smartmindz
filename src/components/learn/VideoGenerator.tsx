@@ -278,9 +278,9 @@ ${voiceover ? `Voiceover notes: ${voiceover}` : ''}`;
               {isGeneratingVideo ? (
                 <><Loader2 className="h-4 w-4 animate-spin" /> Creating Video...</>
               ) : (
-                <><Sparkles className="h-4 w-4" /> Generate Video</>
-              )}
-            </Button>
+              <><Sparkles className="h-4 w-4" /> Generate Visual</>
+            )}
+          </Button>
           </div>
 
           {/* Feature cards */}
@@ -304,7 +304,7 @@ ${voiceover ? `Voiceover notes: ${voiceover}` : ''}`;
           <div className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-secondary/30">
             <span className="text-sm font-medium flex items-center gap-2">
               <Video className="h-4 w-4 text-primary" />
-              {outputMode === 'video' ? 'Video Preview' : 'Production Plan'}
+              {outputMode === 'video' ? 'AI Visual Preview' : 'Production Plan'}
             </span>
             <div className="flex items-center gap-1.5">
               {scriptContent && outputMode === 'script' && (
@@ -314,7 +314,7 @@ ${voiceover ? `Voiceover notes: ${voiceover}` : ''}`;
               )}
               {videoUrl && outputMode === 'video' && (
                 <Button variant="ghost" size="sm" asChild className="gap-1.5 h-7 text-xs">
-                  <a href={videoUrl} download="ai-video.mp4">
+                  <a href={videoUrl} download="ai-visual.png" target="_blank" rel="noopener noreferrer">
                     <Download className="h-3.5 w-3.5" /> Download
                   </a>
                 </Button>
@@ -349,20 +349,30 @@ ${voiceover ? `Voiceover notes: ${voiceover}` : ''}`;
               </div>
             )}
 
-            {/* Video Output */}
+            {/* Video Output - AI Generated Visual */}
             {outputMode === 'video' && videoUrl && (
               <div className="space-y-4">
-                <div className="rounded-lg overflow-hidden bg-black aspect-video">
-                  <video
+                <div className="rounded-lg overflow-hidden bg-black aspect-video relative group">
+                  <img
                     src={videoUrl}
-                    controls
+                    alt="AI Generated Visual"
                     className="w-full h-full object-contain"
-                    autoPlay
                   />
+                  <div className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-md backdrop-blur-sm">
+                    AI Generated
+                  </div>
                 </div>
+                <p className="text-xs text-muted-foreground text-center">
+                  AI-generated visual based on your prompt. Real-time video rendering requires an external video API (e.g. Runway ML).
+                </p>
                 <div className="flex items-center justify-center gap-2">
                   <Button variant="outline" size="sm" onClick={generateVideo} disabled={isLoading} className="gap-1.5">
                     <RotateCcw className="h-3.5 w-3.5" /> Regenerate
+                  </Button>
+                  <Button variant="outline" size="sm" asChild className="gap-1.5">
+                    <a href={videoUrl} download="ai-visual.png" target="_blank" rel="noopener noreferrer">
+                      <Download className="h-3.5 w-3.5" /> Download
+                    </a>
                   </Button>
                 </div>
               </div>
