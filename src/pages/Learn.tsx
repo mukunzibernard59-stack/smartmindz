@@ -2,8 +2,12 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import BackButton from '@/components/BackButton';
 import LearnTabs from '@/components/learn/LearnTabs';
+import BannerAd from '@/components/ads/BannerAd';
+import { getAdConfig } from '@/lib/adManager';
 
 const Learn: React.FC = () => {
+  const adConfig = getAdConfig();
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -22,6 +26,10 @@ const Learn: React.FC = () => {
               </p>
             </div>
             <LearnTabs />
+            {/* Banner Ad at bottom of Learn page */}
+            <div className="mt-6">
+              <BannerAd slot={adConfig.web.bannerLearn} />
+            </div>
           </div>
         </div>
       </main>
