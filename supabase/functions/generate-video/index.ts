@@ -151,6 +151,11 @@ serve(async (req) => {
     if (!createResponse.ok) {
       const errBody = await createResponse.text();
       console.error("Runway create task failed:", createResponse.status, errBody);
+      if (createResponse.status === 400 && errBody.includes("credits")) {
+        return new Response(JSON.stringify({ error: "Runway credits exhausted. Please add credits to your Runway account at https://app.runwayml.com" }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       if (createResponse.status === 401 || createResponse.status === 403) {
         return new Response(JSON.stringify({ error: "Invalid Runway API key. Please check your API key." }), {
           status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
