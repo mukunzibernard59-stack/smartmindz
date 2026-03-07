@@ -1,0 +1,16 @@
+{
+  "appId": "app.lovable.eebaf703d71f4cf9913725fe26e56357",
+  "appName": "smartmindz",
+  "webDir": "dist",
+  "server": {
+    "url": "https://eebaf703-d71f-4cf9-9137-25fe26e56357.lovableproject.com?forceHideBadge=true",
+    "cleartext": true
+  },
+  "plugins": {
+    "AdMob": {
+      "appId": "ca-app-pub-0000000000000000~0000000000",
+      "testDeviceIds": ["YOUR_TEST_DEVICE_ID"],
+      "initializeForTesting": true
+    }
+  }
+}
