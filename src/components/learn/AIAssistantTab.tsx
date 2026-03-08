@@ -19,7 +19,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 const AIAssistantTab: React.FC = () => {
   const { language } = useLanguage();
-  const { user, isAuthenticated, getAccessToken } = useAuth();
+  const { user, profile, isAuthenticated, getAccessToken } = useAuth();
   const {
     activeSession, groupedSessions, activeSessionId,
     addMessage, updateLastMessage, switchSession,
@@ -298,7 +298,7 @@ const AIAssistantTab: React.FC = () => {
           {messages.map((m, i) => {
             const isLatestAssistant = m.role === 'assistant' && m.content !== '' && 
               i === messages.map((msg, idx) => msg.role === 'assistant' && msg.content !== '' ? idx : -1).filter(x => x >= 0).pop();
-            return <ChatMessage key={m.id} message={m} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
+            return <ChatMessage key={m.id} message={m} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} userAvatarUrl={profile?.avatar_url} userInitials={profile?.full_name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) || 'U'} />;
           })}
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-3 animate-fade-in">

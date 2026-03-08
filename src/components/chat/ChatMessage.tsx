@@ -3,15 +3,18 @@ import { Brain, User, File, Image } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import type { ChatMessage as ChatMessageType } from '@/hooks/useChatHistory';
 import TTSControls from './TTSControls';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatMessageProps {
   message: ChatMessageType;
   language?: string;
   autoRead?: boolean;
   isLatestAssistant?: boolean;
+  userAvatarUrl?: string | null;
+  userInitials?: string;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', autoRead = false, isLatestAssistant = false }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', autoRead = false, isLatestAssistant = false, userAvatarUrl, userInitials = 'U' }) => {
   const showTTS = message.role === 'assistant' && message.content && isLatestAssistant;
 
   return (
@@ -87,9 +90,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', aut
       </div>
 
       {message.role === 'user' && (
-        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-          <User className="h-4 w-4 text-accent" />
-        </div>
+        <Avatar className="h-8 w-8 flex-shrink-0 border border-accent/30">
+          <AvatarImage src={userAvatarUrl || undefined} alt="You" />
+          <AvatarFallback className="bg-accent/20 text-accent text-xs">{userInitials}</AvatarFallback>
+        </Avatar>
       )}
     </div>
   );
