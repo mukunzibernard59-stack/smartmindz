@@ -25,6 +25,7 @@ export interface ChatSession {
 }
 
 const STORAGE_KEY = 'smartmind_chat_history';
+const ACTIVE_SESSION_KEY = 'smartmind_active_session';
 const MAX_SESSIONS = 100;
 
 export function useChatHistory() {
