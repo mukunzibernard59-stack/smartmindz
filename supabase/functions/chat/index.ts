@@ -6,6 +6,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const VALID_LANGUAGES = ['en', 'fr', 'rw', 'sw'];
+const MAX_MESSAGE_LENGTH = 10000;
+const MAX_MESSAGES = 50;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -14,9 +18,7 @@ serve(async (req) => {
   try {
     const authHeader = req.headers.get("Authorization");
     
-    // Require authentication
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      console.log("Chat: No auth header");
       return new Response(
         JSON.stringify({ error: "Authentication required. Please sign in to continue." }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -29,34 +31,67 @@ serve(async (req) => {
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
-    // Verify the JWT and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !user) {
-      console.log("Chat: Invalid token", authError?.message);
       return new Response(
         JSON.stringify({ error: "Session expired. Please sign in again." }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const { messages, language = 'en', country, educationLevel, isVoiceMode = false } = await req.json();
+    const body = await req.json();
+    const { messages, language = 'en', country, educationLevel, isVoiceMode = false } = body;
+
+    // Input validation
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
+      return new Response(
+        JSON.stringify({ error: "Invalid messages format." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate each message
+    for (const msg of messages) {
+      if (!msg || typeof msg.role !== 'string' || typeof msg.content !== 'string') {
+        return new Response(
+          JSON.stringify({ error: "Invalid message format." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (msg.content.length > MAX_MESSAGE_LENGTH) {
+        return new Response(
+          JSON.stringify({ error: "Message too long. Maximum 10000 characters." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (!['user', 'assistant', 'system'].includes(msg.role)) {
+        return new Response(
+          JSON.stringify({ error: "Invalid message role." }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    const validLanguage = VALID_LANGUAGES.includes(language) ? language : 'en';
+    const validCountry = (country && typeof country === 'string') ? country.substring(0, 100) : '';
+    const validLevel = (educationLevel && typeof educationLevel === 'string') ? educationLevel.substring(0, 100) : '';
     
-    console.log(`Chat: Access granted for ${user.id} - all features free`);
+    console.log(`Chat: Access granted for ${user.id}`);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Service configuration error. Please try again later." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // Get current date
     const currentDate = new Date();
     const formattedDate = currentDate.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
     const currentYear = currentDate.getFullYear();
 
@@ -67,10 +102,10 @@ serve(async (req) => {
       sw: "Jibu kwa Kiswahili.",
     };
 
-    const countryContext = country ? `User's country: ${country}. Follow the official curriculum for ${country}.` : "Country not specified - use internationally recognized standards.";
-    const levelContext = educationLevel ? `Education level: ${educationLevel}.` : "Education level not specified - adapt to the apparent level from the question.";
+    const countryContext = validCountry ? `User's country: ${validCountry}. Follow the official curriculum for ${validCountry}.` : "Country not specified - use internationally recognized standards.";
+    const levelContext = validLevel ? `Education level: ${validLevel}.` : "Education level not specified - adapt to the apparent level from the question.";
 
-    const systemPrompt = `You are Smart Mind AI, a unified AI assistant that seamlessly combines the roles of an AI Tutor and an AI Chat companion. ${languageInstructions[language] || languageInstructions.en}
+    const systemPrompt = `You are Smart Mind AI, a unified AI assistant that seamlessly combines the roles of an AI Tutor and an AI Chat companion. ${languageInstructions[validLanguage] || languageInstructions.en}
 
 CURRENT DATE & TIME CONTEXT:
 - Today's date: ${formattedDate}
@@ -148,21 +183,18 @@ Math, Science, English, History, Geography, ICT, Programming, Languages, Busines
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment and try again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       return new Response(JSON.stringify({ error: "Failed to get response. Please try again." }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -171,7 +203,7 @@ Math, Science, English, History, Geography, ICT, Programming, Languages, Busines
     });
   } catch (error) {
     console.error("Chat function error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An internal error occurred. Please try again later." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
