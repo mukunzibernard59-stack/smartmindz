@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Instagram } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
   return (
