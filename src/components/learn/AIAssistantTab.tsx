@@ -301,15 +301,21 @@ const AIAssistantTab: React.FC = () => {
             return <ChatMessage key={m.id} message={m} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
           })}
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
-            <div className="flex gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                <Brain className="h-4 w-4 text-primary animate-pulse" />
+            <div className="flex gap-3 animate-fade-in">
+              <div className="relative w-9 h-9 flex-shrink-0">
+                <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping opacity-30" />
+                <div className="relative w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Brain className="h-4 w-4 text-primary animate-pulse" />
+                </div>
               </div>
-              <div className="bg-secondary rounded-2xl rounded-tl-md px-4 py-3">
-                <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
-                  <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <div className="bg-secondary/80 backdrop-blur-sm rounded-2xl rounded-tl-md px-5 py-3.5 border border-border/20">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDuration: '0.8s' }} />
+                    <span className="w-2 h-2 bg-primary/70 rounded-full animate-bounce" style={{ animationDuration: '0.8s', animationDelay: '0.15s' }} />
+                    <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce" style={{ animationDuration: '0.8s', animationDelay: '0.3s' }} />
+                  </div>
+                  <span className="text-xs text-muted-foreground animate-pulse">Thinking...</span>
                 </div>
               </div>
             </div>
