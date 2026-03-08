@@ -287,7 +287,11 @@ const AIAssistantTab: React.FC = () => {
               </div>
             </div>
           )}
-          {messages.map(m => <ChatMessage key={m.id} message={m} />)}
+          {messages.map((m, i) => {
+            const isLatestAssistant = m.role === 'assistant' && m.content !== '' && 
+              i === messages.map((msg, idx) => msg.role === 'assistant' && msg.content !== '' ? idx : -1).filter(x => x >= 0).pop();
+            return <ChatMessage key={m.id} message={m} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
+          })}
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
