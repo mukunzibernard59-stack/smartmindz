@@ -47,6 +47,11 @@ const AIAssistantTab: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Persist sidebar state
+  useEffect(() => {
+    try { localStorage.setItem('smartmind_sidebar_open', String(sidebarOpen)); } catch {}
+  }, [sidebarOpen]);
+
   useEffect(() => {
     return () => {
       window.speechSynthesis?.cancel();
