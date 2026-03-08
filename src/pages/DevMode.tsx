@@ -3,7 +3,7 @@ import BackButton from '@/components/BackButton';
 import Navbar from '@/components/Navbar';
 import LanguageSelector from '@/components/devmode/LanguageSelector';
 import LessonSidebar from '@/components/devmode/LessonSidebar';
-import CodeEditor from '@/components/devmode/CodeEditor';
+import IDELayout from '@/components/devmode/IDELayout';
 import ProgressTracker from '@/components/devmode/ProgressTracker';
 import TerminalHistory from '@/components/devmode/TerminalHistory';
 import Challenges from '@/components/devmode/Challenges';
@@ -17,7 +17,7 @@ import { getLessonContent } from '@/data/lessonContent';
 import { ProgrammingLanguage, AIFeedback, Challenge } from '@/types/devMode';
 import { 
   Code, BookOpen, Trophy, Clock, Target, Folder, ArrowLeftRight,
-  Compass, ChevronLeft, Menu, X, Sparkles, Zap
+  Compass, ChevronLeft, Menu, Sparkles, Zap, Terminal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -32,24 +32,14 @@ const DevMode: React.FC = () => {
   const [currentLessonId, setCurrentLessonId] = useState('intro');
   const [activeTab, setActiveTab] = useState('learn');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false);
+  const [showIDE, setShowIDE] = useState(false);
   const [terminalCode, setTerminalCode] = useState('');
   const { toast } = useToast();
 
   const {
-    progress,
-    history,
-    projects,
-    initializeLanguageProgress,
-    completeLesson,
-    addToHistory,
-    clearHistory,
-    addProject,
-    updateProject,
-    deleteProject,
-    earnBadge,
-    getTotalXp,
-    getOverallRank,
+    progress, history, projects,
+    initializeLanguageProgress, completeLesson, addToHistory, clearHistory,
+    addProject, updateProject, deleteProject, earnBadge, getTotalXp, getOverallRank,
   } = useDevMode();
 
   const topics = selectedLanguage ? getTopicsForLanguage(selectedLanguage.id) : [];
@@ -59,127 +49,88 @@ const DevMode: React.FC = () => {
   const currentLesson = currentTopic?.lessons.find(l => l.id === currentLessonId);
 
   useEffect(() => {
-    if (selectedLanguage) {
-      initializeLanguageProgress(selectedLanguage.id);
-    }
+    if (selectedLanguage) initializeLanguageProgress(selectedLanguage.id);
   }, [selectedLanguage, initializeLanguageProgress]);
 
   useEffect(() => {
-    setShowTerminal(false);
-    if (lessonContent) {
-      setTerminalCode(lessonContent.starterCode);
-    }
+    setShowIDE(false);
+    if (lessonContent) setTerminalCode(lessonContent.starterCode);
   }, [currentLessonId, lessonContent?.starterCode]);
 
   const handleSelectLanguage = (language: ProgrammingLanguage) => {
     setSelectedLanguage(language);
     setActiveTab('learn');
-    setShowTerminal(false);
-    toast({
-      title: `Welcome to ${language.name}!`,
-      description: "Let's start your coding journey",
-    });
+    setShowIDE(false);
+    toast({ title: `Welcome to ${language.name}!`, description: "Let's start your coding journey" });
   };
 
   const handleSelectLesson = (topicId: string, lessonId: string) => {
     setCurrentTopicId(topicId);
     setCurrentLessonId(lessonId);
     setSidebarOpen(false);
-    setShowTerminal(false);
+    setShowIDE(false);
   };
 
-  const handleOpenTerminal = () => {
-    if (lessonContent) {
-      setTerminalCode(lessonContent.starterCode);
-    }
-    setShowTerminal(true);
-  };
-
-  const handleBackToNotes = () => {
-    setShowTerminal(false);
+  const handleOpenIDE = () => {
+    if (lessonContent) setTerminalCode(lessonContent.starterCode);
+    setShowIDE(true);
   };
 
   const handleFinishLesson = () => {
     if (!selectedLanguage) return;
-    
-    // Mark lesson as complete and award XP
     completeLesson(selectedLanguage.id, currentLessonId, 25);
-    
-    toast({
-      title: "Lesson Complete! 🎉",
-      description: "Great job! Moving to the next lesson.",
-    });
-    
-    // Auto-navigate to next lesson
+    toast({ title: "Lesson Complete! 🎉", description: "Great job! Moving to the next lesson." });
+
     const currentTopicLessons = currentTopic?.lessons || [];
     const currentLessonIndex = currentTopicLessons.findIndex(l => l.id === currentLessonId);
-    
+
     if (currentLessonIndex < currentTopicLessons.length - 1) {
-      // Go to next lesson in same topic
-      const nextLesson = currentTopicLessons[currentLessonIndex + 1];
-      setCurrentLessonId(nextLesson.id);
+      setCurrentLessonId(currentTopicLessons[currentLessonIndex + 1].id);
     } else {
-      // Go to first lesson of next topic
       const currentTopicIndex = topics.findIndex(t => t.id === currentTopicId);
       if (currentTopicIndex < topics.length - 1) {
         const nextTopic = topics[currentTopicIndex + 1];
         setCurrentTopicId(nextTopic.id);
-        if (nextTopic.lessons.length > 0) {
-          setCurrentLessonId(nextTopic.lessons[0].id);
-        }
+        if (nextTopic.lessons.length > 0) setCurrentLessonId(nextTopic.lessons[0].id);
       }
     }
   };
 
   const handleCodeExecute = (code: string, output: string, aiFeedback?: AIFeedback[]) => {
     if (!selectedLanguage) return;
-
-    addToHistory({
-      code,
-      language: selectedLanguage.id,
-      output,
-      aiFeedback,
-    });
-
-    // Award XP for running code
+    addToHistory({ code, language: selectedLanguage.id, output, aiFeedback });
     if (!output.toLowerCase().includes('error')) {
       completeLesson(selectedLanguage.id, currentLessonId, 50);
     }
   };
 
   const handleStartChallenge = (challenge: Challenge) => {
-    setActiveTab('learn');
-    toast({
-      title: `Challenge Started: ${challenge.title}`,
-      description: challenge.description,
-    });
+    setActiveTab('ide');
+    toast({ title: `Challenge Started: ${challenge.title}`, description: challenge.description });
   };
 
+  // Language selector screen
   if (!selectedLanguage) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="pt-24 pb-12">
           <div className="container mx-auto px-4">
-            <div className="mb-4">
-              <BackButton />
-            </div>
-            {/* Hero Section */}
+            <div className="mb-4"><BackButton /></div>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6">
                 <Sparkles className="h-4 w-4" />
-                <span className="text-sm font-medium">Developer Learning Environment</span>
+                <span className="text-sm font-medium">Professional Developer Environment</span>
               </div>
               <h1 className="text-4xl sm:text-5xl font-bold mb-4">
                 <span className="text-gradient-primary">Dev Mode</span>
               </h1>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Master any programming language with interactive lessons, AI-powered feedback, 
-                and gamified challenges. Your journey to becoming a developer starts here.
+                A professional IDE with syntax highlighting, live preview, file explorer, 
+                and integrated terminal. Your coding journey starts here.
               </p>
             </div>
 
-            {/* Stats Bar */}
             <div className="flex justify-center gap-8 mb-12">
               <div className="text-center">
                 <p className="text-3xl font-bold text-primary">{getTotalXp()}</p>
@@ -192,67 +143,32 @@ const DevMode: React.FC = () => {
                 <p className="text-sm text-muted-foreground mt-1">Your Rank</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-primary">
-                  {Object.keys(progress).length}
-                </p>
+                <p className="text-3xl font-bold text-primary">{Object.keys(progress).length}</p>
                 <p className="text-sm text-muted-foreground">Languages Started</p>
               </div>
             </div>
 
-            {/* Language Selector */}
             <div className="max-w-5xl mx-auto bg-card border border-border rounded-2xl p-6">
-              <LanguageSelector
-                onSelectLanguage={handleSelectLanguage}
-                selectedLanguageId={selectedLanguage?.id}
-              />
+              <LanguageSelector onSelectLanguage={handleSelectLanguage} selectedLanguageId={selectedLanguage?.id} />
             </div>
 
-            {/* Feature Cards */}
             <div className="grid md:grid-cols-4 gap-4 mt-12 max-w-5xl mx-auto">
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Code className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Smart Terminal</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Write and run code with instant feedback
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="h-6 w-6 text-success" />
-                  </div>
-                  <h3 className="font-semibold mb-2">AI Assistance</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Get help and explanations in plain language
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Trophy className="h-6 w-6 text-warning" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Ranks & Badges</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Earn XP and climb from Beginner to Master
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Compass className="h-6 w-6 text-accent" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Career Paths</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Get guidance for your dream tech career
-                  </p>
-                </CardContent>
-              </Card>
+              {[
+                { icon: Code, title: 'Pro Editor', desc: 'Syntax highlighting & auto-complete', color: 'primary' },
+                { icon: Terminal, title: 'Smart Terminal', desc: 'Interactive console with command history', color: 'success' },
+                { icon: Trophy, title: 'Ranks & Badges', desc: 'Earn XP from Beginner to Master', color: 'warning' },
+                { icon: Compass, title: 'Career Paths', desc: 'Guidance for your dream tech career', color: 'accent' },
+              ].map(({ icon: Icon, title, desc, color }) => (
+                <Card key={title} className="text-center">
+                  <CardContent className="pt-6">
+                    <div className={`w-12 h-12 bg-${color}/10 rounded-xl flex items-center justify-center mx-auto mb-4`}>
+                      <Icon className={`h-6 w-6 text-${color}`} />
+                    </div>
+                    <h3 className="font-semibold mb-2">{title}</h3>
+                    <p className="text-sm text-muted-foreground">{desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </main>
@@ -265,39 +181,28 @@ const DevMode: React.FC = () => {
       <Navbar />
       <main className="pt-16 h-screen flex flex-col">
         {/* Top Bar */}
-        <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedLanguage(null)}
-              className="gap-2"
-            >
+        <div className="border-b border-border bg-card px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedLanguage(null)} className="gap-2">
               <ChevronLeft className="h-4 w-4" />
-              Change Language
+              <span className="hidden sm:inline">Languages</span>
             </Button>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">{selectedLanguage.icon}</span>
-              <span className="font-semibold">{selectedLanguage.name}</span>
-              <Badge variant="outline">{selectedLanguage.difficulty}</Badge>
+              <span className="text-xl">{selectedLanguage.icon}</span>
+              <span className="font-semibold text-sm">{selectedLanguage.name}</span>
+              <Badge variant="outline" className="text-xs">{selectedLanguage.difficulty}</Badge>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-2 text-sm">
               <Zap className="h-4 w-4 text-warning" />
               <span className="font-bold">{currentProgress?.xp || 0} XP</span>
-              <Badge className="bg-primary/10 text-primary">
-                {currentProgress?.rank || 'beginner'}
-              </Badge>
+              <Badge className="bg-primary/10 text-primary text-xs">{currentProgress?.rank || 'beginner'}</Badge>
             </div>
-
-            {/* Mobile Menu */}
             <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-5 w-5" />
-                </Button>
+                <Button variant="ghost" size="icon"><Menu className="h-5 w-5" /></Button>
               </SheetTrigger>
               <SheetContent side="left" className="p-0 w-80">
                 <LessonSidebar
@@ -315,7 +220,7 @@ const DevMode: React.FC = () => {
         {/* Main Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Lesson Sidebar (Desktop) */}
-          <div className="hidden md:block w-72 shrink-0">
+          <div className="hidden md:block w-64 shrink-0">
             <LessonSidebar
               topics={topics}
               currentTopicId={currentTopicId}
@@ -326,166 +231,91 @@ const DevMode: React.FC = () => {
           </div>
 
           {/* Main Area */}
-          <div className="flex-1 overflow-auto p-4">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="mb-4">
-                <TabsTrigger value="learn" className="gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Learn
-                </TabsTrigger>
-                <TabsTrigger value="challenges" className="gap-2">
-                  <Target className="h-4 w-4" />
-                  Challenges
-                </TabsTrigger>
-                <TabsTrigger value="history" className="gap-2">
-                  <Clock className="h-4 w-4" />
-                  History
-                </TabsTrigger>
-                <TabsTrigger value="portfolio" className="gap-2">
-                  <Folder className="h-4 w-4" />
-                  Portfolio
-                </TabsTrigger>
-                <TabsTrigger value="translate" className="gap-2">
-                  <ArrowLeftRight className="h-4 w-4" />
-                  Translate
-                </TabsTrigger>
-                <TabsTrigger value="careers" className="gap-2">
-                  <Compass className="h-4 w-4" />
-                  Careers
-                </TabsTrigger>
-              </TabsList>
+          <div className="flex-1 overflow-hidden flex flex-col">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+              <div className="px-4 pt-2">
+                <TabsList className="h-8">
+                  <TabsTrigger value="learn" className="gap-1.5 text-xs h-7">
+                    <BookOpen className="h-3.5 w-3.5" />Learn
+                  </TabsTrigger>
+                  <TabsTrigger value="ide" className="gap-1.5 text-xs h-7">
+                    <Code className="h-3.5 w-3.5" />IDE
+                  </TabsTrigger>
+                  <TabsTrigger value="challenges" className="gap-1.5 text-xs h-7">
+                    <Target className="h-3.5 w-3.5" />Challenges
+                  </TabsTrigger>
+                  <TabsTrigger value="history" className="gap-1.5 text-xs h-7">
+                    <Clock className="h-3.5 w-3.5" />History
+                  </TabsTrigger>
+                  <TabsTrigger value="portfolio" className="gap-1.5 text-xs h-7">
+                    <Folder className="h-3.5 w-3.5" />Portfolio
+                  </TabsTrigger>
+                  <TabsTrigger value="translate" className="gap-1.5 text-xs h-7">
+                    <ArrowLeftRight className="h-3.5 w-3.5" />Translate
+                  </TabsTrigger>
+                  <TabsTrigger value="careers" className="gap-1.5 text-xs h-7">
+                    <Compass className="h-3.5 w-3.5" />Careers
+                  </TabsTrigger>
+                </TabsList>
+              </div>
 
-              <TabsContent value="learn" className="space-y-4">
-                {/* Breadcrumb navigation */}
+              {/* Learn Tab */}
+              <TabsContent value="learn" className="flex-1 overflow-auto p-4 space-y-4">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <span>{currentTopic?.title || 'Topic'}</span>
                   <span>→</span>
                   <span className="text-foreground font-medium">{currentLesson?.title || 'Lesson'}</span>
-                  {showTerminal && (
-                    <>
-                      <span>→</span>
-                      <span className="text-primary font-medium">Practice</span>
-                    </>
-                  )}
                 </div>
 
-                {!showTerminal ? (
-                  /* Notes View */
-                  <div className="grid lg:grid-cols-3 gap-4">
-                    <div className="lg:col-span-2">
-                      {lessonContent && (
-                        <LessonNotes
-                          content={lessonContent}
-                          languageName={selectedLanguage.name}
-                          onRunCode={handleOpenTerminal}
-                          onFinish={handleFinishLesson}
-                          isActive
-                        />
-                      )}
-                    </div>
-                    <div>
-                      {currentProgress && (
-                        <ProgressTracker
-                          progress={currentProgress}
-                          languageName={selectedLanguage.name}
-                        />
-                      )}
-                    </div>
+                <div className="grid lg:grid-cols-3 gap-4">
+                  <div className="lg:col-span-2">
+                    {lessonContent && (
+                      <LessonNotes
+                        content={lessonContent}
+                        languageName={selectedLanguage.name}
+                        onRunCode={() => { handleOpenIDE(); setActiveTab('ide'); }}
+                        onFinish={handleFinishLesson}
+                        isActive
+                      />
+                    )}
                   </div>
-                ) : (
-                  /* Terminal View */
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleBackToNotes}
-                        className="gap-2"
-                      >
-                        <ChevronLeft className="h-4 w-4" />
-                        Back to Notes
-                      </Button>
-                      <Badge variant="secondary" className="gap-1">
-                        <Code className="h-3 w-3" />
-                        Practice Mode
-                      </Badge>
-                    </div>
-                    <div className="grid lg:grid-cols-3 gap-4">
-                      <div className="lg:col-span-2">
-                        <CodeEditor
-                          language={selectedLanguage.id}
-                          onExecute={handleCodeExecute}
-                          initialCode={terminalCode}
-                        />
-                      </div>
-                      <div className="space-y-4">
-                        {currentProgress && (
-                          <ProgressTracker
-                            progress={currentProgress}
-                            languageName={selectedLanguage.name}
-                          />
-                        )}
-                        {/* Quick reference from notes */}
-                        {lessonContent && (
-                          <Card>
-                            <CardContent className="p-4">
-                              <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
-                                <BookOpen className="h-4 w-4 text-primary" />
-                                Quick Reference
-                              </h4>
-                              <ul className="text-xs text-muted-foreground space-y-1">
-                                {lessonContent.keyPoints.slice(0, 3).map((point, i) => (
-                                  <li key={i} className="flex items-start gap-2">
-                                    <span className="text-primary">•</span>
-                                    {point}
-                                  </li>
-                                ))}
-                              </ul>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-                    </div>
+                  <div>
+                    {currentProgress && (
+                      <ProgressTracker progress={currentProgress} languageName={selectedLanguage.name} />
+                    )}
                   </div>
-                )}
+                </div>
               </TabsContent>
 
-              <TabsContent value="challenges">
-                <Challenges
-                  completedChallenges={[]}
-                  onStartChallenge={handleStartChallenge}
+              {/* IDE Tab - Full Professional IDE */}
+              <TabsContent value="ide" className="flex-1 overflow-hidden p-2">
+                <IDELayout
+                  language={selectedLanguage.id}
+                  initialCode={terminalCode}
+                  onExecute={handleCodeExecute}
                 />
               </TabsContent>
 
-              <TabsContent value="history">
-                <TerminalHistory
-                  history={history}
-                  onClear={clearHistory}
-                />
+              <TabsContent value="challenges" className="flex-1 overflow-auto p-4">
+                <Challenges completedChallenges={[]} onStartChallenge={handleStartChallenge} />
               </TabsContent>
 
-              <TabsContent value="portfolio">
-                <Portfolio
-                  projects={projects}
-                  onAddProject={addProject}
-                  onUpdateProject={updateProject}
-                  onDeleteProject={deleteProject}
-                />
+              <TabsContent value="history" className="flex-1 overflow-auto p-4">
+                <TerminalHistory history={history} onClear={clearHistory} />
               </TabsContent>
 
-              <TabsContent value="translate">
+              <TabsContent value="portfolio" className="flex-1 overflow-auto p-4">
+                <Portfolio projects={projects} onAddProject={addProject} onUpdateProject={updateProject} onDeleteProject={deleteProject} />
+              </TabsContent>
+
+              <TabsContent value="translate" className="flex-1 overflow-auto p-4">
                 <CrossLanguageTranslator />
               </TabsContent>
 
-              <TabsContent value="careers">
+              <TabsContent value="careers" className="flex-1 overflow-auto p-4">
                 <CareerGuidance
                   completedLanguages={Object.keys(progress)}
-                  onSelectPath={(path) => {
-                    toast({
-                      title: `${path.title} Path`,
-                      description: `Focus on: ${path.languages.join(', ')}`,
-                    });
-                  }}
+                  onSelectPath={(path) => toast({ title: `${path.title} Path`, description: `Focus on: ${path.languages.join(', ')}` })}
                 />
               </TabsContent>
             </Tabs>

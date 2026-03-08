@@ -4,8 +4,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -22,11 +23,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { user, profile, isAuthenticated, signOut } = useAuth();
+  const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const { isInstallable, install } = usePWAInstall();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstall = async () => {
     const installed = await install();
@@ -49,6 +52,24 @@ const Navbar: React.FC = () => {
     if (error) { toast.error('Failed to sign out'); }
     else { toast.success('Signed out successfully'); }
   };
+
+  const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+
+    setIsUploadingAvatar(true);
+    try {
+      const { error } = await uploadAvatar(file);
+      if (error) { toast.error('Failed to upload photo'); }
+      else { toast.success('Profile photo updated!'); refreshProfile(); }
+    } catch { toast.error('Upload failed'); }
+    finally {
+      setIsUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  }, [uploadAvatar, refreshProfile]);
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
@@ -119,6 +140,11 @@ const Navbar: React.FC = () => {
                         <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                       </div>
                     </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => avatarInputRef.current?.click()} className="cursor-pointer" disabled={isUploadingAvatar}>
+                      {isUploadingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
+                      <span>{isUploadingAvatar ? 'Uploading...' : 'Change Photo'}</span>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" /><span>Sign out</span>
@@ -191,6 +217,14 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </nav>
+      {/* Hidden file input for avatar upload */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarUpload}
+        className="hidden"
+      />
 
       <LoginModal 
         open={loginModalOpen} 
