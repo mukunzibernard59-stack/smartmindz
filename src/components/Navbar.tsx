@@ -4,8 +4,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
