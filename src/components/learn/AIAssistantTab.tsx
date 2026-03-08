@@ -233,7 +233,7 @@ const AIAssistantTab: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-[calc(100vh-220px)] min-h-[500px] bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="relative flex h-[calc(100vh-220px)] min-h-[500px] bg-card rounded-2xl border border-border overflow-hidden">
       <ChatHistorySidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)}
         groupedSessions={groupedSessions} activeSessionId={activeSessionId}
         onSelectSession={switchSession} onNewChat={startNewChat}
