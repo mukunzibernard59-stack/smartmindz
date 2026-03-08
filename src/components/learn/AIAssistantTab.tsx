@@ -19,7 +19,7 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
 const AIAssistantTab: React.FC = () => {
   const { language } = useLanguage();
-  const { user, isAuthenticated, getAccessToken } = useAuth();
+  const { user, profile, isAuthenticated, getAccessToken } = useAuth();
   const {
     activeSession, groupedSessions, activeSessionId,
     addMessage, updateLastMessage, switchSession,
