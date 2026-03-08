@@ -38,7 +38,6 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/learn', label: t('nav.learn') },
-    { to: '/quiz', label: t('nav.quiz') },
     { to: '/dev', label: 'Dev Mode', icon: Code2 },
   ];
 
