@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
+import { Send, Mic, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -13,6 +13,7 @@ import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
 import AITutorMenu from '@/components/chat/AITutorMenu';
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
+import VoiceRecorder from '@/components/chat/VoiceRecorder';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -170,15 +171,22 @@ const AIAssistantTab: React.FC = () => {
     recognition.start();
   };
 
-  const toggleVoiceMode = async () => {
+  const toggleVoiceMode = () => {
     if (!isAuthenticated) { toast.error('Please sign in'); setLoginOpen(true); return; }
-    if (!voiceMode) {
-      setVoiceMode(true); toast.success('Voice mode ON');
-      const g = language === 'sw' ? 'Habari!' : language === 'fr' ? 'Bonjour!' : language === 'rw' ? 'Muraho!' : 'Hi there!';
-      try { await speakText(g); startListening(); } catch { startListening(); }
-    } else {
-      setVoiceMode(false); stopSpeaking(); recognitionRef.current?.abort(); setIsRecording(false); toast.info('Voice mode OFF');
-    }
+    setVoiceMode(true);
+  };
+
+  const handleVoiceCancel = () => {
+    setVoiceMode(false);
+    stopSpeaking();
+    recognitionRef.current?.abort();
+    setIsRecording(false);
+  };
+
+  const handleVoiceSend = async (text: string) => {
+    setVoiceMode(false);
+    setIsRecording(false);
+    await sendMessage(text, true);
   };
 
   const handleAIAction = (action: string) => {
@@ -225,7 +233,7 @@ const AIAssistantTab: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-[calc(100vh-220px)] min-h-[500px] bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="relative flex h-[calc(100vh-220px)] min-h-[500px] bg-card rounded-2xl border border-border overflow-hidden">
       <ChatHistorySidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)}
         groupedSessions={groupedSessions} activeSessionId={activeSessionId}
         onSelectSession={switchSession} onNewChat={startNewChat}
@@ -313,32 +321,26 @@ const AIAssistantTab: React.FC = () => {
 
         {/* Input */}
         <div className="p-3 border-t border-border">
-          {voiceMode && (
-            <div className="mb-2 flex items-center justify-center gap-2 text-sm text-primary animate-pulse">
-              {isRecording ? <><Mic className="h-4 w-4" /> Listening...</> :
-               isSpeaking ? <><Volume2 className="h-4 w-4" /> Speaking...</> :
-               isLoading ? <><Brain className="h-4 w-4" /> Thinking...</> : null}
-            </div>
-          )}
           <div className="flex gap-2">
             <FileUploadMenu files={files} isProcessing={isProcessing} onUpload={(fl) => uploadFiles(fl)} onRemoveFile={removeFile} onPasteText={handlePasteText} />
-            <Button variant={voiceMode ? 'destructive' : 'secondary'} size="icon"
-              onClick={toggleVoiceMode} className={`h-9 w-9 ${voiceMode ? 'animate-pulse' : ''}`}
-              disabled={isLoading && !voiceMode}>
-              {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            <Button variant="secondary" size="icon"
+              onClick={toggleVoiceMode} className="h-9 w-9"
+              disabled={isLoading}>
+              <Mic className="h-4 w-4" />
             </Button>
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
+            <input type="text" value={input} onChange={(e) => { setInput(e.target.value); stopSpeaking(); }}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={voiceMode ? 'Voice mode active...' : 'Ask anything...'}
-              disabled={isLoading || voiceMode}
+              placeholder="Ask anything..."
+              disabled={isLoading}
               className="flex-1 px-3 py-2 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
-            <Button onClick={handleSend} disabled={!input.trim() || isLoading || voiceMode} size="icon" className="h-9 w-9">
+            <Button onClick={handleSend} disabled={!input.trim() || isLoading} size="icon" className="h-9 w-9">
               <Send className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
 
+      <VoiceRecorder isActive={voiceMode} onCancel={handleVoiceCancel} onSend={handleVoiceSend} language={language} />
       <AIImageGenerator isOpen={imageGenOpen} onClose={() => setImageGenOpen(false)} onGenerate={handleGenerateImage} />
       <LoginModal open={loginOpen} onOpenChange={setLoginOpen} defaultTab="login" />
     </div>
