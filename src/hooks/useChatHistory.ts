@@ -171,6 +171,12 @@ export function useChatHistory() {
     });
   }, [activeSessionId]);
 
+  const renameSession = useCallback((sessionId: string, title: string) => {
+    setSessions(prev => prev.map(s =>
+      s.id === sessionId ? { ...s, title, updatedAt: new Date() } : s
+    ));
+  }, []);
+
   const clearAllHistory = useCallback(() => {
     setSessions([]);
     setActiveSessionId(null);
