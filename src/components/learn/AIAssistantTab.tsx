@@ -330,7 +330,7 @@ const AIAssistantTab: React.FC = () => {
         )}
 
         {/* Input */}
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t border-border/30">
           <div className="flex gap-2">
             <FileUploadMenu files={files} isProcessing={isProcessing} onUpload={(fl) => uploadFiles(fl)} onRemoveFile={removeFile} onPasteText={handlePasteText} />
             <Button variant="secondary" size="icon"
