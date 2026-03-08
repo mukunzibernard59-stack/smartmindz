@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import FloatingInstallButton from "@/components/FloatingInstallButton";
 import UpdateNotification from "@/components/UpdateNotification";
-import AppOpenAd from "@/components/ads/AppOpenAd";
+
 import AppRatingBanner from "@/components/AppRatingBanner";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
@@ -27,7 +27,7 @@ const App = () => (
         <Sonner />
         <FloatingInstallButton />
         <UpdateNotification />
-        <AppOpenAd />
+        
         <AppRatingBanner />
         <BrowserRouter>
           <Routes>
