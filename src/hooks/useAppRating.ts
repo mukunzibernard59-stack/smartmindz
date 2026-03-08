@@ -85,7 +85,7 @@ export function useAppRating() {
   };
 
   const markDismissed = () => {
-    saveState({ ...getState(), dismissed: true, dismissedAt: Date.now() });
+    saveState({ ...getState(), dismissed: true, dismissedAt: Date.now(), rated: true });
     setShouldShow(false);
   };
 
