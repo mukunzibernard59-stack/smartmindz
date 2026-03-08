@@ -3,12 +3,15 @@ import { Brain, User, File, Image } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import type { ChatMessage as ChatMessageType } from '@/hooks/useChatHistory';
 import TTSControls from './TTSControls';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 interface ChatMessageProps {
   message: ChatMessageType;
   language?: string;
   autoRead?: boolean;
   isLatestAssistant?: boolean;
+  userAvatarUrl?: string | null;
+  userInitials?: string;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', autoRead = false, isLatestAssistant = false }) => {
