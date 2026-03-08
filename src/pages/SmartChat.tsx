@@ -481,9 +481,11 @@ const SmartChat: React.FC = () => {
             </div>
           )}
 
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
+          {messages.map((message, i) => {
+            const isLatestAssistant = message.role === 'assistant' && message.content !== '' &&
+              i === messages.map((msg, idx) => msg.role === 'assistant' && msg.content !== '' ? idx : -1).filter(x => x >= 0).pop();
+            return <ChatMessage key={message.id} message={message} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
+          })}
 
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-3">
