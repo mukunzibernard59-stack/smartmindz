@@ -23,7 +23,7 @@ const AIAssistantTab: React.FC = () => {
   const {
     activeSession, groupedSessions, activeSessionId,
     addMessage, updateLastMessage, switchSession,
-    deleteSession, clearAllHistory, startNewChat,
+    deleteSession, renameSession, clearAllHistory, startNewChat,
   } = useChatHistory();
   const { files, isProcessing, uploadFiles, removeFile, clearFiles, getFileContext } = useFileUpload();
 
