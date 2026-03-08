@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Mic, MicOff, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
+import { Send, Mic, Brain, Sparkles, Volume2, VolumeX, LogIn, Menu } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { useLanguage } from '@/contexts/LanguageContext';
