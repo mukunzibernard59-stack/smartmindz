@@ -90,9 +90,10 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', aut
       </div>
 
       {message.role === 'user' && (
-        <div className="w-8 h-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-          <User className="h-4 w-4 text-accent" />
-        </div>
+        <Avatar className="h-8 w-8 flex-shrink-0 border border-accent/30">
+          <AvatarImage src={userAvatarUrl || undefined} alt="You" />
+          <AvatarFallback className="bg-accent/20 text-accent text-xs">{userInitials}</AvatarFallback>
+        </Avatar>
       )}
     </div>
   );
