@@ -217,6 +217,14 @@ const Navbar: React.FC = () => {
           )}
         </div>
       </nav>
+      {/* Hidden file input for avatar upload */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleAvatarUpload}
+        className="hidden"
+      />
 
       <LoginModal 
         open={loginModalOpen} 
