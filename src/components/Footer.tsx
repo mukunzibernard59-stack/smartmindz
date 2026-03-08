@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen } from 'lucide-react';
+import { BookOpen, Instagram } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const Footer: React.FC = () => {
   return (
@@ -47,6 +48,17 @@ const Footer: React.FC = () => {
               <li><Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">Terms of Service</Link></li>
             </ul>
             <p className="text-xs text-muted-foreground mt-4">mukunzibernard59@gmail.com</p>
+            <a
+              href="https://instagram.com/m.berndev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex"
+            >
+              <Badge variant="secondary" className="gap-1.5 hover:bg-secondary/80 transition-colors cursor-pointer">
+                <Instagram className="h-3.5 w-3.5" />
+                @m.berndev
+              </Badge>
+            </a>
           </div>
         </div>
 
