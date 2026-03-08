@@ -1,134 +1,168 @@
 import React, { useState } from 'react';
-import { Star, ThumbsUp, ThumbsDown, X, Send, ExternalLink } from 'lucide-react';
+import { Star, X, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppRating } from '@/hooks/useAppRating';
-import { toast } from 'sonner';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=app.lovable.eebaf703d71f4cf9913725fe26e56357';
 const FEEDBACK_EMAIL = 'mukunzibernard59@gmail.com';
 
-type Step = 'ask' | 'rate' | 'feedback' | 'hidden';
-
 const AppRatingBanner: React.FC = () => {
-  const { shouldShow, markRated, markDismissed, markFeedbackSent } = useAppRating();
-  const [step, setStep] = useState<Step>('ask');
-  const [feedback, setFeedback] = useState('');
+  const { shouldShow, markRated, markDismissed } = useAppRating();
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [comment, setComment] = useState('');
   const [sending, setSending] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const [animateOut, setAnimateOut] = useState(false);
 
-  if (!shouldShow || step === 'hidden') return null;
+  if (!shouldShow) return null;
 
   const close = (action: () => void) => {
     setAnimateOut(true);
     setTimeout(() => {
       action();
-      setStep('hidden');
     }, 300);
   };
 
-  const handleYes = () => setStep('rate');
-  const handleNo = () => setStep('feedback');
-
-  const handleRate = () => {
-    window.open(PLAY_STORE_URL, '_blank');
-    close(markRated);
-    toast.success('Thank you for rating us! ⭐');
+  const getStarDisplay = (stars: number): string => {
+    return '★'.repeat(stars) + '☆'.repeat(5 - stars);
   };
 
-  const handleLater = () => close(markDismissed);
-
-  const handleSendFeedback = async () => {
-    if (!feedback.trim()) {
-      toast.error('Please enter your feedback');
-      return;
-    }
+  const handleSubmit = () => {
+    if (rating === 0) return;
+    
     setSending(true);
 
     const device = navigator.userAgent;
     const time = new Date().toISOString();
-    const subject = encodeURIComponent('App Feedback - SmartMind');
+    const subject = encodeURIComponent('New App Rating - SmartMind');
     const body = encodeURIComponent(
-      `User Feedback:\n"${feedback.trim()}"\n\nTime: ${time}\nDevice: ${device}`
+      `Rating: ${getStarDisplay(rating)} (${rating}/5)\n\n` +
+      `Comment:\n${comment.trim() || '(No comment provided)'}\n\n` +
+      `Time: ${time}\n` +
+      `Device: ${device}`
     );
 
-    window.open(`mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`, '_self');
 
     setSending(false);
-    close(markFeedbackSent);
-    toast.success('Thank you for your feedback! 💙');
+    setSubmitted(true);
+    
+    // Auto close after showing confirmation
+    setTimeout(() => {
+      close(markRated);
+    }, 2500);
   };
+
+  const handleClose = () => close(markDismissed);
+
+  // Submitted confirmation view
+  if (submitted) {
+    return (
+      <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm transition-all duration-300 ${
+        animateOut ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+      }`}>
+        <div className="bg-card border border-border rounded-2xl shadow-xl p-6 text-center">
+          <div className="flex justify-center mb-3">
+            <div className="w-12 h-12 rounded-full bg-success/20 flex items-center justify-center">
+              <CheckCircle className="h-6 w-6 text-success" />
+            </div>
+          </div>
+          <p className="font-semibold text-foreground">Sent! Thank you for your feedback 💙</p>
+          <p className="text-xs text-muted-foreground mt-1">Your rating helps us improve</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`fixed bottom-20 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-sm transition-all duration-300 ${
       animateOut ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-fade-in'
     }`}>
-      <div className="bg-card border border-border rounded-2xl shadow-xl p-4 relative">
-        {/* Close / Later */}
+      <div className="bg-card border border-border rounded-2xl shadow-xl p-5 relative">
+        {/* Close button */}
         <button
-          onClick={handleLater}
-          className="absolute top-2 right-2 p-1 rounded-full hover:bg-secondary text-muted-foreground transition-colors"
-          title="Ask me later"
+          onClick={handleClose}
+          className="absolute top-3 right-3 p-1.5 rounded-full hover:bg-secondary text-muted-foreground transition-colors"
+          title="Close"
         >
           <X className="h-4 w-4" />
         </button>
 
-        {/* Step 1: Ask */}
-        {step === 'ask' && (
-          <div className="text-center space-y-3">
-            <div className="flex justify-center gap-0.5">
-              {[1,2,3,4,5].map(i => (
-                <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-              ))}
-            </div>
-            <p className="font-semibold text-sm">Are you enjoying this app?</p>
-            <div className="flex justify-center gap-3">
-              <Button size="sm" variant="default" className="gap-1.5" onClick={handleYes}>
-                <ThumbsUp className="h-3.5 w-3.5" /> Yes
-              </Button>
-              <Button size="sm" variant="secondary" className="gap-1.5" onClick={handleNo}>
-                <ThumbsDown className="h-3.5 w-3.5" /> Not really
-              </Button>
-            </div>
+        {/* Header */}
+        <div className="text-center mb-4">
+          <div className="flex justify-center gap-0.5 mb-2">
+            <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
           </div>
-        )}
+          <h3 className="font-semibold text-foreground">Rate Your Experience</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">Tap a star to rate the app</p>
+        </div>
 
-        {/* Step 2: Rate */}
-        {step === 'rate' && (
-          <div className="text-center space-y-3">
-            <div className="flex justify-center gap-0.5">
-              {[1,2,3,4,5].map(i => (
-                <Star key={i} className="h-6 w-6 text-yellow-400 fill-yellow-400" />
-              ))}
-            </div>
-            <p className="font-semibold text-sm">Great! Please rate us on the Play Store</p>
-            <Button size="sm" className="gap-1.5" onClick={handleRate}>
-              <ExternalLink className="h-3.5 w-3.5" /> Rate Now
-            </Button>
-          </div>
-        )}
-
-        {/* Step 3: Feedback */}
-        {step === 'feedback' && (
-          <div className="space-y-3">
-            <p className="font-semibold text-sm text-center">💬 We're sorry to hear that</p>
-            <p className="text-xs text-muted-foreground text-center">Tell us what we can improve:</p>
-            <textarea
-              value={feedback}
-              onChange={e => setFeedback(e.target.value)}
-              placeholder="Your feedback helps us improve..."
-              className="w-full px-3 py-2 bg-secondary border border-border rounded-xl text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-primary"
-              maxLength={500}
-            />
-            <Button
-              size="sm"
-              className="w-full gap-1.5"
-              onClick={handleSendFeedback}
-              disabled={sending || !feedback.trim()}
+        {/* Star Rating */}
+        <div className="flex justify-center gap-1 mb-4">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              onClick={() => setRating(star)}
+              onMouseEnter={() => setHoveredRating(star)}
+              onMouseLeave={() => setHoveredRating(0)}
+              className="p-1 transition-transform hover:scale-110 active:scale-95"
             >
-              <Send className="h-3.5 w-3.5" /> Send Feedback
-            </Button>
-          </div>
+              <Star
+                className={`h-8 w-8 transition-colors ${
+                  star <= (hoveredRating || rating)
+                    ? 'text-yellow-400 fill-yellow-400'
+                    : 'text-muted-foreground/30'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+
+        {/* Rating label */}
+        {rating > 0 && (
+          <p className="text-center text-sm text-muted-foreground mb-3">
+            {rating === 1 && '😞 Poor'}
+            {rating === 2 && '😕 Fair'}
+            {rating === 3 && '😐 Good'}
+            {rating === 4 && '😊 Great'}
+            {rating === 5 && '🤩 Excellent!'}
+          </p>
         )}
+
+        {/* Comment */}
+        <div className="mb-4">
+          <label className="text-xs text-muted-foreground mb-1.5 block">
+            Comment (optional)
+          </label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            placeholder="Write your feedback here..."
+            className="w-full px-3 py-2.5 bg-secondary border border-border rounded-xl text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground/60"
+            maxLength={500}
+          />
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="flex-1"
+            onClick={handleClose}
+          >
+            Close
+          </Button>
+          <Button
+            size="sm"
+            className="flex-1 gap-1.5"
+            onClick={handleSubmit}
+            disabled={sending || rating === 0}
+          >
+            <Send className="h-3.5 w-3.5" />
+            Submit
+          </Button>
+        </div>
       </div>
     </div>
   );
