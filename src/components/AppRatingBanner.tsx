@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Star, X, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppRating } from '@/hooks/useAppRating';
-
-const FEEDBACK_EMAIL = 'mukunzibernard59@gmail.com';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const AppRatingBanner: React.FC = () => {
   const { shouldShow, markRated, markDismissed } = useAppRating();
+  const { profile, user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -23,26 +24,26 @@ const AppRatingBanner: React.FC = () => {
     }, 300);
   };
 
-  const getStarDisplay = (stars: number): string => {
-    return '★'.repeat(stars) + '☆'.repeat(5 - stars);
-  };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating === 0) return;
     
     setSending(true);
 
-    const device = navigator.userAgent;
-    const time = new Date().toISOString();
-    const subject = encodeURIComponent('New App Rating - SmartMind');
-    const body = encodeURIComponent(
-      `Rating: ${getStarDisplay(rating)} (${rating}/5)\n\n` +
-      `Comment:\n${comment.trim() || '(No comment provided)'}\n\n` +
-      `Time: ${time}\n` +
-      `Device: ${device}`
-    );
+    try {
+      const userName = profile?.full_name || user?.email || 'Anonymous User';
+      const device = navigator.userAgent;
 
-    window.open(`mailto:${FEEDBACK_EMAIL}?subject=${subject}&body=${body}`, '_self');
+      const { error } = await supabase.functions.invoke('submit-rating', {
+        body: { rating, comment: comment.trim(), device, userName },
+      });
+
+      if (error) {
+        console.error('Rating submit error:', error);
+      }
+    } catch (err) {
+      console.error('Rating submit error:', err);
+    }
 
     setSending(false);
     setSubmitted(true);
