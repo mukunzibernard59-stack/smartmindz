@@ -7,17 +7,10 @@ import {
   Calculator,
   BookOpen,
   ChevronDown,
-  ChevronRight,
   Sparkles,
   PenTool,
   MessageCircle,
   Lightbulb,
-  Video,
-  Film,
-  Camera,
-  Wand2,
-  FileText,
-  Clapperboard,
   AppWindow,
   Mail,
 } from 'lucide-react';
@@ -48,14 +41,6 @@ const AI_TOOLS = [
   { id: 'simplify', label: 'Simplify', icon: MessageCircle, description: 'Make it easier to understand' },
   { id: 'build-app', label: 'Build App Prompt', icon: AppWindow, description: 'Generate app-building prompts' },
   { id: 'design-letter', label: 'Design Letters', icon: Mail, description: 'Professional letter templates' },
-];
-
-const VIDEO_TOOLS = [
-  { id: 'video-text', label: 'Text to Video', icon: Film, description: 'Generate video from text prompt' },
-  { id: 'video-image', label: 'Image to Video', icon: Camera, description: 'Animate an image into video' },
-  { id: 'video-animation', label: 'AI Animation', icon: Wand2, description: 'Create AI-powered animations' },
-  { id: 'video-script', label: 'Video Script Generator', icon: FileText, description: 'Generate detailed scripts' },
-  { id: 'video-cinematic', label: 'Cinematic Creator', icon: Clapperboard, description: 'Cinematic video production' },
 ];
 
 const AITutorMenu: React.FC<AITutorMenuProps> = ({ onSelectAction, onOpenImageGenerator }) => {
