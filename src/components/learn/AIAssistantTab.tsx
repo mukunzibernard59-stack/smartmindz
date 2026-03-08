@@ -319,7 +319,7 @@ const AIAssistantTab: React.FC = () => {
 
         {/* File uploads */}
         {files.length > 0 && (
-          <div className="px-4 py-2 border-t border-border flex gap-2 flex-wrap">
+          <div className="px-4 py-2 border-t border-border/30 flex gap-2 flex-wrap">
             {files.map(f => (
               <span key={f.id} className="text-xs bg-secondary px-2 py-1 rounded-lg flex items-center gap-1">
                 {f.name}
