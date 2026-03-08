@@ -28,7 +28,9 @@ const AIAssistantTab: React.FC = () => {
   const { files, isProcessing, uploadFiles, removeFile, clearFiles, getFileContext } = useFileUpload();
 
   const [loginOpen, setLoginOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    try { return localStorage.getItem('smartmind_sidebar_open') === 'true'; } catch { return false; }
+  });
   const [imageGenOpen, setImageGenOpen] = useState(false);
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
