@@ -10,8 +10,8 @@ const LearnTabs: React.FC = () => {
   const [activeTab, setActiveTab] = useState('assistant');
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="w-full justify-start mb-6 bg-secondary/50 p-1 rounded-xl">
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+      <TabsList className="w-full justify-start bg-secondary/50 p-1 rounded-xl shrink-0">
         <TabsTrigger value="assistant" className="gap-2 flex-1 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground rounded-lg">
           <MessageSquare className="h-4 w-4" />
           <span className="hidden sm:inline">AI Assistant</span>
@@ -25,10 +25,10 @@ const LearnTabs: React.FC = () => {
       </TabsList>
 
       <React.Suspense fallback={<div className="flex items-center justify-center py-12 text-muted-foreground">Loading...</div>}>
-        <TabsContent value="assistant" className="mt-0">
+        <TabsContent value="assistant" className="mt-2 flex-1 overflow-hidden">
           <AIAssistantTab />
         </TabsContent>
-        <TabsContent value="tutor" className="mt-0">
+        <TabsContent value="tutor" className="mt-2 flex-1 overflow-hidden">
           <AITutorTab />
         </TabsContent>
       </React.Suspense>
