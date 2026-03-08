@@ -44,10 +44,8 @@ const AI_TOOLS = [
 ];
 
 const AITutorMenu: React.FC<AITutorMenuProps> = ({ onSelectAction, onOpenImageGenerator }) => {
-  const [videoExpanded, setVideoExpanded] = useState(false);
-
   return (
-    <DropdownMenu onOpenChange={() => setVideoExpanded(false)}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
