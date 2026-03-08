@@ -6,51 +6,31 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const VALID_LANGUAGES = ['en', 'fr', 'rw', 'sw'];
+
 interface NotesData {
   title?: string;
-  introduction?: {
-    what: string;
-    why: string;
-    usage: string;
-  };
+  introduction?: { what: string; why: string; usage: string };
   terms?: { term: string; definition: string }[];
-  moreToKnow?: {
-    concepts: string[];
-    facts: string[];
-    commonMistakes: string[];
-    examples: string[];
-  };
+  moreToKnow?: { concepts: string[]; facts: string[]; commonMistakes: string[]; examples: string[] };
   pages?: { pageNumber: number; title: string; content: string; keyPoints: string[] }[];
 }
 
-// Helper to attempt JSON repair for truncated responses
 function repairAndParseJSON(jsonStr: string): NotesData | null {
   try {
     return JSON.parse(jsonStr) as NotesData;
   } catch {
-    // Try to repair common truncation issues
     let repaired = jsonStr.trim();
-    
-    // Count open brackets
     const openBraces = (repaired.match(/{/g) || []).length;
     const closeBraces = (repaired.match(/}/g) || []).length;
     const openBrackets = (repaired.match(/\[/g) || []).length;
     const closeBrackets = (repaired.match(/]/g) || []).length;
-    
-    // Remove trailing incomplete values
     repaired = repaired.replace(/,\s*"[^"]*$/, '');
     repaired = repaired.replace(/,\s*$/, '');
     repaired = repaired.replace(/:\s*"[^"]*$/, ': ""');
     repaired = repaired.replace(/:\s*$/, ': ""');
-    
-    // Add missing closing brackets
-    for (let i = 0; i < openBrackets - closeBrackets; i++) {
-      repaired += ']';
-    }
-    for (let i = 0; i < openBraces - closeBraces; i++) {
-      repaired += '}';
-    }
-    
+    for (let i = 0; i < openBrackets - closeBrackets; i++) repaired += ']';
+    for (let i = 0; i < openBraces - closeBraces; i++) repaired += '}';
     try {
       return JSON.parse(repaired) as NotesData;
     } catch {
@@ -65,7 +45,6 @@ serve(async (req) => {
   }
 
   try {
-    // Authentication check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return new Response(
@@ -78,15 +57,12 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     
-    // Create Supabase client with user's token for authentication
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } }
     });
 
-    // Verify user token using getClaims
     const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) {
-      console.error("Auth error:", claimsError);
       return new Response(
         JSON.stringify({ error: "Invalid or expired token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -94,25 +70,34 @@ serve(async (req) => {
     }
 
     const userId = claimsData.claims.sub as string;
-    console.log("Authenticated user:", userId, "- all features free");
 
-    const { subject, language = 'en' } = await req.json();
+    const body = await req.json();
+    const { subject, language = 'en' } = body;
+
+    // Validate subject
+    if (!subject || typeof subject !== 'string' || subject.length > 200) {
+      return new Response(
+        JSON.stringify({ error: "Invalid subject. Must be a string under 200 characters." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const validLanguage = VALID_LANGUAGES.includes(language) ? language : 'en';
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Service configuration error. Please try again later." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
     const languageMap: Record<string, string> = {
-      en: "English",
-      fr: "French",
-      rw: "Kinyarwanda",
-      sw: "Swahili",
+      en: "English", fr: "French", rw: "Kinyarwanda", sw: "Swahili",
     };
+    const lang = languageMap[validLanguage] || 'English';
 
-    const lang = languageMap[language] || 'English';
-
-    // Minimal prompt to ensure complete JSON response
     const prompt = `About "${subject}" in ${lang}. Return JSON:
 {"title":"${subject}","introduction":{"what":"[2 sentences what it is]","why":"[2 sentences importance]","usage":"[2 sentences applications]"},"terms":[{"term":"T1","definition":"D1"},{"term":"T2","definition":"D2"},{"term":"T3","definition":"D3"}],"moreToKnow":{"concepts":["C1","C2"],"facts":["F1","F2"],"commonMistakes":["M1"],"examples":["E1"]},"pages":[{"pageNumber":1,"title":"Intro","content":"Brief intro","keyPoints":["K1"]}]}`;
 
@@ -138,19 +123,22 @@ serve(async (req) => {
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Too many requests. Please wait." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("Notes generation error:", response.status, errorText);
-      throw new Error("AI service unavailable");
+      return new Response(JSON.stringify({ error: "Failed to generate notes. Please try again." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const responseText = await response.text();
-    
     if (!responseText || responseText.trim() === '') {
-      throw new Error("Empty response from AI");
+      console.error("Empty response from AI");
+      return new Response(JSON.stringify({ error: "Failed to generate notes. Please try again." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     let data;
@@ -158,30 +146,30 @@ serve(async (req) => {
       data = JSON.parse(responseText);
     } catch {
       console.error("Failed to parse AI wrapper response");
-      throw new Error("Invalid response format");
+      return new Response(JSON.stringify({ error: "Failed to generate notes. Please try again." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const content = data.choices?.[0]?.message?.content;
-    
     if (!content) {
-      throw new Error("No content in response");
+      console.error("No content in response");
+      return new Response(JSON.stringify({ error: "Failed to generate notes. Please try again." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log("AI response length:", content.length);
-
-    // Extract JSON from response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       console.error("No JSON found in:", content.substring(0, 200));
-      throw new Error("Invalid response format");
+      return new Response(JSON.stringify({ error: "Failed to generate notes. Please try again." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // Try to parse, with repair fallback
     let notesData = repairAndParseJSON(jsonMatch[0]);
     
     if (!notesData) {
-      console.error("JSON repair failed for:", jsonMatch[0].substring(0, 300));
-      // Return minimal fallback data
       notesData = {
         title: `Learn: ${subject}`,
         introduction: {
@@ -189,29 +177,20 @@ serve(async (req) => {
           why: "Learning this subject helps build foundational knowledge and skills.",
           usage: "This knowledge applies to many real-world situations and careers."
         },
-        terms: [
-          { term: subject, definition: `The main topic of study in this area.` }
-        ],
+        terms: [{ term: subject, definition: `The main topic of study in this area.` }],
         moreToKnow: {
           concepts: ["Core fundamentals", "Key principles"],
           facts: ["An important area of study"],
           commonMistakes: ["Skipping the basics"],
           examples: ["Real-world applications"]
         },
-        pages: [
-          { pageNumber: 1, title: "Introduction", content: `Welcome to learning about ${subject}.`, keyPoints: ["Start with fundamentals"] }
-        ]
+        pages: [{ pageNumber: 1, title: "Introduction", content: `Welcome to learning about ${subject}.`, keyPoints: ["Start with fundamentals"] }]
       };
     }
 
-    // Ensure required fields exist
     if (!notesData.title) notesData.title = `Learn: ${subject}`;
     if (!notesData.introduction) {
-      notesData.introduction = {
-        what: `${subject} is the topic of study.`,
-        why: "It's important for learning.",
-        usage: "Applies in many areas."
-      };
+      notesData.introduction = { what: `${subject} is the topic of study.`, why: "It's important for learning.", usage: "Applies in many areas." };
     }
 
     console.log("Successfully generated notes for:", subject, "user:", userId);
@@ -221,7 +200,7 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error("Notes function error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "An internal error occurred. Please try again later." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
