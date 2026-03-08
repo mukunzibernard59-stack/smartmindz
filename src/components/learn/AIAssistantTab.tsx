@@ -35,7 +35,7 @@ const AIAssistantTab: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [alwaysReadAloud, setAlwaysReadAloud] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
