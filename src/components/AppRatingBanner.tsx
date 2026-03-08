@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Star, X, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAppRating } from '@/hooks/useAppRating';
-
-const FEEDBACK_EMAIL = 'mukunzibernard59@gmail.com';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 const AppRatingBanner: React.FC = () => {
   const { shouldShow, markRated, markDismissed } = useAppRating();
+  const { profile, user } = useAuth();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
