@@ -64,13 +64,22 @@ export function useChatHistory() {
   // Save to localStorage whenever sessions change
   useEffect(() => {
     if (!isLoaded) return;
-    
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
     } catch (error) {
       console.error('Failed to save chat history:', error);
     }
   }, [sessions, isLoaded]);
+
+  // Persist active session ID
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (activeSessionId) {
+      localStorage.setItem(ACTIVE_SESSION_KEY, activeSessionId);
+    } else {
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+    }
+  }, [activeSessionId, isLoaded]);
 
   const createSession = useCallback((initialMessage?: string): ChatSession => {
     const newSession: ChatSession = {
