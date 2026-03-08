@@ -24,9 +24,6 @@ const AppRatingBanner: React.FC = () => {
     }, 300);
   };
 
-  const getStarDisplay = (stars: number): string => {
-    return '★'.repeat(stars) + '☆'.repeat(5 - stars);
-  };
 
   const handleSubmit = async () => {
     if (rating === 0) return;
