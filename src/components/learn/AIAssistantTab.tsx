@@ -237,7 +237,7 @@ const AIAssistantTab: React.FC = () => {
         onDeleteSession={deleteSession} onClearHistory={clearAllHistory}
         onRenameSession={renameSession} onOpenImageGenerator={() => setImageGenOpen(true)} />
 
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'ml-0'}`}>
         {/* Header */}
         <header className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-secondary/30">
           <div className="flex items-center gap-2">
