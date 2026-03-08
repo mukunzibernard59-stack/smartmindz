@@ -112,59 +112,6 @@ const AITutorMenu: React.FC<AITutorMenuProps> = ({ onSelectAction, onOpenImageGe
               </div>
             </DropdownMenuItem>
 
-            <DropdownMenuSeparator className="my-1" />
-
-            {/* Generate Video - Expandable */}
-            <div>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setVideoExpanded(!videoExpanded);
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 py-2 px-2.5 rounded-lg transition-colors text-left",
-                  "hover:bg-accent/50",
-                  videoExpanded && "bg-accent/30"
-                )}
-              >
-                <Video className="h-4 w-4 text-primary shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">Generate Video</p>
-                  <p className="text-xs text-muted-foreground">AI video creation tools</p>
-                </div>
-                <ChevronRight
-                  className={cn(
-                    "h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200",
-                    videoExpanded && "rotate-90"
-                  )}
-                />
-              </button>
-
-              {/* Nested Video Tools */}
-              <div
-                className={cn(
-                  "overflow-hidden transition-all duration-300 ease-in-out",
-                  videoExpanded ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
-                )}
-              >
-                <div className="ml-4 pl-3 border-l-2 border-primary/20 py-1 space-y-0.5">
-                  {VIDEO_TOOLS.map((tool) => (
-                    <DropdownMenuItem
-                      key={tool.id}
-                      onClick={() => onSelectAction(tool.id)}
-                      className="flex items-start gap-2.5 py-1.5 px-2 cursor-pointer rounded-lg hover:bg-accent/50 focus:bg-accent/50"
-                    >
-                      <tool.icon className="h-3.5 w-3.5 mt-0.5 text-primary/70 shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-medium text-xs">{tool.label}</p>
-                        <p className="text-[10px] text-muted-foreground truncate">{tool.description}</p>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-              </div>
-            </div>
           </div>
         </ScrollArea>
       </DropdownMenuContent>
