@@ -50,10 +50,10 @@ export function useChatHistory() {
         }));
         setSessions(hydratedSessions);
         
-        // Set most recent session as active if exists
-        if (hydratedSessions.length > 0) {
-          setActiveSessionId(hydratedSessions[0].id);
-        }
+        // Restore last active session or fall back to most recent
+        const savedActiveId = localStorage.getItem(ACTIVE_SESSION_KEY);
+        const restoredSession = hydratedSessions.find((s: ChatSession) => s.id === savedActiveId);
+        setActiveSessionId(restoredSession ? restoredSession.id : hydratedSessions[0]?.id || null);
       }
     } catch (error) {
       console.error('Failed to load chat history:', error);
