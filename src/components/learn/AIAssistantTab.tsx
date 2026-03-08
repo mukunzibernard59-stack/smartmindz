@@ -35,7 +35,7 @@ const AIAssistantTab: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [alwaysReadAloud, setAlwaysReadAloud] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -128,10 +128,7 @@ const AIAssistantTab: React.FC = () => {
           }
         }
 
-        if (assistantContent && isVoice && (autoSpeak || voiceMode)) {
-          await speakText(assistantContent);
-          if (voiceMode && isAuthenticated) startListening();
-        }
+        // TTS is now handled by TTSControls in ChatMessage
         break; // success
       } catch (error) {
         if (attempt < MAX_RETRIES) {
@@ -256,9 +253,10 @@ const AIAssistantTab: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <AITutorMenu onSelectAction={handleAIAction} onOpenImageGenerator={() => setImageGenOpen(true)} />
-            <button onClick={() => setAutoSpeak(!autoSpeak)}
-              className={`p-1.5 rounded-lg text-xs transition-colors ${autoSpeak ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
-              {autoSpeak ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            <button onClick={() => setAlwaysReadAloud(!alwaysReadAloud)}
+              className={`p-1.5 rounded-lg text-xs transition-colors ${alwaysReadAloud ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}
+              title={alwaysReadAloud ? 'Always read aloud (ON)' : 'Always read aloud (OFF)'}>
+              {alwaysReadAloud ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
             </button>
             {!isAuthenticated && (
               <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)} className="gap-1.5 h-7 text-xs">
@@ -289,7 +287,11 @@ const AIAssistantTab: React.FC = () => {
               </div>
             </div>
           )}
-          {messages.map(m => <ChatMessage key={m.id} message={m} />)}
+          {messages.map((m, i) => {
+            const isLatestAssistant = m.role === 'assistant' && m.content !== '' && 
+              i === messages.map((msg, idx) => msg.role === 'assistant' && msg.content !== '' ? idx : -1).filter(x => x >= 0).pop();
+            return <ChatMessage key={m.id} message={m} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
+          })}
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">

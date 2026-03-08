@@ -43,7 +43,7 @@ const SmartChat: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [alwaysReadAloud, setAlwaysReadAloud] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -204,12 +204,7 @@ const SmartChat: React.FC = () => {
         }
       }
 
-      if (assistantContent && isVoice && (autoSpeak || voiceMode)) {
-        await speakText(assistantContent);
-        if (voiceMode && isAuthenticated) {
-          startListening();
-        }
-      }
+      // TTS is now handled by TTSControls in ChatMessage
     } catch (error) {
       console.error('Chat error:', error);
       toast.error(sanitizeErrorMessage(error));
@@ -443,13 +438,13 @@ const SmartChat: React.FC = () => {
             />
 
             <button
-              onClick={() => setAutoSpeak(!autoSpeak)}
+              onClick={() => setAlwaysReadAloud(!alwaysReadAloud)}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors ${
-                autoSpeak ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
+                alwaysReadAloud ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
               }`}
-              title={autoSpeak ? 'Disable auto-speak' : 'Enable auto-speak'}
+              title={alwaysReadAloud ? 'Always read aloud (ON)' : 'Always read aloud (OFF)'}
             >
-              {autoSpeak ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+              {alwaysReadAloud ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
             </button>
 
             {!isAuthenticated && (
@@ -486,9 +481,11 @@ const SmartChat: React.FC = () => {
             </div>
           )}
 
-          {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} />
-          ))}
+          {messages.map((message, i) => {
+            const isLatestAssistant = message.role === 'assistant' && message.content !== '' &&
+              i === messages.map((msg, idx) => msg.role === 'assistant' && msg.content !== '' ? idx : -1).filter(x => x >= 0).pop();
+            return <ChatMessage key={message.id} message={message} language={language} autoRead={alwaysReadAloud} isLatestAssistant={!!isLatestAssistant} />;
+          })}
 
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.content === '' && (
             <div className="flex gap-3">
