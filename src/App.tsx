@@ -28,6 +28,7 @@ const App = () => (
         <FloatingInstallButton />
         <UpdateNotification />
         <AppOpenAd />
+        <AppRatingBanner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
