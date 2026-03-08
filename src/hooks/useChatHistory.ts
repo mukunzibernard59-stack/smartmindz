@@ -231,6 +231,7 @@ export function useChatHistory() {
     updateLastMessage,
     switchSession,
     deleteSession,
+    renameSession,
     clearAllHistory,
     startNewChat,
   };
