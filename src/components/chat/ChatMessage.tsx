@@ -14,7 +14,7 @@ interface ChatMessageProps {
   userInitials?: string;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', autoRead = false, isLatestAssistant = false }) => {
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, language = 'en', autoRead = false, isLatestAssistant = false, userAvatarUrl, userInitials = 'U' }) => {
   const showTTS = message.role === 'assistant' && message.content && isLatestAssistant;
 
   return (
