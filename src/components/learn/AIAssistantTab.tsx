@@ -253,9 +253,10 @@ const AIAssistantTab: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <AITutorMenu onSelectAction={handleAIAction} onOpenImageGenerator={() => setImageGenOpen(true)} />
-            <button onClick={() => setAutoSpeak(!autoSpeak)}
-              className={`p-1.5 rounded-lg text-xs transition-colors ${autoSpeak ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}>
-              {autoSpeak ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            <button onClick={() => setAlwaysReadAloud(!alwaysReadAloud)}
+              className={`p-1.5 rounded-lg text-xs transition-colors ${alwaysReadAloud ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}
+              title={alwaysReadAloud ? 'Always read aloud (ON)' : 'Always read aloud (OFF)'}>
+              {alwaysReadAloud ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
             </button>
             {!isAuthenticated && (
               <Button variant="outline" size="sm" onClick={() => setLoginOpen(true)} className="gap-1.5 h-7 text-xs">
