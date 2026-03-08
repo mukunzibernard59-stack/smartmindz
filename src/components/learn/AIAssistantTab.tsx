@@ -237,7 +237,7 @@ const AIAssistantTab: React.FC = () => {
   ];
 
   return (
-    <div className="relative flex h-full bg-card rounded-2xl border border-border overflow-hidden">
+    <div className="relative flex h-full bg-background rounded-2xl overflow-hidden">
       <ChatHistorySidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)}
         groupedSessions={groupedSessions} activeSessionId={activeSessionId}
         onSelectSession={switchSession} onNewChat={startNewChat}
@@ -246,7 +246,7 @@ const AIAssistantTab: React.FC = () => {
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'ml-0'}`}>
         {/* Header */}
-        <header className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-secondary/30">
+        <header className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 bg-background/50 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="h-8 w-8">
               <Menu className="h-4 w-4" />
@@ -319,7 +319,7 @@ const AIAssistantTab: React.FC = () => {
 
         {/* File uploads */}
         {files.length > 0 && (
-          <div className="px-4 py-2 border-t border-border flex gap-2 flex-wrap">
+          <div className="px-4 py-2 border-t border-border/30 flex gap-2 flex-wrap">
             {files.map(f => (
               <span key={f.id} className="text-xs bg-secondary px-2 py-1 rounded-lg flex items-center gap-1">
                 {f.name}
@@ -330,7 +330,7 @@ const AIAssistantTab: React.FC = () => {
         )}
 
         {/* Input */}
-        <div className="p-3 border-t border-border">
+        <div className="p-3 border-t border-border/30">
           <div className="flex gap-2">
             <FileUploadMenu files={files} isProcessing={isProcessing} onUpload={(fl) => uploadFiles(fl)} onRemoveFile={removeFile} onPasteText={handlePasteText} />
             <Button variant="secondary" size="icon"
