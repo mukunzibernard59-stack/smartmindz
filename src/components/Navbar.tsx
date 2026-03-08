@@ -27,7 +27,9 @@ const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const { isInstallable, install } = usePWAInstall();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const handleInstall = async () => {
     const installed = await install();
