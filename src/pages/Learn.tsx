@@ -9,27 +9,15 @@ const Learn: React.FC = () => {
   const adConfig = getAdConfig();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="h-screen flex flex-col bg-background overflow-hidden">
       <Navbar />
-      <main className="pt-24 pb-12">
-        <div className="container mx-auto px-4">
-          <div className="mb-4">
+      <main className="flex-1 flex flex-col pt-16 pb-2 overflow-hidden">
+        <div className="container mx-auto px-3 flex flex-col flex-1 overflow-hidden">
+          <div className="flex items-center gap-2 py-2 shrink-0">
             <BackButton />
           </div>
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-6">
-              <h1 className="text-3xl sm:text-4xl font-bold mb-2">
-                Learn
-              </h1>
-              <p className="text-muted-foreground">
-                AI Assistant, Tutor, and Video Generation — all in one place
-              </p>
-            </div>
+          <div className="flex-1 flex flex-col overflow-hidden max-w-6xl mx-auto w-full">
             <LearnTabs />
-            {/* Banner Ad at bottom of Learn page */}
-            <div className="mt-6">
-              <BannerAd slot={adConfig.web.bannerLearn} />
-            </div>
           </div>
         </div>
       </main>
