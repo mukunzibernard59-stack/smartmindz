@@ -128,10 +128,7 @@ const AIAssistantTab: React.FC = () => {
           }
         }
 
-        if (assistantContent && isVoice && (autoSpeak || voiceMode)) {
-          await speakText(assistantContent);
-          if (voiceMode && isAuthenticated) startListening();
-        }
+        // TTS is now handled by TTSControls in ChatMessage
         break; // success
       } catch (error) {
         if (attempt < MAX_RETRIES) {
