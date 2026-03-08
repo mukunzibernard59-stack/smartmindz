@@ -340,6 +340,7 @@ const AIAssistantTab: React.FC = () => {
         </div>
       </div>
 
+      <VoiceRecorder isActive={voiceMode} onCancel={handleVoiceCancel} onSend={handleVoiceSend} language={language} />
       <AIImageGenerator isOpen={imageGenOpen} onClose={() => setImageGenOpen(false)} onGenerate={handleGenerateImage} />
       <LoginModal open={loginOpen} onOpenChange={setLoginOpen} defaultTab="login" />
     </div>
