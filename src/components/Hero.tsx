@@ -109,13 +109,13 @@ const Hero: React.FC = () => {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link to="/dev">
+              <Link to="/quiz">
                 <Button 
                   size="xl" 
                   className="gap-2 w-full sm:w-auto glass border-primary/20 text-foreground hover:border-primary/40 hover:scale-[1.05] transition-all duration-300"
                 >
                   <Brain className="h-5 w-5 text-primary" />
-                  Dev Mode
+                  {t('hero.ctaSecondary')}
                 </Button>
               </Link>
             </motion.div>
