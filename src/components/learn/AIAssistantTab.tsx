@@ -246,7 +246,7 @@ const AIAssistantTab: React.FC = () => {
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'ml-0'}`}>
         {/* Header */}
-        <header className="flex items-center justify-between px-4 py-2.5 border-b border-border bg-secondary/30">
+        <header className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 bg-background/50 backdrop-blur-sm">
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="h-8 w-8">
               <Menu className="h-4 w-4" />
