@@ -27,7 +27,7 @@ const App = () => (
         <Sonner />
         <FloatingInstallButton />
         <UpdateNotification />
-        <AppOpenAd />
+        
         <AppRatingBanner />
         <BrowserRouter>
           <Routes>
