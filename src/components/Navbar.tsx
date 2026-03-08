@@ -53,6 +53,24 @@ const Navbar: React.FC = () => {
     else { toast.success('Signed out successfully'); }
   };
 
+  const handleAvatarUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please select an image file'); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error('Image must be under 5MB'); return; }
+
+    setIsUploadingAvatar(true);
+    try {
+      const { error } = await uploadAvatar(file);
+      if (error) { toast.error('Failed to upload photo'); }
+      else { toast.success('Profile photo updated!'); refreshProfile(); }
+    } catch { toast.error('Upload failed'); }
+    finally {
+      setIsUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  }, [uploadAvatar, refreshProfile]);
+
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
