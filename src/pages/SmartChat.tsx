@@ -204,12 +204,7 @@ const SmartChat: React.FC = () => {
         }
       }
 
-      if (assistantContent && isVoice && (autoSpeak || voiceMode)) {
-        await speakText(assistantContent);
-        if (voiceMode && isAuthenticated) {
-          startListening();
-        }
-      }
+      // TTS is now handled by TTSControls in ChatMessage
     } catch (error) {
       console.error('Chat error:', error);
       toast.error(sanitizeErrorMessage(error));
