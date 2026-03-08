@@ -30,6 +30,7 @@ const SmartChat: React.FC = () => {
     updateLastMessage,
     switchSession,
     deleteSession,
+    renameSession,
     clearAllHistory,
     startNewChat,
   } = useChatHistory();
