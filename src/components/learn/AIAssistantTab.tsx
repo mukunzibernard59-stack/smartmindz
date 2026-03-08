@@ -171,15 +171,22 @@ const AIAssistantTab: React.FC = () => {
     recognition.start();
   };
 
-  const toggleVoiceMode = async () => {
+  const toggleVoiceMode = () => {
     if (!isAuthenticated) { toast.error('Please sign in'); setLoginOpen(true); return; }
-    if (!voiceMode) {
-      setVoiceMode(true); toast.success('Voice mode ON');
-      const g = language === 'sw' ? 'Habari!' : language === 'fr' ? 'Bonjour!' : language === 'rw' ? 'Muraho!' : 'Hi there!';
-      try { await speakText(g); startListening(); } catch { startListening(); }
-    } else {
-      setVoiceMode(false); stopSpeaking(); recognitionRef.current?.abort(); setIsRecording(false); toast.info('Voice mode OFF');
-    }
+    setVoiceMode(true);
+  };
+
+  const handleVoiceCancel = () => {
+    setVoiceMode(false);
+    stopSpeaking();
+    recognitionRef.current?.abort();
+    setIsRecording(false);
+  };
+
+  const handleVoiceSend = async (text: string) => {
+    setVoiceMode(false);
+    setIsRecording(false);
+    await sendMessage(text, true);
   };
 
   const handleAIAction = (action: string) => {
