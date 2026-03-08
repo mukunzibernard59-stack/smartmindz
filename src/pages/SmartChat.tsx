@@ -438,13 +438,13 @@ const SmartChat: React.FC = () => {
             />
 
             <button
-              onClick={() => setAutoSpeak(!autoSpeak)}
+              onClick={() => setAlwaysReadAloud(!alwaysReadAloud)}
               className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs transition-colors ${
-                autoSpeak ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
+                alwaysReadAloud ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'
               }`}
-              title={autoSpeak ? 'Disable auto-speak' : 'Enable auto-speak'}
+              title={alwaysReadAloud ? 'Always read aloud (ON)' : 'Always read aloud (OFF)'}
             >
-              {autoSpeak ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+              {alwaysReadAloud ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
             </button>
 
             {!isAuthenticated && (
