@@ -321,26 +321,19 @@ const AIAssistantTab: React.FC = () => {
 
         {/* Input */}
         <div className="p-3 border-t border-border">
-          {voiceMode && (
-            <div className="mb-2 flex items-center justify-center gap-2 text-sm text-primary animate-pulse">
-              {isRecording ? <><Mic className="h-4 w-4" /> Listening...</> :
-               isSpeaking ? <><Volume2 className="h-4 w-4" /> Speaking...</> :
-               isLoading ? <><Brain className="h-4 w-4" /> Thinking...</> : null}
-            </div>
-          )}
           <div className="flex gap-2">
             <FileUploadMenu files={files} isProcessing={isProcessing} onUpload={(fl) => uploadFiles(fl)} onRemoveFile={removeFile} onPasteText={handlePasteText} />
-            <Button variant={voiceMode ? 'destructive' : 'secondary'} size="icon"
-              onClick={toggleVoiceMode} className={`h-9 w-9 ${voiceMode ? 'animate-pulse' : ''}`}
-              disabled={isLoading && !voiceMode}>
-              {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+            <Button variant="secondary" size="icon"
+              onClick={toggleVoiceMode} className="h-9 w-9"
+              disabled={isLoading}>
+              <Mic className="h-4 w-4" />
             </Button>
-            <input type="text" value={input} onChange={(e) => setInput(e.target.value)}
+            <input type="text" value={input} onChange={(e) => { setInput(e.target.value); stopSpeaking(); }}
               onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-              placeholder={voiceMode ? 'Voice mode active...' : 'Ask anything...'}
-              disabled={isLoading || voiceMode}
+              placeholder="Ask anything..."
+              disabled={isLoading}
               className="flex-1 px-3 py-2 bg-secondary border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-sm" />
-            <Button onClick={handleSend} disabled={!input.trim() || isLoading || voiceMode} size="icon" className="h-9 w-9">
+            <Button onClick={handleSend} disabled={!input.trim() || isLoading} size="icon" className="h-9 w-9">
               <Send className="h-4 w-4" />
             </Button>
           </div>
