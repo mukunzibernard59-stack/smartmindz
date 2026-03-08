@@ -30,6 +30,7 @@ const SmartChat: React.FC = () => {
     updateLastMessage,
     switchSession,
     deleteSession,
+    renameSession,
     clearAllHistory,
     startNewChat,
   } = useChatHistory();
@@ -395,6 +396,8 @@ const SmartChat: React.FC = () => {
         onNewChat={startNewChat}
         onDeleteSession={deleteSession}
         onClearHistory={clearAllHistory}
+        onRenameSession={renameSession}
+        onOpenImageGenerator={() => setImageGenOpen(true)}
       />
 
       {/* Main Chat Area */}
