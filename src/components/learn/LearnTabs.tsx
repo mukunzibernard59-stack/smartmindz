@@ -25,7 +25,7 @@ const LearnTabs: React.FC = () => {
       <TabsContent value="assistant" className="mt-2 flex-1 overflow-hidden">
         <AIAssistantTab />
       </TabsContent>
-      <TabsContent value="tutor" className="mt-2 flex-1 overflow-hidden">
+      <TabsContent value="tutor" className="mt-2 flex-1 overflow-y-auto">
         <AITutorTab />
       </TabsContent>
     </Tabs>
