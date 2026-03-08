@@ -296,9 +296,18 @@
 /* Hide Lovable Badge */
 a[href*="lovable.dev"][target="_blank"],
 div[class*="lovable"],
-iframe[src*="lovable"] {
+iframe[src*="lovable"],
+#lovable-badge,
+[data-lovable],
+body > a[target="_blank"]:last-of-type,
+body > div:last-child a[href*="lovable"] {
   display: none !important;
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  position: fixed !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  width: 0 !important;
+  height: 0 !important;
 }
