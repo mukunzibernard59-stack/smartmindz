@@ -13,6 +13,7 @@ import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
 import AITutorMenu from '@/components/chat/AITutorMenu';
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
+import VoiceRecorder from '@/components/chat/VoiceRecorder';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
