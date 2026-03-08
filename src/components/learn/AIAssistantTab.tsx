@@ -234,7 +234,8 @@ const AIAssistantTab: React.FC = () => {
       <ChatHistorySidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)}
         groupedSessions={groupedSessions} activeSessionId={activeSessionId}
         onSelectSession={switchSession} onNewChat={startNewChat}
-        onDeleteSession={deleteSession} onClearHistory={clearAllHistory} />
+        onDeleteSession={deleteSession} onClearHistory={clearAllHistory}
+        onRenameSession={renameSession} onOpenImageGenerator={() => setImageGenOpen(true)} />
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-72' : 'ml-0'}`}>
         {/* Header */}
