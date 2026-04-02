@@ -74,21 +74,27 @@ Rules:
 - Closing should be professional (e.g., "Sincerely,")
 - Return ONLY valid JSON, no markdown`;
 
-    const aiResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    const lovableApiKey = Deno.env.get("LOVABLE_API_KEY");
+    if (!lovableApiKey) {
+      return new Response(JSON.stringify({ error: "AI service not configured." }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const aiResponse = await fetch("https://ai-gateway.lovable.dev/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${Deno.env.get("GROQ_API_KEY")}`,
+        "Authorization": `Bearer ${lovableApiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "llama-3.1-70b-versatile",
+        model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "You are a professional letter writing assistant. Always respond with valid JSON only." },
+          { role: "system", content: "You are a professional letter writing assistant. Always respond with valid JSON only, no markdown formatting." },
           { role: "user", content: prompt },
         ],
         temperature: 0.7,
         max_tokens: 2000,
-        response_format: { type: "json_object" },
       }),
     });
 
@@ -101,7 +107,12 @@ Rules:
     }
 
     const aiData = await aiResponse.json();
-    const letterContent = JSON.parse(aiData.choices[0].message.content);
+    let content = aiData.choices[0].message.content;
+    
+    // Strip markdown code fences if present
+    content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+    
+    const letterContent = JSON.parse(content);
 
     return new Response(JSON.stringify({ letter: letterContent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
