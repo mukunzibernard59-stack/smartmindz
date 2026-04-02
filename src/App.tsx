@@ -21,29 +21,38 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppContent = () => {
+  const { isOnline } = useOfflineMode();
+
+  return (
+    <>
+      <OfflineBanner isOnline={isOnline} />
+      <Toaster />
+      <Sonner />
+      <FloatingInstallButton />
+      <UpdateNotification />
+      <AppRatingBanner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/quiz" element={<Learn />} />
+          <Route path="/dev" element={<DevMode />} />
+          <Route path="/chat" element={<Learn />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <FloatingInstallButton />
-        <UpdateNotification />
-        
-        <AppRatingBanner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/quiz" element={<Learn />} />
-            <Route path="/dev" element={<DevMode />} />
-            <Route path="/chat" element={<Learn />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+        <AppContent />
       </TooltipProvider>
     </LanguageProvider>
   </QueryClientProvider>
