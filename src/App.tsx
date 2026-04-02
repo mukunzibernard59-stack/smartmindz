@@ -18,6 +18,7 @@ import DevMode from "./pages/DevMode";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
+import DesignLetters from "./pages/DesignLetters";
 
 const queryClient = new QueryClient();
 
