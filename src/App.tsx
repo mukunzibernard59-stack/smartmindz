@@ -6,6 +6,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import FloatingInstallButton from "@/components/FloatingInstallButton";
 import UpdateNotification from "@/components/UpdateNotification";
+import OfflineBanner from "@/components/OfflineBanner";
+import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 import AppRatingBanner from "@/components/AppRatingBanner";
 import Index from "./pages/Index";
