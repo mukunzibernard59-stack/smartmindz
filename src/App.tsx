@@ -42,6 +42,7 @@ const AppContent = () => {
           <Route path="/chat" element={<Learn />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/design-letters" element={<DesignLetters />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
