@@ -7,7 +7,7 @@
 // Test/placeholder ad unit IDs — replace with real ones in production
 const AD_CONFIG = {
   // Google AdSense Publisher ID (replace with your real one)
-  publisherId: 'ca-pub-0000000000000000',
+  publisherId: 'ca-pub-4985844054229933',
 
   // Web (AdSense) ad slot IDs
   web: {
