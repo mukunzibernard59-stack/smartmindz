@@ -1,0 +1,439 @@
+import React, { useState, useRef } from 'react';
+import Navbar from '@/components/Navbar';
+import BackButton from '@/components/BackButton';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FileText, Copy, Download, Loader2, PenLine, Check, ArrowRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface LetterData {
+  senderName: string;
+  senderAddress: string;
+  date: string;
+  recipientName: string;
+  recipientAddress: string;
+  subject: string;
+  greeting: string;
+  body: string[];
+  closing: string;
+  signatureName: string;
+}
+
+const LETTER_TYPES = [
+  'Job Application',
+  'Formal Request',
+  'Complaint Letter',
+  'Business Proposal',
+  'Cover Letter',
+  'Resignation Letter',
+  'Recommendation Letter',
+  'Thank You Letter',
+  'Apology Letter',
+  'Permission Letter',
+  'Inquiry Letter',
+  'Custom',
+];
+
+const DesignLetters: React.FC = () => {
+  const { toast } = useToast();
+  const letterRef = useRef<HTMLDivElement>(null);
+
+  const [letterType, setLetterType] = useState('');
+  const [details, setDetails] = useState('');
+  const [senderName, setSenderName] = useState('');
+  const [senderAddress, setSenderAddress] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [subject, setSubject] = useState('');
+
+  const [letter, setLetter] = useState<LetterData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editedLetter, setEditedLetter] = useState<LetterData | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const currentLetter = editing ? editedLetter : letter;
+
+  const generateLetter = async () => {
+    if (!letterType || !details.trim()) {
+      toast({ title: 'Missing info', description: 'Please select a letter type and provide details.', variant: 'destructive' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({ title: 'Sign in required', description: 'Please sign in to generate letters.', variant: 'destructive' });
+        setLoading(false);
+        return;
+      }
+
+      const response = await supabase.functions.invoke('generate-letter', {
+        body: { letterType, details, senderName, senderAddress, recipientName, recipientAddress, subject },
+      });
+
+      if (response.error) throw new Error(response.error.message);
+
+      const letterData = response.data.letter as LetterData;
+      setLetter(letterData);
+      setEditedLetter({ ...letterData });
+      setEditing(false);
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Failed to generate letter.', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getLetterText = (): string => {
+    const l = currentLetter;
+    if (!l) return '';
+    return [
+      l.senderName, l.senderAddress, '', l.date, '',
+      l.recipientName, l.recipientAddress, '',
+      `Subject: ${l.subject}`, '',
+      l.greeting, '',
+      ...l.body.map(p => p + '\n'),
+      l.closing, l.signatureName,
+    ].join('\n');
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(getLetterText());
+      setCopied(true);
+      toast({ title: 'Copied!', description: 'Letter copied to clipboard.' });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: 'Error', description: 'Failed to copy.', variant: 'destructive' });
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    const l = currentLetter;
+    if (!l) return;
+
+    // Use print-based PDF generation for clean A4 output
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      toast({ title: 'Error', description: 'Please allow popups to download PDF.', variant: 'destructive' });
+      return;
+    }
+
+    const bodyParagraphs = l.body.map(p => `<p style="margin:0 0 14px 0;line-height:1.6;">${p}</p>`).join('');
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html><head><title>${l.subject}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap');
+@page { size: A4; margin: 25mm 25mm 25mm 25mm; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Crimson Text', 'Times New Roman', serif;
+  font-size: 12pt;
+  color: #1a1a1a;
+  line-height: 1.5;
+  padding: 0;
+}
+.letter { max-width: 210mm; margin: 0 auto; }
+.sender { margin-bottom: 24px; }
+.sender-name { font-weight: 700; font-size: 14pt; }
+.date { margin-bottom: 24px; }
+.recipient { margin-bottom: 24px; }
+.subject { font-weight: 700; margin-bottom: 20px; }
+.greeting { margin-bottom: 16px; }
+.body { margin-bottom: 24px; }
+.closing { margin-bottom: 40px; }
+.signature { font-weight: 600; }
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style></head><body>
+<div class="letter">
+  <div class="sender">
+    <div class="sender-name">${l.senderName}</div>
+    <div>${l.senderAddress.replace(/\n/g, '<br>')}</div>
+  </div>
+  <div class="date">${l.date}</div>
+  <div class="recipient">
+    <div style="font-weight:600">${l.recipientName}</div>
+    <div>${l.recipientAddress.replace(/\n/g, '<br>')}</div>
+  </div>
+  <div class="subject">Subject: ${l.subject}</div>
+  <div class="greeting">${l.greeting}</div>
+  <div class="body">${bodyParagraphs}</div>
+  <div class="closing">${l.closing}</div>
+  <div class="signature">${l.signatureName}</div>
+</div>
+<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
+</body></html>`);
+    printWindow.document.close();
+  };
+
+  const handleEditField = (field: keyof LetterData, value: string | string[]) => {
+    if (!editedLetter) return;
+    setEditedLetter({ ...editedLetter, [field]: value });
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="pt-20 pb-10 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-3 mb-6">
+            <BackButton />
+            <div>
+              <h1 className="text-2xl font-bold flex items-center gap-2">
+                <FileText className="h-6 w-6 text-primary" />
+                Design Letters
+              </h1>
+              <p className="text-sm text-muted-foreground">Create professional letters instantly</p>
+            </div>
+          </div>
+
+          {/* Form */}
+          {!letter && (
+            <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Letter Type *</label>
+                  <Select value={letterType} onValueChange={setLetterType}>
+                    <SelectTrigger><SelectValue placeholder="Select letter type" /></SelectTrigger>
+                    <SelectContent>
+                      {LETTER_TYPES.map(t => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Subject (optional)</label>
+                  <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Letter subject" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Your Name</label>
+                  <Input value={senderName} onChange={e => setSenderName(e.target.value)} placeholder="John Doe" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Your Address</label>
+                  <Input value={senderAddress} onChange={e => setSenderAddress(e.target.value)} placeholder="123 Main St, City" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Recipient Name</label>
+                  <Input value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Jane Smith" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Recipient Address</label>
+                  <Input value={recipientAddress} onChange={e => setRecipientAddress(e.target.value)} placeholder="456 Corp Ave, City" />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Details / Purpose *</label>
+                <Textarea
+                  value={details}
+                  onChange={e => setDetails(e.target.value)}
+                  placeholder="Describe what the letter is about, key points to include, tone preferences..."
+                  className="min-h-[120px]"
+                />
+              </div>
+
+              <Button onClick={generateLetter} disabled={loading} variant="hero" size="lg" className="w-full gap-2">
+                {loading ? (
+                  <><Loader2 className="h-5 w-5 animate-spin" /> Generating...</>
+                ) : (
+                  <><ArrowRight className="h-5 w-5" /> Generate Letter</>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {/* Generated Letter Preview */}
+          {currentLetter && (
+            <div className="space-y-4">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button onClick={() => { setLetter(null); setEditedLetter(null); setEditing(false); }} variant="outline" className="gap-2">
+                  <FileText className="h-4 w-4" /> New Letter
+                </Button>
+                <Button onClick={() => setEditing(!editing)} variant={editing ? 'default' : 'secondary'} className="gap-2">
+                  <PenLine className="h-4 w-4" /> {editing ? 'Done Editing' : 'Edit Letter'}
+                </Button>
+                <Button onClick={handleCopy} variant="secondary" className="gap-2">
+                  {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                  {copied ? 'Copied!' : 'Copy'}
+                </Button>
+                <Button onClick={handleDownloadPDF} variant="hero" className="gap-2">
+                  <Download className="h-4 w-4" /> Download PDF
+                </Button>
+              </div>
+
+              {/* A4 Letter Document */}
+              <div className="flex justify-center">
+                <div
+                  ref={letterRef}
+                  className="w-full max-w-[210mm] bg-white text-gray-900 rounded-lg shadow-2xl overflow-hidden"
+                  style={{
+                    minHeight: '297mm',
+                    padding: '25mm',
+                    fontFamily: "'Times New Roman', 'Crimson Text', serif",
+                    fontSize: '12pt',
+                    lineHeight: '1.6',
+                  }}
+                >
+                  {/* Sender */}
+                  <div style={{ marginBottom: '24px' }}>
+                    {editing ? (
+                      <div className="space-y-1">
+                        <input
+                          value={editedLetter?.senderName || ''}
+                          onChange={e => handleEditField('senderName', e.target.value)}
+                          className="w-full font-bold text-lg bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                        />
+                        <input
+                          value={editedLetter?.senderAddress || ''}
+                          onChange={e => handleEditField('senderAddress', e.target.value)}
+                          className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ fontWeight: 700, fontSize: '14pt' }}>{currentLetter.senderName}</div>
+                        <div>{currentLetter.senderAddress}</div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Date */}
+                  <div style={{ marginBottom: '24px' }}>
+                    {editing ? (
+                      <input
+                        value={editedLetter?.date || ''}
+                        onChange={e => handleEditField('date', e.target.value)}
+                        className="bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                      />
+                    ) : (
+                      currentLetter.date
+                    )}
+                  </div>
+
+                  {/* Recipient */}
+                  <div style={{ marginBottom: '24px' }}>
+                    {editing ? (
+                      <div className="space-y-1">
+                        <input
+                          value={editedLetter?.recipientName || ''}
+                          onChange={e => handleEditField('recipientName', e.target.value)}
+                          className="w-full font-semibold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                        />
+                        <input
+                          value={editedLetter?.recipientAddress || ''}
+                          onChange={e => handleEditField('recipientAddress', e.target.value)}
+                          className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ fontWeight: 600 }}>{currentLetter.recipientName}</div>
+                        <div>{currentLetter.recipientAddress}</div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Subject */}
+                  <div style={{ fontWeight: 700, marginBottom: '20px' }}>
+                    {editing ? (
+                      <input
+                        value={editedLetter?.subject || ''}
+                        onChange={e => handleEditField('subject', e.target.value)}
+                        className="w-full font-bold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                      />
+                    ) : (
+                      `Subject: ${currentLetter.subject}`
+                    )}
+                  </div>
+
+                  {/* Greeting */}
+                  <div style={{ marginBottom: '16px' }}>
+                    {editing ? (
+                      <input
+                        value={editedLetter?.greeting || ''}
+                        onChange={e => handleEditField('greeting', e.target.value)}
+                        className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                      />
+                    ) : (
+                      currentLetter.greeting
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div style={{ marginBottom: '24px' }}>
+                    {editing ? (
+                      <div className="space-y-2">
+                        {(editedLetter?.body || []).map((para, i) => (
+                          <textarea
+                            key={i}
+                            value={para}
+                            onChange={e => {
+                              const newBody = [...(editedLetter?.body || [])];
+                              newBody[i] = e.target.value;
+                              handleEditField('body', newBody);
+                            }}
+                            className="w-full min-h-[80px] bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900 resize-y"
+                            style={{ fontFamily: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      currentLetter.body.map((para, i) => (
+                        <p key={i} style={{ marginBottom: '14px' }}>{para}</p>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Closing */}
+                  <div style={{ marginBottom: '40px' }}>
+                    {editing ? (
+                      <input
+                        value={editedLetter?.closing || ''}
+                        onChange={e => handleEditField('closing', e.target.value)}
+                        className="bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                      />
+                    ) : (
+                      currentLetter.closing
+                    )}
+                  </div>
+
+                  {/* Signature */}
+                  <div style={{ fontWeight: 600 }}>
+                    {editing ? (
+                      <input
+                        value={editedLetter?.signatureName || ''}
+                        onChange={e => handleEditField('signatureName', e.target.value)}
+                        className="font-semibold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
+                      />
+                    ) : (
+                      currentLetter.signatureName
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default DesignLetters;
