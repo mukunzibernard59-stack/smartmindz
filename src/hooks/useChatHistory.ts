@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export interface ChatMessage {
   id: string;
@@ -33,6 +33,12 @@ export function useChatHistory() {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Use a ref to always have the latest activeSessionId in callbacks
+  const activeSessionIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    activeSessionIdRef.current = activeSessionId;
+  }, [activeSessionId]);
+
   // Load from localStorage on mount
   useEffect(() => {
     try {
@@ -49,10 +55,10 @@ export function useChatHistory() {
           })),
         }));
         setSessions(hydratedSessions);
-        
-        // Always start with a fresh new chat — history stays in sidebar
-        setActiveSessionId(null);
       }
+      // Always start with a fresh new chat — history stays in sidebar
+      setActiveSessionId(null);
+      activeSessionIdRef.current = null;
     } catch (error) {
       console.error('Failed to load chat history:', error);
     }
@@ -87,17 +93,17 @@ export function useChatHistory() {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    
+
     setSessions(prev => {
       const updated = [newSession, ...prev];
-      // Limit total sessions
       if (updated.length > MAX_SESSIONS) {
         return updated.slice(0, MAX_SESSIONS);
       }
       return updated;
     });
-    
+
     setActiveSessionId(newSession.id);
+    activeSessionIdRef.current = newSession.id;
     return newSession;
   }, []);
 
@@ -112,47 +118,48 @@ export function useChatHistory() {
       timestamp: new Date(),
     };
 
-    setSessions(prev => {
-      let sessionId = activeSessionId;
-      
-      // Create new session if none active
-      if (!sessionId) {
-        const newSession: ChatSession = {
-          id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          title: message.content.substring(0, 50) || 'New Chat',
-          messages: [newMessage],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        setActiveSessionId(newSession.id);
-        return [newSession, ...prev].slice(0, MAX_SESSIONS);
-      }
+    // Use the ref to get the latest session ID (avoids stale closure)
+    let sessionId = activeSessionIdRef.current;
 
-      return prev.map(session => {
-        if (session.id === sessionId) {
+    if (!sessionId) {
+      // Create new session inline
+      const newSession: ChatSession = {
+        id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        title: message.content.substring(0, 50) || 'New Chat',
+        messages: [newMessage],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      sessionId = newSession.id;
+      setActiveSessionId(newSession.id);
+      activeSessionIdRef.current = newSession.id;
+      setSessions(prev => [newSession, ...prev].slice(0, MAX_SESSIONS));
+    } else {
+      const currentSessionId = sessionId;
+      setSessions(prev => prev.map(session => {
+        if (session.id === currentSessionId) {
           const updatedSession = {
             ...session,
             messages: [...session.messages, newMessage],
             updatedAt: new Date(),
           };
-          
-          // Update title from first user message
           if (session.messages.length === 0 && message.role === 'user') {
             updatedSession.title = message.content.substring(0, 50);
           }
-          
           return updatedSession;
         }
         return session;
-      });
-    });
+      }));
+    }
 
     return newMessage;
-  }, [activeSessionId]);
+  }, []);
 
   const updateLastMessage = useCallback((content: string) => {
+    const sessionId = activeSessionIdRef.current;
+    if (!sessionId) return;
     setSessions(prev => prev.map(session => {
-      if (session.id === activeSessionId && session.messages.length > 0) {
+      if (session.id === sessionId && session.messages.length > 0) {
         const messages = [...session.messages];
         const lastIdx = messages.length - 1;
         messages[lastIdx] = { ...messages[lastIdx], content };
@@ -160,24 +167,24 @@ export function useChatHistory() {
       }
       return session;
     }));
-  }, [activeSessionId]);
+  }, []);
 
   const switchSession = useCallback((sessionId: string) => {
     setActiveSessionId(sessionId);
+    activeSessionIdRef.current = sessionId;
   }, []);
 
   const deleteSession = useCallback((sessionId: string) => {
     setSessions(prev => {
       const filtered = prev.filter(s => s.id !== sessionId);
-      
-      // If deleted session was active, switch to most recent
-      if (sessionId === activeSessionId) {
-        setActiveSessionId(filtered[0]?.id || null);
+      if (sessionId === activeSessionIdRef.current) {
+        const newId = filtered[0]?.id || null;
+        setActiveSessionId(newId);
+        activeSessionIdRef.current = newId;
       }
-      
       return filtered;
     });
-  }, [activeSessionId]);
+  }, []);
 
   const renameSession = useCallback((sessionId: string, title: string) => {
     setSessions(prev => prev.map(s =>
@@ -188,13 +195,14 @@ export function useChatHistory() {
   const clearAllHistory = useCallback(() => {
     setSessions([]);
     setActiveSessionId(null);
+    activeSessionIdRef.current = null;
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
   const startNewChat = useCallback(() => {
-    const session = createSession();
-    return session;
-  }, [createSession]);
+    setActiveSessionId(null);
+    activeSessionIdRef.current = null;
+  }, []);
 
   // Group sessions by date
   const groupedSessions = useCallback(() => {

@@ -8,7 +8,7 @@
   },
   "plugins": {
     "AdMob": {
-      "appId": "ca-app-pub-0000000000000000~0000000000",
+      "appId": "ca-app-pub-4985844054229933~9621082253",
       "testDeviceIds": ["YOUR_TEST_DEVICE_ID"],
       "initializeForTesting": true
     }

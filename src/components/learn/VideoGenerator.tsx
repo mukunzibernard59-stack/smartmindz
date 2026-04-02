@@ -62,7 +62,7 @@ const VideoGenerator: React.FC = () => {
     }
     let stage = 0;
     const timings = [0, 3000, 8000, 20000, 60000];
-    const timers: NodeJS.Timeout[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
     timings.forEach((delay, i) => {
       timers.push(setTimeout(() => setRenderStage(i), delay));
     });
