@@ -23,18 +23,9 @@ interface LetterData {
 }
 
 const LETTER_TYPES = [
-  'Job Application',
-  'Formal Request',
-  'Complaint Letter',
-  'Business Proposal',
-  'Cover Letter',
-  'Resignation Letter',
-  'Recommendation Letter',
-  'Thank You Letter',
-  'Apology Letter',
-  'Permission Letter',
-  'Inquiry Letter',
-  'Custom',
+  'Job Application', 'Formal Request', 'Complaint Letter', 'Business Proposal',
+  'Cover Letter', 'Resignation Letter', 'Recommendation Letter', 'Thank You Letter',
+  'Apology Letter', 'Permission Letter', 'Inquiry Letter', 'Custom',
 ];
 
 const DesignLetters: React.FC = () => {
@@ -62,7 +53,6 @@ const DesignLetters: React.FC = () => {
       toast({ title: 'Missing info', description: 'Please select a letter type and provide details.', variant: 'destructive' });
       return;
     }
-
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -71,13 +61,10 @@ const DesignLetters: React.FC = () => {
         setLoading(false);
         return;
       }
-
       const response = await supabase.functions.invoke('generate-letter', {
         body: { letterType, details, senderName, senderAddress, recipientName, recipientAddress, subject },
       });
-
       if (response.error) throw new Error(response.error.message);
-
       const letterData = response.data.letter as LetterData;
       setLetter(letterData);
       setEditedLetter({ ...letterData });
@@ -92,14 +79,7 @@ const DesignLetters: React.FC = () => {
   const getLetterText = (): string => {
     const l = currentLetter;
     if (!l) return '';
-    return [
-      l.senderName, l.senderAddress, '', l.date, '',
-      l.recipientName, l.recipientAddress, '',
-      `Subject: ${l.subject}`, '',
-      l.greeting, '',
-      ...l.body.map(p => p + '\n'),
-      l.closing, l.signatureName,
-    ].join('\n');
+    return [l.senderName, l.senderAddress, '', l.date, '', l.recipientName, l.recipientAddress, '', `Subject: ${l.subject}`, '', l.greeting, '', ...l.body.map(p => p + '\n'), l.closing, l.signatureName].join('\n');
   };
 
   const handleCopy = async () => {
@@ -108,37 +88,21 @@ const DesignLetters: React.FC = () => {
       setCopied(true);
       toast({ title: 'Copied!', description: 'Letter copied to clipboard.' });
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast({ title: 'Error', description: 'Failed to copy.', variant: 'destructive' });
-    }
+    } catch { toast({ title: 'Error', description: 'Failed to copy.', variant: 'destructive' }); }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadPDF = () => {
     const l = currentLetter;
     if (!l) return;
-
-    // Use print-based PDF generation for clean A4 output
     const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      toast({ title: 'Error', description: 'Please allow popups to download PDF.', variant: 'destructive' });
-      return;
-    }
-
-    const bodyParagraphs = l.body.map(p => `<p style="margin:0 0 14px 0;line-height:1.6;">${p}</p>`).join('');
-
-    printWindow.document.write(`<!DOCTYPE html>
-<html><head><title>${l.subject}</title>
+    if (!printWindow) { toast({ title: 'Error', description: 'Please allow popups to download PDF.', variant: 'destructive' }); return; }
+    const bodyParagraphs = l.body.map(p => `<p style="margin:0 0 14px 0;line-height:1.7;">${p}</p>`).join('');
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>${l.subject}</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600;700&display=swap');
-@page { size: A4; margin: 25mm 25mm 25mm 25mm; }
+@page { size: A4; margin: 25mm; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'Crimson Text', 'Times New Roman', serif;
-  font-size: 12pt;
-  color: #1a1a1a;
-  line-height: 1.5;
-  padding: 0;
-}
+body { font-family: 'Crimson Text', 'Times New Roman', serif; font-size: 12pt; color: #1a1a1a; line-height: 1.6; }
 .letter { max-width: 210mm; margin: 0 auto; }
 .sender { margin-bottom: 24px; }
 .sender-name { font-weight: 700; font-size: 14pt; }
@@ -149,20 +113,12 @@ body {
 .body { margin-bottom: 24px; }
 .closing { margin-bottom: 40px; }
 .signature { font-weight: 600; }
-@media print {
-  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-}
+@media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
 </style></head><body>
 <div class="letter">
-  <div class="sender">
-    <div class="sender-name">${l.senderName}</div>
-    <div>${l.senderAddress.replace(/\n/g, '<br>')}</div>
-  </div>
+  <div class="sender"><div class="sender-name">${l.senderName}</div><div>${l.senderAddress.replace(/\n/g, '<br>')}</div></div>
   <div class="date">${l.date}</div>
-  <div class="recipient">
-    <div style="font-weight:600">${l.recipientName}</div>
-    <div>${l.recipientAddress.replace(/\n/g, '<br>')}</div>
-  </div>
+  <div class="recipient"><div style="font-weight:600">${l.recipientName}</div><div>${l.recipientAddress.replace(/\n/g, '<br>')}</div></div>
   <div class="subject">Subject: ${l.subject}</div>
   <div class="greeting">${l.greeting}</div>
   <div class="body">${bodyParagraphs}</div>
@@ -179,35 +135,52 @@ body {
     setEditedLetter({ ...editedLetter, [field]: value });
   };
 
+  // Editable field component
+  const EditableField = ({ value, field, className = '', multiline = false }: { value: string; field: keyof LetterData; className?: string; multiline?: boolean }) => {
+    if (!editing) return <span>{value}</span>;
+    if (multiline) return (
+      <textarea
+        value={(editedLetter as any)?.[field] || ''}
+        onChange={e => handleEditField(field, e.target.value)}
+        className={`w-full bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-y ${className}`}
+        style={{ fontFamily: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}
+      />
+    );
+    return (
+      <input
+        value={(editedLetter as any)?.[field] || ''}
+        onChange={e => handleEditField(field, e.target.value)}
+        className={`w-full bg-primary/5 border border-primary/20 rounded-lg px-3 py-1.5 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 ${className}`}
+        style={{ fontFamily: 'inherit', fontSize: 'inherit' }}
+      />
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="pt-20 pb-10 px-4">
+      <main className="pt-20 pb-10 px-3 sm:px-4">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
             <BackButton />
             <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <FileText className="h-6 w-6 text-primary" />
+              <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
+                <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                 Design Letters
               </h1>
-              <p className="text-sm text-muted-foreground">Create professional letters instantly</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Create professional letters instantly</p>
             </div>
           </div>
 
           {/* Form */}
           {!letter && (
-            <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-card rounded-2xl border border-border p-4 sm:p-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Letter Type *</label>
                   <Select value={letterType} onValueChange={setLetterType}>
                     <SelectTrigger><SelectValue placeholder="Select letter type" /></SelectTrigger>
-                    <SelectContent>
-                      {LETTER_TYPES.map(t => (
-                        <SelectItem key={t} value={t}>{t}</SelectItem>
-                      ))}
-                    </SelectContent>
+                    <SelectContent>{LETTER_TYPES.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
@@ -215,8 +188,7 @@ body {
                   <Input value={subject} onChange={e => setSubject(e.target.value)} placeholder="Letter subject" />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Your Name</label>
                   <Input value={senderName} onChange={e => setSenderName(e.target.value)} placeholder="John Doe" />
@@ -226,8 +198,7 @@ body {
                   <Input value={senderAddress} onChange={e => setSenderAddress(e.target.value)} placeholder="123 Main St, City" />
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Recipient Name</label>
                   <Input value={recipientName} onChange={e => setRecipientName(e.target.value)} placeholder="Jane Smith" />
@@ -237,110 +208,76 @@ body {
                   <Input value={recipientAddress} onChange={e => setRecipientAddress(e.target.value)} placeholder="456 Corp Ave, City" />
                 </div>
               </div>
-
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Details / Purpose *</label>
-                <Textarea
-                  value={details}
-                  onChange={e => setDetails(e.target.value)}
-                  placeholder="Describe what the letter is about, key points to include, tone preferences..."
-                  className="min-h-[120px]"
-                />
+                <Textarea value={details} onChange={e => setDetails(e.target.value)} placeholder="Describe what the letter is about..." className="min-h-[100px]" />
               </div>
-
               <Button onClick={generateLetter} disabled={loading} variant="hero" size="lg" className="w-full gap-2">
-                {loading ? (
-                  <><Loader2 className="h-5 w-5 animate-spin" /> Generating...</>
-                ) : (
-                  <><ArrowRight className="h-5 w-5" /> Generate Letter</>
-                )}
+                {loading ? <><Loader2 className="h-5 w-5 animate-spin" /> Generating...</> : <><ArrowRight className="h-5 w-5" /> Generate Letter</>}
               </Button>
             </div>
           )}
 
-          {/* Generated Letter Preview */}
+          {/* Generated Letter */}
           {currentLetter && (
             <div className="space-y-4">
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={() => { setLetter(null); setEditedLetter(null); setEditing(false); }} variant="outline" className="gap-2">
-                  <FileText className="h-4 w-4" /> New Letter
+              {/* Action bar */}
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                <Button onClick={() => { setLetter(null); setEditedLetter(null); setEditing(false); }} variant="outline" size="sm" className="gap-1.5">
+                  <FileText className="h-4 w-4" /> New
                 </Button>
-                <Button onClick={() => setEditing(!editing)} variant={editing ? 'default' : 'secondary'} className="gap-2">
-                  <PenLine className="h-4 w-4" /> {editing ? 'Done Editing' : 'Edit Letter'}
+                <Button onClick={() => setEditing(!editing)} variant={editing ? 'default' : 'secondary'} size="sm" className="gap-1.5">
+                  <PenLine className="h-4 w-4" /> {editing ? 'Done' : 'Edit'}
                 </Button>
-                <Button onClick={handleCopy} variant="secondary" className="gap-2">
+                <Button onClick={handleCopy} variant="secondary" size="sm" className="gap-1.5">
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   {copied ? 'Copied!' : 'Copy'}
                 </Button>
-                <Button onClick={handleDownloadPDF} variant="hero" className="gap-2">
-                  <Download className="h-4 w-4" /> Download PDF
+                <Button onClick={handleDownloadPDF} variant="hero" size="sm" className="gap-1.5">
+                  <Download className="h-4 w-4" /> PDF
                 </Button>
               </div>
 
-              {/* A4 Letter Document */}
-              <div className="flex justify-center">
+              {/* A4 Paper */}
+              <div className="flex justify-center overflow-x-auto">
                 <div
                   ref={letterRef}
-                  className="w-full max-w-[210mm] bg-white text-gray-900 rounded-lg shadow-2xl overflow-hidden"
+                  className="w-full max-w-[210mm] bg-white rounded-xl shadow-[0_4px_40px_rgba(0,0,0,0.15)] overflow-hidden"
                   style={{
-                    minHeight: '297mm',
-                    padding: '25mm',
-                    fontFamily: "'Times New Roman', 'Crimson Text', serif",
-                    fontSize: '12pt',
-                    lineHeight: '1.6',
+                    minHeight: 'min(297mm, 80vh)',
+                    padding: 'clamp(16px, 5vw, 25mm)',
+                    fontFamily: "'Crimson Text', 'Times New Roman', serif",
+                    fontSize: 'clamp(11px, 2.5vw, 12pt)',
+                    lineHeight: '1.7',
+                    color: '#1a1a1a',
                   }}
                 >
                   {/* Sender */}
-                  <div style={{ marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '20px' }}>
                     {editing ? (
                       <div className="space-y-1">
-                        <input
-                          value={editedLetter?.senderName || ''}
-                          onChange={e => handleEditField('senderName', e.target.value)}
-                          className="w-full font-bold text-lg bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                        />
-                        <input
-                          value={editedLetter?.senderAddress || ''}
-                          onChange={e => handleEditField('senderAddress', e.target.value)}
-                          className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                        />
+                        <EditableField value={currentLetter.senderName} field="senderName" className="font-bold text-lg" />
+                        <EditableField value={currentLetter.senderAddress} field="senderAddress" />
                       </div>
                     ) : (
                       <>
-                        <div style={{ fontWeight: 700, fontSize: '14pt' }}>{currentLetter.senderName}</div>
+                        <div style={{ fontWeight: 700, fontSize: '1.15em' }}>{currentLetter.senderName}</div>
                         <div>{currentLetter.senderAddress}</div>
                       </>
                     )}
                   </div>
 
                   {/* Date */}
-                  <div style={{ marginBottom: '24px' }}>
-                    {editing ? (
-                      <input
-                        value={editedLetter?.date || ''}
-                        onChange={e => handleEditField('date', e.target.value)}
-                        className="bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                      />
-                    ) : (
-                      currentLetter.date
-                    )}
+                  <div style={{ marginBottom: '20px' }}>
+                    {editing ? <EditableField value={currentLetter.date} field="date" /> : currentLetter.date}
                   </div>
 
                   {/* Recipient */}
-                  <div style={{ marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '20px' }}>
                     {editing ? (
                       <div className="space-y-1">
-                        <input
-                          value={editedLetter?.recipientName || ''}
-                          onChange={e => handleEditField('recipientName', e.target.value)}
-                          className="w-full font-semibold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                        />
-                        <input
-                          value={editedLetter?.recipientAddress || ''}
-                          onChange={e => handleEditField('recipientAddress', e.target.value)}
-                          className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                        />
+                        <EditableField value={currentLetter.recipientName} field="recipientName" className="font-semibold" />
+                        <EditableField value={currentLetter.recipientAddress} field="recipientAddress" />
                       </div>
                     ) : (
                       <>
@@ -351,33 +288,17 @@ body {
                   </div>
 
                   {/* Subject */}
-                  <div style={{ fontWeight: 700, marginBottom: '20px' }}>
-                    {editing ? (
-                      <input
-                        value={editedLetter?.subject || ''}
-                        onChange={e => handleEditField('subject', e.target.value)}
-                        className="w-full font-bold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                      />
-                    ) : (
-                      `Subject: ${currentLetter.subject}`
-                    )}
+                  <div style={{ fontWeight: 700, marginBottom: '18px' }}>
+                    {editing ? <EditableField value={currentLetter.subject} field="subject" className="font-bold" /> : `Subject: ${currentLetter.subject}`}
                   </div>
 
                   {/* Greeting */}
-                  <div style={{ marginBottom: '16px' }}>
-                    {editing ? (
-                      <input
-                        value={editedLetter?.greeting || ''}
-                        onChange={e => handleEditField('greeting', e.target.value)}
-                        className="w-full bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                      />
-                    ) : (
-                      currentLetter.greeting
-                    )}
+                  <div style={{ marginBottom: '14px' }}>
+                    {editing ? <EditableField value={currentLetter.greeting} field="greeting" /> : currentLetter.greeting}
                   </div>
 
                   {/* Body */}
-                  <div style={{ marginBottom: '24px' }}>
+                  <div style={{ marginBottom: '22px' }}>
                     {editing ? (
                       <div className="space-y-2">
                         {(editedLetter?.body || []).map((para, i) => (
@@ -389,42 +310,24 @@ body {
                               newBody[i] = e.target.value;
                               handleEditField('body', newBody);
                             }}
-                            className="w-full min-h-[80px] bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900 resize-y"
+                            className="w-full min-h-[70px] bg-primary/5 border border-primary/20 rounded-lg px-3 py-2 text-[#1a1a1a] resize-y focus:outline-none focus:ring-2 focus:ring-primary/30"
                             style={{ fontFamily: 'inherit', fontSize: 'inherit', lineHeight: 'inherit' }}
                           />
                         ))}
                       </div>
                     ) : (
-                      currentLetter.body.map((para, i) => (
-                        <p key={i} style={{ marginBottom: '14px' }}>{para}</p>
-                      ))
+                      currentLetter.body.map((para, i) => <p key={i} style={{ marginBottom: '12px' }}>{para}</p>)
                     )}
                   </div>
 
                   {/* Closing */}
-                  <div style={{ marginBottom: '40px' }}>
-                    {editing ? (
-                      <input
-                        value={editedLetter?.closing || ''}
-                        onChange={e => handleEditField('closing', e.target.value)}
-                        className="bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                      />
-                    ) : (
-                      currentLetter.closing
-                    )}
+                  <div style={{ marginBottom: '36px' }}>
+                    {editing ? <EditableField value={currentLetter.closing} field="closing" /> : currentLetter.closing}
                   </div>
 
                   {/* Signature */}
                   <div style={{ fontWeight: 600 }}>
-                    {editing ? (
-                      <input
-                        value={editedLetter?.signatureName || ''}
-                        onChange={e => handleEditField('signatureName', e.target.value)}
-                        className="font-semibold bg-blue-50 border border-blue-200 rounded px-2 py-1 text-gray-900"
-                      />
-                    ) : (
-                      currentLetter.signatureName
-                    )}
+                    {editing ? <EditableField value={currentLetter.signatureName} field="signatureName" className="font-semibold" /> : currentLetter.signatureName}
                   </div>
                 </div>
               </div>

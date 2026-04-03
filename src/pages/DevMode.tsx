@@ -17,7 +17,7 @@ import { getLessonContent } from '@/data/lessonContent';
 import { ProgrammingLanguage, AIFeedback, Challenge } from '@/types/devMode';
 import { 
   Code, BookOpen, Trophy, Clock, Target, Folder, ArrowLeftRight,
-  Compass, ChevronLeft, Menu, Sparkles, Zap, Terminal
+  Compass, ChevronLeft, Menu, Zap, Terminal
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -118,10 +118,6 @@ const DevMode: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="mb-4"><BackButton /></div>
             <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 mb-6">
-                <Sparkles className="h-4 w-4" />
-                <span className="text-sm font-medium">Professional Developer Environment</span>
-              </div>
               <h1 className="text-4xl sm:text-5xl font-bold mb-4">
                 <span className="text-gradient-primary">Dev Mode</span>
               </h1>
