@@ -146,11 +146,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
           <Button
             type="button"
             variant="outline"
-            className="w-full gap-2 h-11 border-border/50 hover:bg-secondary/50"
+            className="w-full gap-3 h-12 border-border/50 bg-card hover:bg-secondary/50 hover:shadow-md hover:scale-[1.01] transition-all duration-200 font-medium"
             onClick={handleGoogleSignIn}
             disabled={googleLoading || loading}
           >
-            {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4 text-primary" />}
+            {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleLogo />}
             Continue with Google
           </Button>
 
