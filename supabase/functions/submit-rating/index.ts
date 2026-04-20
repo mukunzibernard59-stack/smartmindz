@@ -6,44 +6,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-function escapeHtml(s: string): string {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Require authenticated user
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     const { rating, comment, device, userName } = await req.json();
 
     if (!rating || rating < 1 || rating > 5) {
@@ -53,15 +21,9 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Validate input lengths to prevent abuse
-    const safeUserName = String(userName || "Anonymous User").slice(0, 100);
-    const safeComment = String(comment || "").trim().slice(0, 1000) || "(No comment provided)";
-    const safeDevice = String(device || "Unknown device").slice(0, 200);
-
     const stars = "★".repeat(rating) + "☆".repeat(5 - rating);
-    const displayName = escapeHtml(safeUserName);
-    const commentText = escapeHtml(safeComment);
-    const deviceText = escapeHtml(safeDevice);
+    const displayName = userName || "Anonymous User";
+    const commentText = comment?.trim() || "(No comment provided)";
     const time = new Date().toISOString();
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -88,11 +50,11 @@ Deno.serve(async (req) => {
           </div>
           <div style="background: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
             <p style="font-size: 12px; color: #9ca3af; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">Comment</p>
-            <p style="font-size: 14px; color: #374151; margin: 0; white-space: pre-wrap;">${commentText}</p>
+            <p style="font-size: 14px; color: #374151; margin: 0;">${commentText}</p>
           </div>
           <div style="font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 12px;">
-            <p style="margin: 0;">📅 ${escapeHtml(time)}</p>
-            <p style="margin: 4px 0 0;">📱 ${deviceText}</p>
+            <p style="margin: 0;">📅 ${time}</p>
+            <p style="margin: 4px 0 0;">📱 ${device || "Unknown device"}</p>
           </div>
         </div>
       </div>
@@ -107,7 +69,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: "SmartMind <onboarding@resend.dev>",
         to: ["mukunzibernard59@gmail.com"],
-        subject: `⭐ SmartMind rated ${rating}/5 by ${safeUserName}`,
+        subject: `⭐ SmartMind rated ${rating}/5 by ${displayName}`,
         html: emailHtml,
       }),
     });
