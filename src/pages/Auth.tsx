@@ -156,7 +156,7 @@ const Auth: React.FC = () => {
             </div>
           )}
 
-          <Button type="submit" variant="hero" className="w-full" size="lg" disabled={loading || !formValid}>
+          <Button type="submit" variant="hero" className="w-full" size="lg" disabled={loading}>
             {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Please wait...</> : isLogin ? 'Log In' : 'Sign Up'}
           </Button>
 
