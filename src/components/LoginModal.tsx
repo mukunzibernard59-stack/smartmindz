@@ -29,7 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
@@ -48,26 +48,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
     : emailValid && passwordValid && nameValid;
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
-
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error('Google sign-in failed. Please try again.');
-        return;
-      }
-      if (result.redirected) return;
-      toast.success('Welcome!');
-      onOpenChange(false);
-    } catch {
-      toast.error('Google sign-in failed');
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,23 +112,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Google Sign-In */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-3 h-12 border-border/50 bg-card hover:bg-secondary/50 hover:shadow-md hover:scale-[1.01] transition-all duration-200 font-medium"
-            onClick={handleGoogleSignIn}
-            disabled={googleLoading || loading}
-          >
-            {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleLogo />}
-            Continue with Google
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or continue with email</span></div>
-          </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
             {!isLogin && (
