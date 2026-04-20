@@ -14,8 +14,7 @@ import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
 import DevMode from "./pages/DevMode";
-import Auth from "./pages/Auth";
-import ProtectedRoute from "./components/ProtectedRoute";
+// SmartChat merged into Learn
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
@@ -36,16 +35,14 @@ const AppContent = () => {
       <AppRatingBanner />
       <BrowserRouter>
         <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/home" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/learn" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-          <Route path="/quiz" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-          <Route path="/dev" element={<ProtectedRoute><DevMode /></ProtectedRoute>} />
-          <Route path="/chat" element={<ProtectedRoute><Learn /></ProtectedRoute>} />
-          <Route path="/design-letters" element={<ProtectedRoute><DesignLetters /></ProtectedRoute>} />
+          <Route path="/" element={<Index />} />
+          <Route path="/learn" element={<Learn />} />
+          <Route path="/quiz" element={<Learn />} />
+          <Route path="/dev" element={<DevMode />} />
+          <Route path="/chat" element={<Learn />} />
           <Route path="/privacy" element={<PrivacyPolicy />} />
           <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/design-letters" element={<DesignLetters />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
