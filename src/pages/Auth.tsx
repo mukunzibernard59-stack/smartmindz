@@ -23,17 +23,12 @@ const Auth: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const emailValid = EMAIL_REGEX.test(email);
-  const passwordChecks = useMemo(() => ({
-    length: password.length >= 8,
-    uppercase: /[A-Z]/.test(password),
-    number: /\d/.test(password),
-  }), [password]);
-  const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.number;
+  const passwordValid = password.length > 0;
   const nameValid = name.trim().length >= 2;
   const confirmValid = password === confirmPassword && confirmPassword.length > 0;
 
   const formValid = isLogin
-    ? emailValid && password.length >= 6
+    ? emailValid && password.length > 0
     : emailValid && passwordValid && nameValid && confirmValid;
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
