@@ -123,13 +123,6 @@ const Auth: React.FC = () => {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-                  <p key={rule.label} className={`text-xs flex items-center gap-1 ${rule.check ? 'text-green-500' : 'text-muted-foreground'}`}>
-                    {rule.check ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                    {rule.label}
-                  </p>
-                ))}
-              </div>
-            )}
           </div>
 
           {!isLogin && (
