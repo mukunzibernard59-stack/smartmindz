@@ -113,22 +113,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Google Sign-In */}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full gap-3 h-12 border-border/50 bg-card hover:bg-secondary/50 hover:shadow-md hover:scale-[1.01] transition-all duration-200 font-medium"
-            onClick={handleGoogleSignIn}
-            disabled={googleLoading || loading}
-          >
-            {googleLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <GoogleLogo />}
-            Continue with Google
-          </Button>
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border/50" /></div>
-            <div className="relative flex justify-center text-xs"><span className="bg-card px-2 text-muted-foreground">or continue with email</span></div>
-          </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-3">
