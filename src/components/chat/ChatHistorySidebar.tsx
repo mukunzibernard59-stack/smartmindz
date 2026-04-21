@@ -128,18 +128,33 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
           </div>
         </div>
 
-        {/* Tools */}
+        {/* AI Tools */}
         {!search && (
-          <div className="px-3 pb-2 space-y-0.5">
-            {onOpenImageGenerator && (
-              <button
-                onClick={() => { onOpenImageGenerator(); if (window.innerWidth < 768) onToggle(); }}
-                className="flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm hover:bg-secondary transition-colors text-muted-foreground hover:text-foreground"
-              >
-                <Image className="h-4 w-4" />
-                <span>Images</span>
-              </button>
-            )}
+          <div className="px-3 pb-2">
+            <p className="text-[10px] font-semibold text-muted-foreground/60 uppercase tracking-wider px-2 py-1.5">
+              AI Tools
+            </p>
+            <div className="space-y-0.5">
+              {[
+                { id: 'writer', label: 'AI Writer', icon: Sparkles, action: () => onOpenTool?.('writer') },
+                { id: 'detector', label: 'AI Detector', icon: Brain, action: () => onOpenTool?.('detector') },
+                { id: 'youtube', label: 'YouTube Tutor', icon: Youtube, action: () => onOpenTool?.('youtube') },
+                { id: 'devmode', label: 'Dev Mode', icon: Code2, action: () => navigate('/dev') },
+                { id: 'image', label: 'Generate Image', icon: ImagePlus, action: () => onOpenImageGenerator?.() },
+                { id: 'letter', label: 'Design Letter', icon: FileText, action: () => navigate('/design-letters') },
+                { id: 'build-app', label: 'Build App Prompt', icon: Wand2, action: () => onOpenTool?.('build-app') },
+                { id: 'translate', label: 'Translate', icon: Languages, action: () => onOpenTool?.('translate') },
+              ].map(tool => (
+                <button
+                  key={tool.id}
+                  onClick={() => { tool.action(); if (window.innerWidth < 768) onToggle(); }}
+                  className="group flex items-center gap-2.5 w-full px-2.5 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                >
+                  <tool.icon className="h-4 w-4 transition-colors group-hover:text-primary" />
+                  <span>{tool.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
