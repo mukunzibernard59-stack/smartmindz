@@ -49,25 +49,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
 
-  const handleGoogleSignIn = async () => {
-    setGoogleLoading(true);
-    try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
-      if (result.error) {
-        toast.error('Google sign-in failed. Please try again.');
-        return;
-      }
-      if (result.redirected) return;
-      toast.success('Welcome!');
-      onOpenChange(false);
-    } catch {
-      toast.error('Google sign-in failed');
-    } finally {
-      setGoogleLoading(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
