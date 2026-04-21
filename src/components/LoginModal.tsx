@@ -29,7 +29,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  
   const [showPassword, setShowPassword] = useState(false);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
