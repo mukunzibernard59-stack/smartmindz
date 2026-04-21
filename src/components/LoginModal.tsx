@@ -53,9 +53,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
   const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.number;
   const nameValid = name.trim().length >= 2;
 
+  // Password is not strictly enforced — only email and name are required
   const formValid = isLogin
-    ? emailValid && password.length >= 6
-    : emailValid && passwordValid && nameValid;
+    ? emailValid && password.length > 0
+    : emailValid && password.length > 0 && nameValid;
+
+  const passwordWeak = password.length > 0 && !passwordValid;
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
 
