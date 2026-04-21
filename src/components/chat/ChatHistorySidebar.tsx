@@ -21,13 +21,15 @@ interface ChatHistorySidebarProps {
   onClearHistory: () => void;
   onRenameSession?: (sessionId: string, title: string) => void;
   onOpenImageGenerator?: () => void;
+  onOpenTool?: (tool: 'writer' | 'detector' | 'youtube' | 'devmode' | 'image' | 'letter' | 'build-app' | 'translate') => void;
 }
 
 const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
   isOpen, onToggle, groupedSessions, activeSessionId,
   onSelectSession, onNewChat, onDeleteSession, onClearHistory,
-  onRenameSession, onOpenImageGenerator,
+  onRenameSession, onOpenImageGenerator, onOpenTool,
 }) => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
