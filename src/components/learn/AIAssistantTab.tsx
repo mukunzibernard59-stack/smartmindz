@@ -242,7 +242,20 @@ const AIAssistantTab: React.FC = () => {
         groupedSessions={groupedSessions} activeSessionId={activeSessionId}
         onSelectSession={switchSession} onNewChat={startNewChat}
         onDeleteSession={deleteSession} onClearHistory={clearAllHistory}
-        onRenameSession={renameSession} onOpenImageGenerator={() => setImageGenOpen(true)} />
+        onRenameSession={renameSession} onOpenImageGenerator={() => setImageGenOpen(true)}
+        onOpenTool={(tool) => {
+          const toolPrompts: Record<string, string> = {
+            writer: 'Write a well-structured article about: ',
+            detector: 'Analyze the following text and tell me if it was written by AI or a human:\n\n',
+            youtube: 'Act as my YouTube tutor and teach me about: ',
+            'build-app': 'Generate a detailed app-building prompt for: ',
+            translate: 'Translate the following text to [target language]:\n\n',
+          };
+          if (toolPrompts[tool]) {
+            startNewChat();
+            setInput(toolPrompts[tool]);
+          }
+        }} />
 
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'md:ml-72' : 'ml-0'}`}>
         {/* Header */}
