@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -53,12 +53,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
   const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.number;
   const nameValid = name.trim().length >= 2;
 
-  // Password is not strictly enforced — only email and name are required
   const formValid = isLogin
-    ? emailValid && password.length > 0
-    : emailValid && password.length > 0 && nameValid;
-
-  const passwordWeak = password.length > 0 && !passwordValid;
+    ? emailValid && password.length >= 6
+    : emailValid && passwordValid && nameValid;
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
 
@@ -197,11 +194,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
                   </button>
                 </div>
               </div>
-              {!isLogin && passwordWeak && (
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />
-                  This password may be easy to guess — consider making it stronger
-                </p>
+              {!isLogin && touched.password && password.length > 0 && (
+                <div className="space-y-1 mt-1">
+                  {[
+                    { check: passwordChecks.length, label: 'At least 8 characters' },
+                    { check: passwordChecks.uppercase, label: 'One uppercase letter' },
+                    { check: passwordChecks.number, label: 'One number' },
+                  ].map(rule => (
+                    <p key={rule.label} className={`text-xs flex items-center gap-1 ${rule.check ? 'text-green-500' : 'text-muted-foreground'}`}>
+                      {rule.check ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
+                      {rule.label}
+                    </p>
+                  ))}
+                </div>
               )}
             </div>
 
