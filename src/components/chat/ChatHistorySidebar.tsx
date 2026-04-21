@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   MessageSquare, Plus, Trash2, X, Search, Image, PenLine,
-  Check, MoreHorizontal, Edit3,
+  Check, MoreHorizontal, Edit3, Sparkles, Brain, Youtube, Code2,
+  ImagePlus, FileText, Wand2, Languages,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
