@@ -20,6 +20,12 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 import DesignLetters from "./pages/DesignLetters";
+import AIWriter from "./pages/AIWriter";
+import AIDetector from "./pages/AIDetector";
+import GenerateImage from "./pages/GenerateImage";
+import BuildAppPrompt from "./pages/BuildAppPrompt";
+import Translate from "./pages/Translate";
+import YouTubeTutor from "./pages/YouTubeTutor";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +54,12 @@ const AppContent = () => {
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/design-letters" element={<DesignLetters />} />
+                <Route path="/ai-writer" element={<AIWriter />} />
+                <Route path="/ai-detector" element={<AIDetector />} />
+                <Route path="/generate-image" element={<GenerateImage />} />
+                <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
+                <Route path="/translate" element={<Translate />} />
+                <Route path="/youtube-tutor" element={<YouTubeTutor />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
