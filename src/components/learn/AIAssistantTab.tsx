@@ -11,7 +11,6 @@ import LoginModal from '@/components/LoginModal';
 import ChatHistorySidebar from '@/components/chat/ChatHistorySidebar';
 import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
-import AITutorMenu from '@/components/chat/AITutorMenu';
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
 import VoiceRecorder from '@/components/chat/VoiceRecorder';
 
@@ -273,7 +272,6 @@ const AIAssistantTab: React.FC = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <AITutorMenu onSelectAction={handleAIAction} onOpenImageGenerator={() => setImageGenOpen(true)} />
             <button onClick={() => setAlwaysReadAloud(!alwaysReadAloud)}
               className={`p-1.5 rounded-lg text-xs transition-colors ${alwaysReadAloud ? 'bg-primary/20 text-primary' : 'bg-secondary text-muted-foreground'}`}
               title={alwaysReadAloud ? 'Always read aloud (ON)' : 'Always read aloud (OFF)'}>
