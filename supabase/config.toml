@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.submit-rating]
 verify_jwt = false
+
+[functions.ai-task]
+verify_jwt = false

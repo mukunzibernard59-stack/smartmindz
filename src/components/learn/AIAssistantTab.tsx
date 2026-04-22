@@ -288,22 +288,8 @@ const AIAssistantTab: React.FC = () => {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 && (
-            <div className="text-center py-8">
-              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                <Sparkles className="h-7 w-7 text-primary-foreground" />
-              </div>
-              <h2 className="text-lg font-semibold mb-1">AI Assistant</h2>
-              <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
-                Build apps, generate documents, brainstorm ideas, create images, and more.
-              </p>
-              <div className="flex flex-wrap justify-center gap-2">
-                {popularQuestions.map(q => (
-                  <button key={q} onClick={() => setInput(q)}
-                    className="px-3 py-1.5 text-xs bg-secondary hover:bg-secondary/80 rounded-full transition-colors">
-                    {q}
-                  </button>
-                ))}
-              </div>
+            <div className="text-center py-10 text-sm text-muted-foreground">
+              Start a conversation — ask anything.
             </div>
           )}
           {messages.map((m, i) => {

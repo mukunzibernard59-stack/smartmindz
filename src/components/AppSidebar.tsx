@@ -24,30 +24,29 @@ const mainItems = [
 ];
 
 const aiTools = [
-  { title: 'AI Writer', tool: 'writer', icon: Sparkles },
-  { title: 'AI Detector', tool: 'detector', icon: Brain },
-  { title: 'YouTube Tutor', tool: 'youtube', icon: Youtube },
-  { title: 'Generate Image', tool: 'image', icon: ImagePlus },
-  { title: 'Design Letter', tool: 'letter', icon: FileText },
-  { title: 'Build App Prompt', tool: 'build-app', icon: Wand2 },
-  { title: 'Translate', tool: 'translate', icon: Languages },
+  { title: 'AI Writer', url: '/ai-writer', icon: Sparkles },
+  { title: 'AI Detector', url: '/ai-detector', icon: Brain },
+  { title: 'YouTube Tutor', url: '/youtube-tutor', icon: Youtube },
+  { title: 'Generate Image', url: '/generate-image', icon: ImagePlus },
+  { title: 'Design Letter', url: '/design-letters', icon: FileText },
+  { title: 'Build App Prompt', url: '/build-app-prompt', icon: Wand2 },
+  { title: 'Translate', url: '/translate', icon: Languages },
 ];
 
 const AppSidebar: React.FC = () => {
-  const { state } = useSidebar();
+  const { state, isMobile, setOpen, setOpenMobile } = useSidebar();
   const collapsed = state === 'collapsed';
   const navigate = useNavigate();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
 
-  const openTool = (tool: string) => {
-    if (tool === 'image') {
-      navigate('/learn?tool=image');
-    } else if (tool === 'letter') {
-      navigate('/design-letters');
-    } else {
-      navigate(`/learn?tool=${tool}`);
+  const go = (url: string, isTool = false) => {
+    navigate(url);
+    if (isTool) {
+      // Auto-collapse to icons-only for an immersive tool experience
+      if (isMobile) setOpenMobile(false);
+      else setOpen(false);
     }
   };
 
@@ -62,12 +61,13 @@ const AppSidebar: React.FC = () => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
+                    tooltip={item.title}
                     className={cn(
                       'transition-colors',
                       isActive(item.url) && 'bg-primary/10 text-primary font-medium'
                     )}
                   >
-                    <button onClick={() => navigate(item.url)} className="w-full flex items-center">
+                    <button onClick={() => go(item.url)} className="w-full flex items-center">
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>
@@ -86,9 +86,13 @@ const AppSidebar: React.FC = () => {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
-                    className="transition-colors hover:text-primary hover:bg-primary/10"
+                    tooltip={item.title}
+                    className={cn(
+                      'transition-colors hover:text-primary hover:bg-primary/10',
+                      isActive(item.url) && 'bg-primary/10 text-primary font-medium'
+                    )}
                   >
-                    <button onClick={() => openTool(item.tool)} className="w-full flex items-center">
+                    <button onClick={() => go(item.url, true)} className="w-full flex items-center">
                       <item.icon className="h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>
