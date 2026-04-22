@@ -5,6 +5,7 @@ import LanguageSelector from './LanguageSelector';
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
 import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -81,32 +82,21 @@ const Navbar: React.FC = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 glass-strong">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[0_0_20px_-3px_hsl(187_85%_53%/0.5)] animate-glow-pulse">
-                <BookOpen className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <span className="font-bold text-xl text-foreground group-hover:text-primary transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Smart<span className="text-primary">Mind</span>
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center glass rounded-full p-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`px-5 py-2 rounded-full font-medium text-sm transition-all duration-300 ${
-                    location.pathname === link.to
-                      ? 'text-primary-foreground bg-gradient-to-r from-primary to-accent shadow-[0_0_15px_-3px_hsl(187_85%_53%/0.5)]'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            {/* Logo + sidebar trigger */}
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="text-muted-foreground hover:text-primary" />
+              <Link to="/" className="flex items-center gap-2 group">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[0_0_20px_-3px_hsl(187_85%_53%/0.5)] animate-glow-pulse">
+                  <BookOpen className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="font-bold text-xl text-foreground group-hover:text-primary transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                  Smart<span className="text-primary">Mind</span>
+                </span>
+              </Link>
             </div>
+
+            {/* Top nav links removed — now in left sidebar */}
+            <div className="hidden md:block" />
 
             {/* Right Side */}
             <div className="hidden md:flex items-center gap-3">
