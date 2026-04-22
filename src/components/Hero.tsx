@@ -50,21 +50,6 @@ const Hero: React.FC = () => {
             with the power of AI. Your personal tutor that never sleeps.
           </motion.p>
 
-          {/* CTA Button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex justify-center mb-10"
-          >
-            <Link to="/learn">
-              <Button variant="hero" size="xl" className="gap-2 glow-cyan hover:scale-[1.05] transition-all duration-300">
-                {t('hero.cta')}
-                <ArrowRight className="h-5 w-5" />
-              </Button>
-            </Link>
-          </motion.div>
-
           {/* Feature Pills */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
