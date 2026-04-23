@@ -63,12 +63,12 @@ const AppSidebar: React.FC = () => {
                     asChild
                     tooltip={item.title}
                     className={cn(
-                      'transition-colors',
-                      isActive(item.url) && 'bg-primary/10 text-primary font-medium'
+                      'transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
                     )}
                   >
-                    <button onClick={() => go(item.url)} className="w-full flex items-center">
-                      <item.icon className="h-4 w-4" />
+                    <button onClick={() => go(item.url)} className="w-full flex items-center gap-2">
+                      <item.icon className="h-5 w-5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>
                   </SidebarMenuButton>
@@ -88,12 +88,12 @@ const AppSidebar: React.FC = () => {
                     asChild
                     tooltip={item.title}
                     className={cn(
-                      'transition-colors hover:text-primary hover:bg-primary/10',
-                      isActive(item.url) && 'bg-primary/10 text-primary font-medium'
+                      'transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
                     )}
                   >
-                    <button onClick={() => go(item.url, true)} className="w-full flex items-center">
-                      <item.icon className="h-4 w-4" />
+                    <button onClick={() => go(item.url, true)} className="w-full flex items-center gap-2">
+                      <item.icon className="h-5 w-5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>
                   </SidebarMenuButton>
