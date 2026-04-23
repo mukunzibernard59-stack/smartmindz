@@ -12,18 +12,25 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    const { system, prompt, model = "google/gemini-3-flash-preview", json = false } = await req.json();
+    const { system, prompt, model = "google/gemini-3-flash-preview", json = false, imageUrl } = await req.json();
     if (!prompt || typeof prompt !== "string" || prompt.length > 20000) {
       return new Response(JSON.stringify({ error: "Invalid prompt" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    const userContent: any = imageUrl
+      ? [
+          { type: "text", text: prompt },
+          { type: "image_url", image_url: { url: imageUrl } },
+        ]
+      : prompt;
+
     const body: any = {
       model,
       messages: [
         ...(system ? [{ role: "system", content: system }] : []),
-        { role: "user", content: prompt },
+        { role: "user", content: userContent },
       ],
     };
     if (json) body.response_format = { type: "json_object" };
