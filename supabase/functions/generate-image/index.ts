@@ -5,11 +5,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const PHOTO_EDITOR_SYSTEM = `You are a professional AI photo editor and retoucher.
+Enhance the uploaded image based on the user's request while keeping it natural, realistic, and high-quality.
+Rules: preserve identity (no facial structure changes), no distorted proportions, subtle pro-grade edits,
+maintain original lighting unless asked otherwise, avoid plastic/over-smoothed look.
+Capabilities: skin retouching, lighting correction, color grading, background cleanup/blur,
+sharpening, noise reduction, object removal (if requested), style transformation (only if explicitly requested).
+If the request is vague, apply balanced professional enhancement: clean, sharp, well-lit, natural skin tones.
+Always return a high-quality edited image. Ultra realistic, natural skin texture, 4k, sharp focus, balanced lighting.`;
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { prompt, style = "realistic" } = await req.json();
+    const { prompt, style = "Photorealistic", imageUrl, mode = "generate" } = await req.json();
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(JSON.stringify({ error: "Prompt is required" }), {
@@ -17,7 +26,7 @@ serve(async (req) => {
       });
     }
 
-    const sanitizedPrompt = prompt.replace(/<[^>]*>/g, "").replace(/javascript:/gi, "").substring(0, 1000);
+    const sanitizedPrompt = prompt.replace(/<[^>]*>/g, "").replace(/javascript:/gi, "").substring(0, 1500);
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -43,16 +52,34 @@ serve(async (req) => {
       illustration: "digital illustration, detailed artwork",
     };
 
-    const enhancedPrompt = `${sanitizedPrompt}, ${stylePrompts[style] || stylePrompts.Photorealistic}, masterpiece, award-winning, ultra high quality`;
+    const isEdit = mode === "edit" && imageUrl;
 
-    console.log("Generating image:", enhancedPrompt.slice(0, 200));
+    const enhancedPrompt = isEdit
+      ? `${sanitizedPrompt}. High quality, ultra realistic, professional photo editing, natural skin texture, detailed, 4k, sharp focus, balanced lighting.`
+      : `${sanitizedPrompt}, ${stylePrompts[style] || stylePrompts.Photorealistic}, masterpiece, award-winning, ultra high quality`;
+
+    console.log(`${isEdit ? "Editing" : "Generating"} image:`, enhancedPrompt.slice(0, 200));
+
+    const userContent: any = isEdit
+      ? [
+          { type: "text", text: enhancedPrompt },
+          { type: "image_url", image_url: { url: imageUrl } },
+        ]
+      : enhancedPrompt;
+
+    const messages: any[] = isEdit
+      ? [
+          { role: "system", content: PHOTO_EDITOR_SYSTEM },
+          { role: "user", content: userContent },
+        ]
+      : [{ role: "user", content: userContent }];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-3.1-flash-image-preview",
-        messages: [{ role: "user", content: enhancedPrompt }],
+        messages,
         modalities: ["image", "text"],
       }),
     });
@@ -73,14 +100,14 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!imageUrl) {
+    const resultUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+    if (!resultUrl) {
       console.error("No image in response:", JSON.stringify(data).slice(0, 500));
       return new Response(JSON.stringify({ error: "No image returned from AI" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify({ imageUrl }),
+    return new Response(JSON.stringify({ imageUrl: resultUrl }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (error) {
     console.error("Generate image error:", error);
