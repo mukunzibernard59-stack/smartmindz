@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
@@ -26,6 +27,7 @@ import GenerateImage from "./pages/GenerateImage";
 import BuildAppPrompt from "./pages/BuildAppPrompt";
 import Translate from "./pages/Translate";
 import YouTubeTutor from "./pages/YouTubeTutor";
+import HomeworkHelper from "./pages/HomeworkHelper";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +62,7 @@ const AppContent = () => {
                 <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
                 <Route path="/translate" element={<Translate />} />
                 <Route path="/youtube-tutor" element={<YouTubeTutor />} />
+                <Route path="/ai-homework-helper" element={<HomeworkHelper />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
@@ -71,13 +74,15 @@ const AppContent = () => {
 };
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <TooltipProvider>
-        <AppContent />
-      </TooltipProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <TooltipProvider>
+          <AppContent />
+        </TooltipProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
