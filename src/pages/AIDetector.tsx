@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Brain, Camera, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -18,25 +18,36 @@ const AIDetector: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const [result, setResult] = useState<DetectionResult | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const uploadInputRef = useRef<HTMLInputElement>(null);
 
   const onPickImage = async (file?: File) => {
     if (!file) return;
     setOcrLoading(true);
     try {
       const dataUrl: string = await new Promise((res, rej) => {
-        const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(file);
+        const r = new FileReader();
+        r.onload = () => res(r.result as string);
+        r.onerror = rej;
+        r.readAsDataURL(file);
       });
       const ocr = await runAITask({
-        system: 'You are an OCR engine. Return ONLY the verbatim text visible in the image. No commentary.',
-        prompt: `Image (data URL): ${dataUrl.slice(0, 80)}... [embedded].\n\nExtract all readable text exactly as shown.`,
+        model: 'google/gemini-2.5-flash',
+        system: 'You are an OCR engine. Return ONLY the verbatim text visible in the image. No commentary, no markdown, no quotes.',
+        prompt: 'Extract all readable text from this image exactly as shown.',
+        imageUrl: dataUrl,
       });
-      // Many models won't read raw data URL via this prompt; do it properly via direct gateway with image_url is not exposed here.
-      // Fallback: ask user to paste text if OCR returns nothing meaningful.
-      if (ocr && ocr.trim().length > 5) setText(prev => (prev ? prev + '\n' : '') + ocr.trim());
-      else toast.message('OCR produced no text. Please paste text directly.');
+      if (ocr && ocr.trim().length > 2) {
+        setText(prev => (prev ? prev + '\n' : '') + ocr.trim());
+        toast.success('Text extracted from image');
+      } else {
+        toast.message('No text detected. Try a clearer photo.');
+      }
     } catch (e: any) {
       toast.error('Could not read the image. Try pasting text instead.');
-    } finally { setOcrLoading(false); }
+    } finally {
+      setOcrLoading(false);
+    }
   };
 
   const detect = async () => {
@@ -69,21 +80,32 @@ ai_score + human_score must equal 100.`,
           <label className="text-sm font-medium">Text to analyze</label>
           <Textarea value={text} onChange={e => setText(e.target.value)}
             placeholder="Paste any text here..." className="min-h-[220px] resize-y" />
+          <input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            onChange={e => { onPickImage(e.target.files?.[0] || undefined); e.target.value = ''; }}
+          />
+          <input
+            ref={uploadInputRef}
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={e => { onPickImage(e.target.files?.[0] || undefined); e.target.value = ''; }}
+          />
           <div className="flex flex-wrap gap-2">
-            <label className="inline-flex">
-              <input type="file" accept="image/*" capture="environment" hidden
-                onChange={e => onPickImage(e.target.files?.[0] || undefined)} />
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-sm cursor-pointer">
-                <Camera className="h-4 w-4" /> {ocrLoading ? 'Reading…' : 'Take photo'}
-              </span>
-            </label>
-            <label className="inline-flex">
-              <input type="file" accept="image/*" hidden
-                onChange={e => onPickImage(e.target.files?.[0] || undefined)} />
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-sm cursor-pointer">
-                <Upload className="h-4 w-4" /> Upload image
-              </span>
-            </label>
+            <Button type="button" variant="secondary" size="sm" disabled={ocrLoading}
+              onClick={() => cameraInputRef.current?.click()}>
+              <Camera className="h-4 w-4 mr-2" />
+              {ocrLoading ? 'Reading…' : 'Take photo'}
+            </Button>
+            <Button type="button" variant="secondary" size="sm" disabled={ocrLoading}
+              onClick={() => uploadInputRef.current?.click()}>
+              <Upload className="h-4 w-4 mr-2" />
+              Upload image
+            </Button>
           </div>
           <Button onClick={detect} disabled={loading} className="w-full">
             {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Analyzing…</> : <><Brain className="h-4 w-4 mr-2" />Detect AI</>}

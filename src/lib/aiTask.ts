@@ -5,6 +5,7 @@ export interface AITaskOptions {
   prompt: string;
   model?: string;
   json?: boolean;
+  imageUrl?: string;
 }
 
 export async function runAITask(opts: AITaskOptions, retries = 3): Promise<string> {
