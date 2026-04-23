@@ -91,8 +91,8 @@ Deno.serve(async (req) => {
             <p style="font-size: 14px; color: #374151; margin: 0;">${commentText}</p>
           </div>
           <div style="font-size: 12px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 12px;">
-            <p style="margin: 0;">📅 ${time}</p>
-            <p style="margin: 4px 0 0;">📱 ${device || "Unknown device"}</p>
+            <p style="margin: 0;">📅 ${escapeHtml(time)}</p>
+            <p style="margin: 4px 0 0;">📱 ${safeDevice}</p>
           </div>
         </div>
       </div>
