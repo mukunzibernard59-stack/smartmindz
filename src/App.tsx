@@ -13,6 +13,7 @@ import OfflineBanner from "@/components/OfflineBanner";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 import AppRatingBanner from "@/components/AppRatingBanner";
+import WelcomeSplash from "@/components/WelcomeSplash";
 import Index from "./pages/Index";
 import Learn from "./pages/Learn";
 import Quiz from "./pages/Quiz";
