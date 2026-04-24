@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Learn Smarter.{' '}
-            <span className="text-gradient-primary text-glow">Think Faster.</span>{' '}
+            <span className="text-gradient-primary text-glow">Get Help Faster.</span>{' '}
             <span className="inline-block">🚀</span>
           </motion.h1>
 
