@@ -154,18 +154,21 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
                   </button>
                 </div>
               </div>
-              {!isLogin && touched.password && password.length > 0 && (
+              {!isLogin && password.length > 0 && (
                 <div className="space-y-1 mt-1">
-                  {[
-                    { check: passwordChecks.length, label: 'At least 8 characters' },
-                    { check: passwordChecks.uppercase, label: 'One uppercase letter' },
-                    { check: passwordChecks.number, label: 'One number' },
-                  ].map(rule => (
-                    <p key={rule.label} className={`text-xs flex items-center gap-1 ${rule.check ? 'text-green-500' : 'text-muted-foreground'}`}>
-                      {rule.check ? <CheckCircle2 className="h-3 w-3" /> : <XCircle className="h-3 w-3" />}
-                      {rule.label}
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-1 flex-1">
+                      {[1, 2, 3].map(i => (
+                        <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i <= passwordStrength ? (passwordStrength <= 1 ? 'bg-destructive' : passwordStrength === 2 ? 'bg-yellow-500' : 'bg-green-500') : 'bg-muted'}`} />
+                      ))}
+                    </div>
+                    <span className={`text-xs ml-2 font-medium ${strengthColor}`}>{strengthLabel}</span>
+                  </div>
+                  {passwordStrength < 3 && (
+                    <p className="text-xs text-muted-foreground">
+                      Tip: use 8+ characters, an uppercase letter, and a number for a stronger password (optional).
                     </p>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
