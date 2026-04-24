@@ -43,6 +43,7 @@ const AppContent = () => {
       <FloatingInstallButton />
       <UpdateNotification />
       <AppRatingBanner />
+      <WelcomeSplash />
       <BrowserRouter>
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
