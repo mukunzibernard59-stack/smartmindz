@@ -43,9 +43,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
   const passwordValid = passwordChecks.length && passwordChecks.uppercase && passwordChecks.number;
   const nameValid = name.trim().length >= 2;
 
+  const passwordStrength = [passwordChecks.length, passwordChecks.uppercase, passwordChecks.number].filter(Boolean).length;
+  const strengthLabel = passwordStrength === 0 ? '' : passwordStrength === 1 ? 'Weak' : passwordStrength === 2 ? 'Medium' : 'Strong';
+  const strengthColor = passwordStrength <= 1 ? 'text-destructive' : passwordStrength === 2 ? 'text-yellow-500' : 'text-green-500';
+
+  // Allow submission even with weak password — just warn
   const formValid = isLogin
     ? emailValid && password.length >= 6
-    : emailValid && passwordValid && nameValid;
+    : emailValid && password.length >= 6 && nameValid;
 
   const handleBlur = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
 
