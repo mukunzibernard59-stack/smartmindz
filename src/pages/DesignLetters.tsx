@@ -56,13 +56,14 @@ const DesignLetters: React.FC = () => {
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      if (!session?.access_token) {
         toast({ title: 'Sign in required', description: 'Please sign in to generate letters.', variant: 'destructive' });
         setLoading(false);
         return;
       }
       const response = await supabase.functions.invoke('generate-letter', {
         body: { letterType, details, senderName, senderAddress, recipientName, recipientAddress, subject },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (response.error) throw new Error(response.error.message);
       const letterData = response.data.letter as LetterData;
