@@ -1,103 +1,101 @@
 import React, { useState } from 'react';
-import { Languages, Camera, Upload, Loader2, Copy, Check } from 'lucide-react';
+import { Languages, Loader2, Copy, Check, ArrowRightLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
-import { runAITask } from '@/lib/aiTask';
 
-const LANGUAGES = [
-  'English','French','Spanish','German','Italian','Portuguese','Dutch','Russian','Polish','Turkish',
-  'Arabic','Hebrew','Persian','Hindi','Bengali','Urdu','Tamil','Telugu','Marathi','Gujarati','Punjabi',
-  'Chinese (Simplified)','Chinese (Traditional)','Japanese','Korean','Vietnamese','Thai','Indonesian','Malay','Filipino',
-  'Swahili','Kinyarwanda','Yoruba','Igbo','Hausa','Amharic','Zulu','Xhosa','Somali',
-  'Greek','Czech','Slovak','Hungarian','Romanian','Bulgarian','Ukrainian','Serbian','Croatian','Norwegian','Swedish','Danish','Finnish',
-  'Latin','Esperanto',
+/* -----------------------------------------------------------
+ * Lightweight translation — uses MyMemory's free public API.
+ * No API key. Replaces the previous AI-based translation.
+ * --------------------------------------------------------- */
+
+interface Lang { code: string; name: string; }
+
+const LANGUAGES: Lang[] = [
+  { code: 'en', name: 'English' }, { code: 'fr', name: 'French' }, { code: 'es', name: 'Spanish' },
+  { code: 'de', name: 'German' }, { code: 'it', name: 'Italian' }, { code: 'pt', name: 'Portuguese' },
+  { code: 'nl', name: 'Dutch' }, { code: 'ru', name: 'Russian' }, { code: 'pl', name: 'Polish' },
+  { code: 'tr', name: 'Turkish' }, { code: 'ar', name: 'Arabic' }, { code: 'he', name: 'Hebrew' },
+  { code: 'fa', name: 'Persian' }, { code: 'hi', name: 'Hindi' }, { code: 'bn', name: 'Bengali' },
+  { code: 'ur', name: 'Urdu' }, { code: 'zh-CN', name: 'Chinese (Simplified)' },
+  { code: 'zh-TW', name: 'Chinese (Traditional)' }, { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' }, { code: 'vi', name: 'Vietnamese' }, { code: 'th', name: 'Thai' },
+  { code: 'id', name: 'Indonesian' }, { code: 'ms', name: 'Malay' }, { code: 'sw', name: 'Swahili' },
+  { code: 'rw', name: 'Kinyarwanda' }, { code: 'yo', name: 'Yoruba' }, { code: 'am', name: 'Amharic' },
+  { code: 'el', name: 'Greek' }, { code: 'cs', name: 'Czech' }, { code: 'hu', name: 'Hungarian' },
+  { code: 'ro', name: 'Romanian' }, { code: 'uk', name: 'Ukrainian' }, { code: 'sv', name: 'Swedish' },
+  { code: 'no', name: 'Norwegian' }, { code: 'da', name: 'Danish' }, { code: 'fi', name: 'Finnish' },
 ];
 
 const Translate: React.FC = () => {
   const [text, setText] = useState('');
-  const [target, setTarget] = useState('French');
-  const [loading, setLoading] = useState(false);
-  const [ocrLoading, setOcrLoading] = useState(false);
+  const [source, setSource] = useState('en');
+  const [target, setTarget] = useState('fr');
   const [output, setOutput] = useState('');
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  const onPickImage = async (file?: File) => {
-    if (!file) return;
-    setOcrLoading(true);
-    try {
-      const reader = new FileReader();
-      const dataUrl: string = await new Promise((res, rej) => {
-        reader.onload = () => res(reader.result as string); reader.onerror = rej; reader.readAsDataURL(file);
-      });
-      const ocr = await runAITask({
-        system: 'You are an OCR engine. Return ONLY the verbatim text visible in the image. No commentary.',
-        prompt: `Extract all readable text from this image data URL: ${dataUrl.slice(0, 80)}…`,
-      });
-      if (ocr && ocr.trim().length > 3) setText(prev => (prev ? prev + '\n' : '') + ocr.trim());
-      else toast.message('OCR produced no text. Please paste text directly.');
-    } catch {
-      toast.error('Could not read the image. Paste text instead.');
-    } finally { setOcrLoading(false); }
-  };
 
   const translate = async () => {
     if (!text.trim()) { toast.error('Provide text to translate.'); return; }
+    if (source === target) { setOutput(text); return; }
     setLoading(true); setOutput('');
     try {
-      const out = await runAITask({
-        system: `You are a professional translator. Translate the user's text into ${target}, preserving meaning, tone, and formatting. Output the translation only — no explanations.`,
-        prompt: text,
-      });
-      setOutput(out);
-    } catch {
-      toast.error('Translation failed. Try again.');
+      // MyMemory has a 500-char per-call limit — split the input safely.
+      const chunks: string[] = [];
+      const sentences = text.split(/(?<=[.!?])\s+/);
+      let buf = '';
+      for (const s of sentences) {
+        if ((buf + ' ' + s).length > 480) { if (buf) chunks.push(buf); buf = s; }
+        else buf = buf ? buf + ' ' + s : s;
+      }
+      if (buf) chunks.push(buf);
+
+      const parts: string[] = [];
+      for (const chunk of chunks) {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${source}|${target}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Translation service error');
+        const json = await res.json();
+        parts.push(json?.responseData?.translatedText || '');
+      }
+      setOutput(parts.join(' '));
+    } catch (e: any) {
+      toast.error(e?.message || 'Translation failed.');
     } finally { setLoading(false); }
   };
 
+  const swap = () => {
+    setSource(target); setTarget(source);
+    setText(output); setOutput(text);
+  };
+
   const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(output);
-      setCopied(true); toast.success('Copied');
-      setTimeout(() => setCopied(false), 1500);
-    } catch { toast.error('Copy failed'); }
+    try { await navigator.clipboard.writeText(output); setCopied(true); toast.success('Copied'); setTimeout(() => setCopied(false), 1500); }
+    catch { toast.error('Copy failed'); }
   };
 
   return (
     <ToolPage
       title="Translate"
-      description="Paste text or scan a document — translate into any major language."
+      description="Fast translations powered by a lightweight free dictionary API."
       icon={<Languages className="h-5 w-5" />}
     >
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-3">
-          <label className="text-sm font-medium">Source text</label>
-          <Textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="Paste text or scan a document..." className="min-h-[200px] resize-y" />
-          <div className="flex flex-wrap gap-2">
-            <label className="inline-flex">
-              <input type="file" accept="image/*" capture="environment" hidden
-                onChange={e => onPickImage(e.target.files?.[0] || undefined)} />
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-sm cursor-pointer">
-                <Camera className="h-4 w-4" /> {ocrLoading ? 'Reading…' : 'Take photo'}
-              </span>
-            </label>
-            <label className="inline-flex">
-              <input type="file" accept="image/*" hidden
-                onChange={e => onPickImage(e.target.files?.[0] || undefined)} />
-              <span className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary hover:bg-secondary/80 text-sm cursor-pointer">
-                <Upload className="h-4 w-4" /> Upload
-              </span>
-            </label>
-          </div>
-          <div>
-            <label className="text-xs text-muted-foreground">Translate into</label>
+          <div className="flex items-center gap-2">
+            <select value={source} onChange={e => setSource(e.target.value)}
+              className="flex-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
+              {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
+            </select>
+            <Button variant="outline" size="icon" onClick={swap} title="Swap"><ArrowRightLeft className="h-4 w-4" /></Button>
             <select value={target} onChange={e => setTarget(e.target.value)}
-              className="w-full mt-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
-              {LANGUAGES.map(l => <option key={l}>{l}</option>)}
+              className="flex-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
+              {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.name}</option>)}
             </select>
           </div>
+          <Textarea value={text} onChange={e => setText(e.target.value)}
+            placeholder="Enter text to translate…" className="min-h-[220px] resize-y" />
           <Button onClick={translate} disabled={loading} className="w-full">
             {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Translating…</> : <><Languages className="h-4 w-4 mr-2" />Translate</>}
           </Button>
