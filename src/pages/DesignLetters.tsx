@@ -7,7 +7,90 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FileText, Copy, Download, Loader2, PenLine, Check, ArrowRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+
+/* Local letter template engine — replaces the previous AI edge function. */
+const buildLetterLocal = (input: {
+  letterType: string; details: string;
+  senderName: string; senderAddress: string;
+  recipientName: string; recipientAddress: string;
+  subject: string;
+}): LetterData => {
+  const today = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+  const greeting = input.recipientName ? `Dear ${input.recipientName},` : 'Dear Sir/Madam,';
+  const subject = input.subject || input.letterType;
+
+  // Per-type opening / body / closing
+  const T: Record<string, { opening: string; closing: string }> = {
+    'Job Application': {
+      opening: `I am writing to formally apply for the position described below. Please consider this letter as my official application.`,
+      closing: `Thank you for considering my application. I look forward to the opportunity to discuss how I can contribute to your team.`,
+    },
+    'Cover Letter': {
+      opening: `I am excited to submit my application and share why I believe I am a strong fit for this role.`,
+      closing: `I would welcome the chance to speak further about how my background aligns with your needs.`,
+    },
+    'Resignation Letter': {
+      opening: `Please accept this letter as formal notice of my resignation from my current position.`,
+      closing: `I am grateful for the opportunities I have had and will do everything I can to ensure a smooth transition.`,
+    },
+    'Recommendation Letter': {
+      opening: `It is my pleasure to write this letter of recommendation. Based on my direct experience, I can speak to the candidate's strong character and abilities.`,
+      closing: `I recommend them without reservation and am happy to provide further information if needed.`,
+    },
+    'Business Proposal': {
+      opening: `I am writing to present a proposal that I believe will deliver clear value to your organization.`,
+      closing: `I would appreciate the opportunity to discuss this proposal in more detail at your convenience.`,
+    },
+    'Complaint Letter': {
+      opening: `I am writing to formally raise a concern that requires your attention.`,
+      closing: `I trust this matter will be handled promptly and look forward to your response.`,
+    },
+    'Formal Request': {
+      opening: `I am writing to formally request your assistance with the matter outlined below.`,
+      closing: `Thank you for your time and consideration of this request.`,
+    },
+    'Thank You Letter': {
+      opening: `I would like to take a moment to express my sincere appreciation.`,
+      closing: `Thank you again — your kindness means a great deal to me.`,
+    },
+    'Apology Letter': {
+      opening: `Please accept my sincere apology for what I outline below.`,
+      closing: `I value our relationship and am committed to making things right.`,
+    },
+    'Permission Letter': {
+      opening: `I am writing to formally request your permission regarding the matter described below.`,
+      closing: `Thank you for considering this request. I look forward to your favorable reply.`,
+    },
+    'Inquiry Letter': {
+      opening: `I am writing to inquire about the details described below and would appreciate your guidance.`,
+      closing: `Thank you in advance for any information you can provide.`,
+    },
+  };
+
+  const tpl = T[input.letterType] || {
+    opening: `I am writing regarding the matter described below.`,
+    closing: `Thank you for your time and consideration.`,
+  };
+
+  const body = [
+    tpl.opening,
+    input.details.trim() || 'Please find the relevant details in the description above.',
+    tpl.closing,
+  ];
+
+  return {
+    senderName: input.senderName || 'Your Name',
+    senderAddress: input.senderAddress || 'Your Address',
+    date: today,
+    recipientName: input.recipientName || 'Recipient Name',
+    recipientAddress: input.recipientAddress || 'Recipient Address',
+    subject,
+    greeting,
+    body,
+    closing: 'Sincerely,',
+    signatureName: input.senderName || 'Your Name',
+  };
+};
 
 interface LetterData {
   senderName: string;
@@ -55,18 +138,9 @@ const DesignLetters: React.FC = () => {
     }
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        toast({ title: 'Sign in required', description: 'Please sign in to generate letters.', variant: 'destructive' });
-        setLoading(false);
-        return;
-      }
-      const response = await supabase.functions.invoke('generate-letter', {
-        body: { letterType, details, senderName, senderAddress, recipientName, recipientAddress, subject },
-        headers: { Authorization: `Bearer ${session.access_token}` },
+      const letterData = buildLetterLocal({
+        letterType, details, senderName, senderAddress, recipientName, recipientAddress, subject,
       });
-      if (response.error) throw new Error(response.error.message);
-      const letterData = response.data.letter as LetterData;
       setLetter(letterData);
       setEditedLetter({ ...letterData });
       setEditing(false);
