@@ -1,130 +1,142 @@
 import React, { useMemo, useState } from 'react';
-import { Sparkles, Printer, Copy, Check, Download } from 'lucide-react';
+import { Sparkles, Copy, Check, Download, FileText, FileType2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
+import jsPDF from 'jspdf';
+import {
+  Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel,
+} from 'docx';
 
 /* -----------------------------------------------------------
- * Smart Template Engine — replaces AI generation.
- * Predefined professional templates + variable substitution.
+ * Smart Template Engine — fully local, no AI calls.
+ * Categories: Job Letters (full form), Emails, Blog, Captions, CV.
+ * Exports: PDF (jsPDF), DOCX (docx), TXT, Copy, Print-friendly preview.
  * --------------------------------------------------------- */
 
 type Category = 'job' | 'email' | 'blog' | 'caption' | 'cv';
-type Style = 'Professional' | 'Friendly' | 'Persuasive' | 'Concise' | 'Inspirational';
+type Style = 'Professional' | 'Modern' | 'Concise' | 'Persuasive' | 'Friendly';
 
+interface FieldDef {
+  key: string; label: string; placeholder?: string; multiline?: boolean; type?: 'date' | 'text' | 'tel' | 'email';
+}
 interface Template {
-  id: string;
-  category: Category;
-  label: string;
-  fields: { key: string; label: string; placeholder?: string; multiline?: boolean }[];
-  build: (v: Record<string, string>, style: Style) => string;
+  id: string; category: Category; label: string; fields: FieldDef[];
+  build: (v: Record<string, string>, style: Style) => { title: string; body: string; sender?: string };
 }
 
-const intro = (style: Style, who: string) => {
-  switch (style) {
-    case 'Friendly': return `Hi ${who || 'there'},\n\nHope you're doing well!`;
-    case 'Persuasive': return `Dear ${who || 'Sir/Madam'},\n\nI'm writing because I believe this is an opportunity worth your attention.`;
-    case 'Concise': return `Dear ${who || 'Sir/Madam'},`;
-    case 'Inspirational': return `Dear ${who || 'Friend'},\n\nEvery great journey begins with a single step.`;
-    default: return `Dear ${who || 'Sir/Madam'},\n\nI hope this message finds you well.`;
-  }
+const today = () => new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+/* ---------- Job Letter (full professional form) ---------- */
+const JOB_FIELDS: FieldDef[] = [
+  { key: 'fullName', label: 'Full name', placeholder: 'Jane Doe' },
+  { key: 'email', label: 'Email', placeholder: 'jane@example.com', type: 'email' },
+  { key: 'phone', label: 'Phone number', placeholder: '+1 555 010 1234', type: 'tel' },
+  { key: 'location', label: 'Current location', placeholder: 'Kigali, Rwanda' },
+  { key: 'date', label: 'Date', type: 'date' },
+  { key: 'company', label: 'Company name', placeholder: 'Acme Inc.' },
+  { key: 'position', label: 'Job position', placeholder: 'Senior Frontend Engineer' },
+  { key: 'experience', label: 'Experience (years / summary)', placeholder: '5 years building web apps' },
+  { key: 'skills', label: 'Top skills (comma separated)', multiline: true, placeholder: 'React, TypeScript, UI design' },
+];
+
+const buildJobLetter = (v: Record<string, string>, style: Style) => {
+  const date = v.date ? new Date(v.date).toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' }) : today();
+  const skills = (v.skills || '').split(',').map(s => s.trim()).filter(Boolean);
+  const skillsLine = skills.length ? skills.join(', ') : 'a wide range of relevant skills';
+
+  // Style-aware opening line
+  const openings: Record<Style, string> = {
+    Professional: `I am writing to formally express my interest in the ${v.position || '[position]'} role at ${v.company || '[company]'}.`,
+    Modern: `I'd love to be considered for the ${v.position || '[position]'} opening at ${v.company || '[company]'}.`,
+    Concise: `I am applying for the ${v.position || '[position]'} role at ${v.company || '[company]'}.`,
+    Persuasive: `When I saw the ${v.position || '[position]'} opening at ${v.company || '[company]'}, I knew I had to apply.`,
+    Friendly: `I'm excited to apply for the ${v.position || '[position]'} role at ${v.company || '[company]'}.`,
+  };
+
+  const body =
+`${v.fullName || '[Your Name]'}
+${v.location || '[Your Location]'}
+${v.phone || '[Your Phone]'}
+${v.email || '[Your Email]'}
+
+${date}
+
+Hiring Manager
+${v.company || '[Company Name]'}
+
+Subject: Application for the ${v.position || '[Position]'} Role
+
+Dear Hiring Manager,
+
+${openings[style]} With ${v.experience || 'solid hands-on experience'} and proven strengths in ${skillsLine}, I am confident I can make a meaningful contribution to your team from day one.
+
+Throughout my career I have focused on delivering measurable results, collaborating effectively with cross-functional teams, and continuously sharpening my craft. I am particularly drawn to ${v.company || 'your company'} because of its reputation for excellence and the opportunity to work on impactful projects.
+
+I would welcome the chance to discuss how my background in ${skillsLine} aligns with the goals of the ${v.position || 'role'} and your team. Thank you for considering my application — I have attached my resume for your review and look forward to hearing from you.
+
+Sincerely,
+
+${v.fullName || '[Your Name]'}`;
+
+  return { title: `${v.fullName || 'Job'} – ${v.position || 'Application'}`, body, sender: v.fullName };
 };
 
-const closing = (style: Style, name: string) => {
-  const sign = name || 'Your Name';
-  switch (style) {
-    case 'Friendly': return `\nThanks so much,\n${sign}`;
-    case 'Persuasive': return `\nLooking forward to your positive response.\n\nSincerely,\n${sign}`;
-    case 'Concise': return `\nRegards,\n${sign}`;
-    case 'Inspirational': return `\nWith gratitude,\n${sign}`;
-    default: return `\nKind regards,\n${sign}`;
-  }
-};
-
+/* ---------- Other templates (kept simple/local) ---------- */
 const TEMPLATES: Template[] = [
+  { id: 'job-application', category: 'job', label: 'Job Application Letter', fields: JOB_FIELDS, build: buildJobLetter },
   {
-    id: 'job-application',
-    category: 'job',
-    label: 'Job Application Letter',
+    id: 'cover-letter', category: 'job', label: 'Short Cover Letter',
     fields: [
-      { key: 'name', label: 'Your full name' },
-      { key: 'role', label: 'Position you are applying for' },
-      { key: 'company', label: 'Company name' },
-      { key: 'recipient', label: 'Hiring manager (optional)' },
-      { key: 'experience', label: 'Years of experience' },
-      { key: 'skills', label: 'Top skills (comma separated)', multiline: true },
-    ],
-    build: (v, s) =>
-`${intro(s, v.recipient)}
-
-I am writing to formally apply for the ${v.role || '[position]'} role at ${v.company || '[company]'}. With ${v.experience || 'several'} years of professional experience and proven expertise in ${v.skills || '[your skills]'}, I am confident I can contribute meaningfully to your team.
-
-Throughout my career I have focused on delivering measurable results, collaborating with cross-functional teams, and continuously improving my craft. I am particularly drawn to ${v.company || 'your company'} because of its reputation for excellence and innovation.
-
-I would welcome the opportunity to discuss how my background aligns with your needs.
-${closing(s, v.name)}`,
-  },
-  {
-    id: 'cover-letter',
-    category: 'job',
-    label: 'Cover Letter',
-    fields: [
-      { key: 'name', label: 'Your name' },
-      { key: 'role', label: 'Role title' },
+      { key: 'fullName', label: 'Your name' },
+      { key: 'position', label: 'Role title' },
       { key: 'company', label: 'Company' },
       { key: 'highlight', label: 'One key achievement', multiline: true },
     ],
-    build: (v, s) =>
-`${intro(s, '')}
+    build: (v) => ({
+      title: `${v.fullName || 'Cover'} – ${v.position || 'Letter'}`,
+      body:
+`${today()}
 
-I am excited to apply for the ${v.role || '[role]'} position at ${v.company || '[company]'}. ${v.highlight ? `A recent highlight from my career: ${v.highlight}.` : ''}
+Dear Hiring Manager,
 
-I believe my skills, drive, and commitment to quality make me a strong fit for this role.
-${closing(s, v.name)}`,
+I am excited to apply for the ${v.position || '[role]'} position at ${v.company || '[company]'}. ${v.highlight ? `A recent highlight from my career: ${v.highlight}.` : ''}
+
+I believe my skills, drive and commitment to quality make me a strong fit for this role and would love the opportunity to discuss it further.
+
+Sincerely,
+${v.fullName || '[Your Name]'}`,
+      sender: v.fullName,
+    }),
   },
   {
-    id: 'professional-email',
-    category: 'email',
-    label: 'Professional Email',
+    id: 'professional-email', category: 'email', label: 'Professional Email',
     fields: [
       { key: 'recipient', label: 'Recipient name' },
       { key: 'subject', label: 'Subject / purpose' },
       { key: 'message', label: 'Main message', multiline: true },
       { key: 'name', label: 'Your name' },
     ],
-    build: (v, s) =>
+    build: (v) => ({
+      title: v.subject || 'Email',
+      body:
 `Subject: ${v.subject || '[subject]'}
 
-${intro(s, v.recipient)}
+Dear ${v.recipient || 'Sir/Madam'},
 
 ${v.message || '[your message]'}
 
 Please let me know if you need any additional information.
-${closing(s, v.name)}`,
+
+Kind regards,
+${v.name || '[Your Name]'}`,
+      sender: v.name,
+    }),
   },
   {
-    id: 'follow-up-email',
-    category: 'email',
-    label: 'Follow-up Email',
-    fields: [
-      { key: 'recipient', label: 'Recipient name' },
-      { key: 'topic', label: 'What you are following up on' },
-      { key: 'name', label: 'Your name' },
-    ],
-    build: (v, s) =>
-`Subject: Following up — ${v.topic || '[topic]'}
-
-${intro(s, v.recipient)}
-
-I'm following up on our previous discussion regarding ${v.topic || '[topic]'}. I wanted to check in and see if there's any update or anything you need from my side to move things forward.
-${closing(s, v.name)}`,
-  },
-  {
-    id: 'blog-outline',
-    category: 'blog',
-    label: 'Blog Post Outline',
+    id: 'blog-outline', category: 'blog', label: 'Blog Post Outline',
     fields: [
       { key: 'title', label: 'Working title' },
       { key: 'audience', label: 'Target audience' },
@@ -132,70 +144,52 @@ ${closing(s, v.name)}`,
     ],
     build: (v) => {
       const points = (v.points || '').split('\n').filter(Boolean);
-      return `# ${v.title || '[Working Title]'}
+      return {
+        title: v.title || 'Blog Outline',
+        body:
+`${v.title || '[Working Title]'}
 
 Audience: ${v.audience || '[target audience]'}
 
-1. Hook
-   - Start with a relatable problem or surprising fact.
-   - State who this article is for.
-
-2. Introduction
-   - Define the topic clearly.
-   - Promise the value the reader will get.
-
-3. Main Sections
+1. Hook — relatable problem or surprising fact.
+2. Introduction — define topic, promise value.
+3. Main Sections:
 ${points.length ? points.map((p, i) => `   ${i + 1}. ${p}`).join('\n') : '   1. Point one\n   2. Point two\n   3. Point three'}
-
-4. Practical Examples
-   - Provide one real-world example for each main point.
-
-5. Common Mistakes
-   - List 3 pitfalls and how to avoid them.
-
-6. Conclusion
-   - Summarize the takeaways.
-   - End with a clear call-to-action.
-
-7. SEO Notes
-   - Title under 60 chars.
-   - Meta description under 160 chars.
-   - Use the primary keyword in H1, intro, and conclusion.`;
+4. Practical Examples for each main point.
+5. Common Mistakes — list 3 and how to avoid them.
+6. Conclusion + Call to Action.`,
+      };
     },
   },
   {
-    id: 'social-caption',
-    category: 'caption',
-    label: 'Social Media Caption',
+    id: 'social-caption', category: 'caption', label: 'Social Media Caption',
     fields: [
       { key: 'topic', label: 'What is the post about?' },
       { key: 'cta', label: 'Call to action' },
       { key: 'hashtags', label: 'Hashtags (comma separated)' },
     ],
-    build: (v, s) => {
-      const hooks: Record<Style, string> = {
-        Professional: `${v.topic || '[topic]'} — here's what you need to know 👇`,
-        Friendly: `Okay, real talk about ${v.topic || '[topic]'} ✨`,
-        Persuasive: `Stop scrolling. ${v.topic || '[topic]'} could change your week.`,
-        Concise: `${v.topic || '[topic]'}.`,
-        Inspirational: `Today's reminder: ${v.topic || '[topic]'} 💫`,
+    build: (v) => {
+      const tags = (v.hashtags || '').split(',').map(t => t.trim()).filter(Boolean)
+        .map(t => (t.startsWith('#') ? t : `#${t}`)).join(' ');
+      return {
+        title: 'Caption',
+        body: `${v.topic || '[topic]'} — here's what you need to know 👇\n\n${v.cta || 'Drop a comment and let me know what you think!'}\n\n${tags}`,
       };
-      const tags = (v.hashtags || '').split(',').map(t => t.trim()).filter(Boolean).map(t => (t.startsWith('#') ? t : `#${t}`)).join(' ');
-      return `${hooks[s]}\n\n${v.cta || 'Drop a comment and let me know what you think!'}\n\n${tags}`;
     },
   },
   {
-    id: 'cv-summary',
-    category: 'cv',
-    label: 'CV / Resume Summary',
+    id: 'cv-summary', category: 'cv', label: 'CV / Resume Summary',
     fields: [
       { key: 'role', label: 'Your professional title' },
       { key: 'years', label: 'Years of experience' },
       { key: 'skills', label: 'Top 3 skills' },
       { key: 'goal', label: 'Career goal', multiline: true },
     ],
-    build: (v) =>
-`${v.role || '[Professional Title]'} with ${v.years || 'X'}+ years of experience specializing in ${v.skills || '[skills]'}. Proven track record of delivering high-quality results, collaborating with diverse teams, and adapting quickly to new challenges. ${v.goal ? `Currently focused on ${v.goal}.` : ''} Known for strong communication, ownership, and a continuous-learning mindset.`,
+    build: (v) => ({
+      title: 'CV Summary',
+      body:
+`${v.role || '[Professional Title]'} with ${v.years || 'X'}+ years of experience specializing in ${v.skills || '[skills]'}. Proven track record of delivering high-quality results and collaborating with diverse teams. ${v.goal ? `Currently focused on ${v.goal}.` : ''} Known for strong communication, ownership and a continuous-learning mindset.`,
+    }),
   },
 ];
 
@@ -206,6 +200,8 @@ const CATEGORIES: { id: Category; label: string }[] = [
   { id: 'caption', label: 'Captions' },
   { id: 'cv', label: 'CV Summaries' },
 ];
+
+const STYLES: Style[] = ['Professional', 'Modern', 'Concise', 'Persuasive', 'Friendly'];
 
 const AIWriter: React.FC = () => {
   const [category, setCategory] = useState<Category>('job');
@@ -220,8 +216,10 @@ const AIWriter: React.FC = () => {
     [templateId, visibleTemplates],
   );
 
-  // Output is generated instantly via the template engine — no API calls.
-  const output = useMemo(() => (template ? template.build(vars, style) : ''), [template, vars, style]);
+  // Instant local generation — no API calls.
+  const generated = useMemo(() => (template ? template.build(vars, style) : { title: '', body: '' }), [template, vars, style]);
+  const output = generated.body;
+  const safeName = (generated.title || 'document').replace(/[^a-z0-9-]+/gi, '_').toLowerCase();
 
   const copy = async () => {
     try {
@@ -233,30 +231,77 @@ const AIWriter: React.FC = () => {
 
   const downloadTxt = () => {
     const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = `${template?.id || 'document'}.txt`;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
+    triggerDownload(blob, `${safeName}.txt`);
   };
 
-  const printPdf = () => {
-    const w = window.open('', '_blank');
-    if (!w) return;
-    const safe = output.replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' } as any)[c]);
-    w.document.write(`<html><head><title>${template?.label || 'Document'}</title>
-      <style>body{font-family:Georgia,serif;color:#111;background:#fff;padding:48px;line-height:1.7;font-size:13pt;white-space:pre-wrap}@page{size:A4;margin:24mm}</style>
-      </head><body>${safe}</body></html>`);
-    w.document.close(); w.focus(); w.print();
+  // PDF export — A4, professional margins, Times font for letter feel.
+  const downloadPdf = () => {
+    try {
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const marginX = 22;
+      const marginTop = 24;
+      const pageW = doc.internal.pageSize.getWidth();
+      const pageH = doc.internal.pageSize.getHeight();
+      const usableW = pageW - marginX * 2;
+
+      doc.setFont('times', 'normal');
+      doc.setFontSize(12);
+
+      const lines = doc.splitTextToSize(output, usableW) as string[];
+      let y = marginTop;
+      const lineHeight = 6;
+      lines.forEach(line => {
+        if (y > pageH - marginTop) { doc.addPage(); y = marginTop; }
+        doc.text(line, marginX, y);
+        y += lineHeight;
+      });
+      doc.save(`${safeName}.pdf`);
+    } catch (e) {
+      toast.error('PDF export failed');
+    }
+  };
+
+  // DOCX export — clean A4 layout, Times-style heading + body.
+  const downloadDocx = async () => {
+    try {
+      const paragraphs: Paragraph[] = output.split('\n').map(line =>
+        new Paragraph({
+          children: [new TextRun({ text: line || ' ', font: 'Times New Roman', size: 24 })],
+          alignment: AlignmentType.LEFT,
+          spacing: { after: 120 },
+        })
+      );
+
+      const doc = new Document({
+        styles: {
+          default: { document: { run: { font: 'Times New Roman', size: 24 } } },
+        },
+        sections: [{
+          properties: {
+            page: {
+              size: { width: 11906, height: 16838 }, // A4 in DXA
+              margin: { top: 1440, right: 1440, bottom: 1440, left: 1440 },
+            },
+          },
+          children: paragraphs,
+        }],
+      });
+
+      const blob = await Packer.toBlob(doc);
+      triggerDownload(blob, `${safeName}.docx`);
+    } catch (e) {
+      toast.error('DOCX export failed');
+    }
   };
 
   return (
     <ToolPage
       title="AI Writer"
-      description="Smart templates with instant generation — pick a category, fill the blanks, and copy or export."
+      description="Smart templates with instant generation — fill the blanks, preview, then copy or export to PDF, DOCX or TXT."
       icon={<Sparkles className="h-5 w-5" />}
     >
       <div className="grid lg:grid-cols-2 gap-5">
+        {/* Form */}
         <div className="space-y-3 bg-card border border-border rounded-2xl p-4 sm:p-5">
           <div>
             <label className="text-xs text-muted-foreground">Category</label>
@@ -289,12 +334,12 @@ const AIWriter: React.FC = () => {
               <label className="text-xs text-muted-foreground">Style</label>
               <select value={style} onChange={e => setStyle(e.target.value as Style)}
                 className="w-full mt-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
-                {['Professional','Friendly','Persuasive','Concise','Inspirational'].map(s => <option key={s}>{s}</option>)}
+                {STYLES.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 max-h-[55vh] overflow-y-auto pr-1">
             {template?.fields.map(f => (
               <div key={f.key}>
                 <label className="text-xs text-muted-foreground">{f.label}</label>
@@ -306,6 +351,7 @@ const AIWriter: React.FC = () => {
                   />
                 ) : (
                   <Input
+                    type={f.type || 'text'}
                     value={vars[f.key] || ''}
                     onChange={e => setVars(v => ({ ...v, [f.key]: e.target.value }))}
                     placeholder={f.placeholder} className="mt-1"
@@ -316,23 +362,28 @@ const AIWriter: React.FC = () => {
           </div>
         </div>
 
+        {/* Preview + actions */}
         <div className="bg-card border border-border rounded-2xl p-3 sm:p-4 flex flex-col">
-          <div className="flex items-center justify-between mb-3 gap-2">
+          <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
             <h3 className="text-sm font-medium">Live preview</h3>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button variant="outline" size="sm" onClick={copy} disabled={!output}>
                 {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />} Copy
               </Button>
               <Button variant="outline" size="sm" onClick={downloadTxt} disabled={!output}>
                 <Download className="h-4 w-4 mr-1" /> TXT
               </Button>
-              <Button variant="outline" size="sm" onClick={printPdf} disabled={!output}>
-                <Printer className="h-4 w-4 mr-1" /> PDF
+              <Button variant="outline" size="sm" onClick={downloadDocx} disabled={!output}>
+                <FileType2 className="h-4 w-4 mr-1" /> DOCX
+              </Button>
+              <Button size="sm" onClick={downloadPdf} disabled={!output}>
+                <FileText className="h-4 w-4 mr-1" /> PDF
               </Button>
             </div>
           </div>
-          <div className="flex-1 min-h-[420px] bg-white text-zinc-900 rounded-xl p-6 sm:p-10 shadow-lg overflow-y-auto whitespace-pre-wrap leading-relaxed"
-            style={{ fontFamily: 'Georgia, serif', fontSize: '14px' }}>
+          {/* A4-styled paper preview */}
+          <div className="flex-1 min-h-[420px] bg-white text-zinc-900 rounded-xl p-8 sm:p-12 shadow-lg overflow-y-auto whitespace-pre-wrap leading-relaxed"
+            style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '13.5px' }}>
             {output}
           </div>
         </div>
@@ -340,5 +391,13 @@ const AIWriter: React.FC = () => {
     </ToolPage>
   );
 };
+
+function triggerDownload(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export default AIWriter;
