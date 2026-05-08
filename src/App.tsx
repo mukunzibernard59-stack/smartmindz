@@ -20,7 +20,6 @@ import DevMode from "./pages/DevMode";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
-import DesignLetters from "./pages/DesignLetters";
 import AIWriter from "./pages/AIWriter";
 import AIDetector from "./pages/AIDetector";
 import GenerateImage from "./pages/GenerateImage";
@@ -55,7 +54,6 @@ const AppContent = () => {
                 <Route path="/chat" element={<Learn />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/design-letters" element={<DesignLetters />} />
                 <Route path="/ai-writer" element={<AIWriter />} />
                 <Route path="/ai-detector" element={<AIDetector />} />
                 <Route path="/generate-image" element={<GenerateImage />} />
