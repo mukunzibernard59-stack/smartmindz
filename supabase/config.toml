@@ -23,6 +23,3 @@ verify_jwt = true
 
 [functions.ai-task]
 verify_jwt = false
-
-[functions.generate-letter]
-verify_jwt = false
