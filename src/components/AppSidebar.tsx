@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, GraduationCap, Sparkles, Brain, Youtube, Code2,
-  ImagePlus, FileText, Wand2, Languages,
+  ImagePlus, Wand2, Languages,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -27,8 +27,7 @@ const aiTools = [
   { title: 'AI Writer', url: '/ai-writer', icon: Sparkles },
   { title: 'AI Detector', url: '/ai-detector', icon: Brain },
   { title: 'YouTube Tutor', url: '/youtube-tutor', icon: Youtube },
-  { title: 'Generate Image', url: '/generate-image', icon: ImagePlus },
-  { title: 'Design Letter', url: '/design-letters', icon: FileText },
+  { title: 'Design Studio', url: '/generate-image', icon: ImagePlus },
   { title: 'Build App Prompt', url: '/build-app-prompt', icon: Wand2 },
   { title: 'Translate', url: '/translate', icon: Languages },
 ];
@@ -52,22 +51,22 @@ const AppSidebar: React.FC = () => {
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
-      <SidebarContent className="bg-card">
-        <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+      <SidebarContent className="bg-card pt-6">
+        <SidebarGroup className="mb-2">
+          <SidebarGroupLabel className="mb-2">Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1.5">
               {mainItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
                     className={cn(
-                      'transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
                       isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
                     )}
                   >
-                    <button onClick={() => go(item.url)} className="w-full flex items-center gap-2">
+                    <button onClick={() => go(item.url)} className="w-full flex items-center gap-3">
                       <item.icon className="h-5 w-5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>
@@ -78,21 +77,21 @@ const AppSidebar: React.FC = () => {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <SidebarGroup>
-          <SidebarGroupLabel>AI Tools</SidebarGroupLabel>
+        <SidebarGroup className="mt-3">
+          <SidebarGroupLabel className="mb-2">AI Tools</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="gap-1.5">
               {aiTools.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
                     className={cn(
-                      'transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
                       isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
                     )}
                   >
-                    <button onClick={() => go(item.url, true)} className="w-full flex items-center gap-2">
+                    <button onClick={() => go(item.url, true)} className="w-full flex items-center gap-3">
                       <item.icon className="h-5 w-5 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </button>

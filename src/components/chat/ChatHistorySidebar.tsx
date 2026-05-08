@@ -141,7 +141,7 @@ const ChatHistorySidebar: React.FC<ChatHistorySidebarProps> = ({
                 { id: 'youtube', label: 'YouTube Tutor', icon: Youtube, action: () => onOpenTool?.('youtube') },
                 { id: 'devmode', label: 'Dev Mode', icon: Code2, action: () => navigate('/dev') },
                 { id: 'image', label: 'Generate Image', icon: ImagePlus, action: () => onOpenImageGenerator?.() },
-                { id: 'letter', label: 'Design Letter', icon: FileText, action: () => navigate('/design-letters') },
+                
                 { id: 'build-app', label: 'Build App Prompt', icon: Wand2, action: () => onOpenTool?.('build-app') },
                 { id: 'translate', label: 'Translate', icon: Languages, action: () => onOpenTool?.('translate') },
               ].map(tool => (

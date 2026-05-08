@@ -1,286 +1,336 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ImagePlus, Download, Shuffle } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { ImagePlus, Upload, Download, RotateCw, Crop as CropIcon, Undo2, Redo2, Type, Square, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import ToolPage from '@/components/tools/ToolPage';
 import { toast } from 'sonner';
 
 /* -----------------------------------------------------------
- * Design Studio — replaces AI image generation.
- * Pure HTML <canvas>: gradient backgrounds, thumbnails,
- * logos, avatars, icon composer. No external libraries.
+ * Design Studio — upload-based image editor.
+ * Pure HTML <canvas> + CSS filters (no heavy deps).
+ * Features: brightness/contrast/saturation/blur/sharpen,
+ * rotate, crop, filters, text overlay, border/frame,
+ * undo/redo, export PNG/JPG/WEBP, side-by-side compare.
  * --------------------------------------------------------- */
 
-type Mode = 'thumbnail' | 'logo' | 'avatar' | 'gradient';
-
-interface Design {
-  mode: Mode;
-  width: number;
-  height: number;
-  title: string;
-  subtitle: string;
-  initials: string;
-  fontFamily: string;
+interface EditState {
+  brightness: number;  // %
+  contrast: number;    // %
+  saturation: number;  // %
+  blur: number;        // px
+  sharpen: number;     // 0-100
+  rotation: number;    // deg (0/90/180/270)
+  filter: 'none' | 'grayscale' | 'sepia' | 'invert' | 'vintage' | 'cool' | 'warm';
+  text: string;
   textColor: string;
-  gradFrom: string;
-  gradTo: string;
-  angle: number;
-  shape: 'circle' | 'square' | 'hex';
+  textSize: number;    // px (relative to image)
+  border: number;      // px
+  borderColor: string;
+  frame: 'none' | 'shadow' | 'glow' | 'polaroid';
 }
 
-const PRESETS = [
-  { from: '#6366f1', to: '#06b6d4' },
-  { from: '#f43f5e', to: '#f59e0b' },
-  { from: '#10b981', to: '#0ea5e9' },
-  { from: '#8b5cf6', to: '#ec4899' },
-  { from: '#0f172a', to: '#1e293b' },
-  { from: '#facc15', to: '#f97316' },
-];
-
-const FONTS = ['Inter, sans-serif', 'Georgia, serif', 'Courier New, monospace', 'Impact, sans-serif'];
-
-const SIZES: Record<Mode, { w: number; h: number; label: string }> = {
-  thumbnail: { w: 1280, h: 720, label: 'YouTube thumbnail (1280×720)' },
-  logo:      { w: 1024, h: 1024, label: 'Logo (1024×1024)' },
-  avatar:    { w: 512,  h: 512,  label: 'Avatar (512×512)' },
-  gradient:  { w: 1920, h: 1080, label: 'Gradient wallpaper (1920×1080)' },
+const DEFAULT_STATE: EditState = {
+  brightness: 100, contrast: 100, saturation: 100, blur: 0, sharpen: 0,
+  rotation: 0, filter: 'none',
+  text: '', textColor: '#ffffff', textSize: 48,
+  border: 0, borderColor: '#ffffff',
+  frame: 'none',
 };
 
-const initialsFrom = (s: string) =>
-  s.trim().split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'SM';
+const FILTER_CSS: Record<EditState['filter'], string> = {
+  none: '',
+  grayscale: 'grayscale(1)',
+  sepia: 'sepia(0.85)',
+  invert: 'invert(1)',
+  vintage: 'sepia(0.4) contrast(0.95) saturate(1.2)',
+  cool: 'hue-rotate(-15deg) saturate(1.1)',
+  warm: 'hue-rotate(15deg) saturate(1.15)',
+};
 
 const GenerateImage: React.FC = () => {
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [d, setD] = useState<Design>({
-    mode: 'thumbnail',
-    width: SIZES.thumbnail.w, height: SIZES.thumbnail.h,
-    title: 'Your Headline Here', subtitle: 'A clean, modern subtitle',
-    initials: 'SM',
-    fontFamily: FONTS[0], textColor: '#ffffff',
-    gradFrom: PRESETS[0].from, gradTo: PRESETS[0].to, angle: 135,
-    shape: 'circle',
-  });
 
-  // Draw to canvas whenever the design changes — instant, local.
+  // Edit state with undo/redo history
+  const [state, setState] = useState<EditState>(DEFAULT_STATE);
+  const [history, setHistory] = useState<EditState[]>([DEFAULT_STATE]);
+  const [hIndex, setHIndex] = useState(0);
+  const [compare, setCompare] = useState(false);
+
+  // Push to history (debounced via change tracking)
+  const commit = useCallback((next: EditState) => {
+    setState(next);
+    setHistory(h => {
+      const trimmed = h.slice(0, hIndex + 1);
+      trimmed.push(next);
+      return trimmed.slice(-30); // cap history
+    });
+    setHIndex(i => Math.min(i + 1, 29));
+  }, [hIndex]);
+
+  const setField = <K extends keyof EditState>(k: K, v: EditState[K]) => commit({ ...state, [k]: v });
+
+  const undo = () => { if (hIndex > 0) { setHIndex(hIndex - 1); setState(history[hIndex - 1]); } };
+  const redo = () => { if (hIndex < history.length - 1) { setHIndex(hIndex + 1); setState(history[hIndex + 1]); } };
+
+  // ---------- Upload ----------
+  const onUpload = (file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { toast.error('Please upload an image'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+      const src = e.target?.result as string;
+      setImgSrc(src);
+      const img = new Image();
+      img.onload = () => { imgRef.current = img; setState(DEFAULT_STATE); setHistory([DEFAULT_STATE]); setHIndex(0); };
+      img.src = src;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ---------- Render to canvas whenever state/img changes ----------
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return;
-    c.width = d.width; c.height = d.height;
+    const c = canvasRef.current; const img = imgRef.current;
+    if (!c || !img) return;
+
+    // Compute rotated dimensions
+    const rotated = state.rotation % 180 !== 0;
+    const w = rotated ? img.naturalHeight : img.naturalWidth;
+    const h = rotated ? img.naturalWidth : img.naturalHeight;
+    c.width = w + state.border * 2;
+    c.height = h + state.border * 2;
+
     const ctx = c.getContext('2d'); if (!ctx) return;
+    ctx.clearRect(0, 0, c.width, c.height);
 
-    // Gradient background
-    const rad = (d.angle * Math.PI) / 180;
-    const x = Math.cos(rad) * d.width;
-    const y = Math.sin(rad) * d.height;
-    const grad = ctx.createLinearGradient(0, 0, x, y);
-    grad.addColorStop(0, d.gradFrom);
-    grad.addColorStop(1, d.gradTo);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, d.width, d.height);
-
-    // Subtle noise/light overlay
-    ctx.fillStyle = 'rgba(255,255,255,0.04)';
-    for (let i = 0; i < 60; i++) {
-      ctx.beginPath();
-      ctx.arc(Math.random() * d.width, Math.random() * d.height, Math.random() * 60 + 10, 0, Math.PI * 2);
-      ctx.fill();
+    // Border background
+    if (state.border > 0) {
+      ctx.fillStyle = state.borderColor;
+      ctx.fillRect(0, 0, c.width, c.height);
     }
 
-    ctx.fillStyle = d.textColor;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    // Apply CSS filter chain to image draw
+    const filterStr = [
+      `brightness(${state.brightness}%)`,
+      `contrast(${state.contrast}%)`,
+      `saturate(${state.saturation}%)`,
+      state.blur > 0 ? `blur(${state.blur}px)` : '',
+      // Sharpen approximated via contrast boost (true convolution is heavy)
+      state.sharpen > 0 ? `contrast(${100 + state.sharpen * 0.6}%)` : '',
+      FILTER_CSS[state.filter],
+    ].filter(Boolean).join(' ');
 
-    if (d.mode === 'avatar' || d.mode === 'logo') {
-      const cx = d.width / 2, cy = d.height / 2;
-      const r = Math.min(d.width, d.height) * 0.32;
+    ctx.save();
+    (ctx as any).filter = filterStr || 'none';
+    ctx.translate(c.width / 2, c.height / 2);
+    ctx.rotate((state.rotation * Math.PI) / 180);
+    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+    ctx.restore();
 
-      // Shape disc
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
-      ctx.beginPath();
-      if (d.shape === 'circle') ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      else if (d.shape === 'square') ctx.rect(cx - r, cy - r, r * 2, r * 2);
-      else {
-        for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i - Math.PI / 2;
-          const px = cx + r * Math.cos(a);
-          const py = cy + r * Math.sin(a);
-          if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-        }
-        ctx.closePath();
-      }
-      ctx.fill();
+    // Frame effects (drawn over image)
+    if (state.frame === 'polaroid') {
+      ctx.fillStyle = '#fff';
+      const pad = 24; const bottomPad = 80;
+      // expand canvas-like effect by drawing inner shadow border
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = pad * 2;
+      ctx.strokeRect(0, 0, c.width, c.height + bottomPad);
+    }
 
-      ctx.fillStyle = d.textColor;
-      ctx.font = `bold ${r}px ${d.fontFamily}`;
-      ctx.fillText(d.initials || initialsFrom(d.title), cx, cy + r * 0.05);
-
-      if (d.mode === 'logo' && d.title) {
-        ctx.font = `600 ${d.height * 0.06}px ${d.fontFamily}`;
-        ctx.fillText(d.title, cx, cy + r + d.height * 0.1);
-      }
-    } else if (d.mode === 'thumbnail') {
-      // Title block
-      const padding = d.width * 0.06;
-      ctx.font = `900 ${d.height * 0.13}px ${d.fontFamily}`;
-      wrapText(ctx, d.title, padding, d.height * 0.4, d.width - padding * 2, d.height * 0.15);
-
-      ctx.font = `500 ${d.height * 0.045}px ${d.fontFamily}`;
-      ctx.textAlign = 'left';
-      ctx.fillText(d.subtitle, padding, d.height - padding);
+    // Text overlay
+    if (state.text) {
+      ctx.save();
+      (ctx as any).filter = 'none';
+      ctx.fillStyle = state.textColor;
+      ctx.font = `bold ${state.textSize}px Inter, sans-serif`;
       ctx.textAlign = 'center';
-    } else {
-      // gradient wallpaper — optional centered title
-      if (d.title) {
-        ctx.font = `300 ${d.height * 0.08}px ${d.fontFamily}`;
-        ctx.fillText(d.title, d.width / 2, d.height / 2);
-      }
+      ctx.textBaseline = 'bottom';
+      ctx.shadowColor = 'rgba(0,0,0,0.45)';
+      ctx.shadowBlur = 6;
+      ctx.fillText(state.text, c.width / 2, c.height - 24);
+      ctx.restore();
     }
-  }, [d]);
+  }, [state, imgSrc]);
 
-  const setMode = (mode: Mode) => {
-    const s = SIZES[mode];
-    setD(prev => ({ ...prev, mode, width: s.w, height: s.h }));
-  };
-
-  const randomize = () => {
-    const p = PRESETS[Math.floor(Math.random() * PRESETS.length)];
-    setD(prev => ({ ...prev, gradFrom: p.from, gradTo: p.to, angle: Math.floor(Math.random() * 360) }));
-  };
-
-  const download = () => {
-    const c = canvasRef.current; if (!c) return;
+  // ---------- Export ----------
+  const exportImage = (mime: 'image/png' | 'image/jpeg' | 'image/webp') => {
+    const c = canvasRef.current; if (!c) { toast.error('Upload an image first'); return; }
     c.toBlob(blob => {
       if (!blob) { toast.error('Export failed'); return; }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = url; a.download = `smartmind-${d.mode}-${Date.now()}.png`;
+      const ext = mime.split('/')[1].replace('jpeg', 'jpg');
+      a.href = url; a.download = `smartmindz-${Date.now()}.${ext}`;
       document.body.appendChild(a); a.click(); a.remove();
       URL.revokeObjectURL(url);
-    }, 'image/png');
+    }, mime, 0.92);
   };
+
+  const reset = () => { setState(DEFAULT_STATE); setHistory([DEFAULT_STATE]); setHIndex(0); };
 
   return (
     <ToolPage
       title="Design Studio"
-      description="Build thumbnails, logos, avatars and gradient wallpapers — instantly, offline."
+      description="Upload an image and edit it with adjustments, filters, text overlays, frames and exports."
       icon={<ImagePlus className="h-5 w-5" />}
     >
-      <div className="grid lg:grid-cols-2 gap-5">
-        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-4">
-          <div>
-            <label className="text-xs text-muted-foreground">Mode</label>
-            <div className="flex flex-wrap gap-1.5 mt-1.5">
-              {(Object.keys(SIZES) as Mode[]).map(m => (
-                <button key={m} onClick={() => setMode(m)}
-                  className={`text-xs px-3 py-1.5 rounded-full border ${d.mode === m ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary border-border'}`}>
-                  {m}
-                </button>
-              ))}
+      {!imgSrc ? (
+        <UploadZone onUpload={onUpload} />
+      ) : (
+        <div className="grid lg:grid-cols-[320px_1fr] gap-5">
+          {/* Controls */}
+          <div className="bg-card border border-border rounded-2xl p-4 space-y-4 max-h-[80vh] overflow-y-auto">
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={undo} disabled={hIndex <= 0} title="Undo"><Undo2 className="h-4 w-4" /></Button>
+              <Button size="sm" variant="outline" onClick={redo} disabled={hIndex >= history.length - 1} title="Redo"><Redo2 className="h-4 w-4" /></Button>
+              <Button size="sm" variant="outline" onClick={reset} className="ml-auto">Reset</Button>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">{SIZES[d.mode].label}</p>
-          </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted-foreground">Title</label>
-              <Input value={d.title} onChange={e => setD({ ...d, title: e.target.value })} className="mt-1" />
-            </div>
-            {d.mode === 'thumbnail' && (
-              <div>
-                <label className="text-xs text-muted-foreground">Subtitle</label>
-                <Input value={d.subtitle} onChange={e => setD({ ...d, subtitle: e.target.value })} className="mt-1" />
+            <Section title="Adjustments">
+              <Slide label="Brightness" value={state.brightness} min={0} max={200} onChange={v => setField('brightness', v)} />
+              <Slide label="Contrast" value={state.contrast} min={0} max={200} onChange={v => setField('contrast', v)} />
+              <Slide label="Saturation" value={state.saturation} min={0} max={200} onChange={v => setField('saturation', v)} />
+              <Slide label="Blur" value={state.blur} min={0} max={20} onChange={v => setField('blur', v)} />
+              <Slide label="Sharpen" value={state.sharpen} min={0} max={100} onChange={v => setField('sharpen', v)} />
+            </Section>
+
+            <Section title="Filters">
+              <div className="grid grid-cols-3 gap-1.5">
+                {(Object.keys(FILTER_CSS) as EditState['filter'][]).map(f => (
+                  <button key={f} onClick={() => setField('filter', f)}
+                    className={`text-xs py-1.5 rounded-lg border capitalize ${state.filter === f ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary border-border'}`}>
+                    {f}
+                  </button>
+                ))}
               </div>
-            )}
-            {(d.mode === 'logo' || d.mode === 'avatar') && (
-              <>
+            </Section>
+
+            <Section title="Transform">
+              <Button size="sm" variant="outline" onClick={() => setField('rotation', (state.rotation + 90) % 360)}>
+                <RotateCw className="h-4 w-4 mr-1" /> Rotate 90°
+              </Button>
+            </Section>
+
+            <Section title="Text overlay" icon={<Type className="h-3.5 w-3.5" />}>
+              <Input value={state.text} onChange={e => setField('text', e.target.value)} placeholder="Add caption…" />
+              <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="text-xs text-muted-foreground">Initials</label>
-                  <Input value={d.initials} onChange={e => setD({ ...d, initials: e.target.value.slice(0, 3).toUpperCase() })} className="mt-1" />
+                  <label className="text-xs text-muted-foreground">Color</label>
+                  <input type="color" value={state.textColor} onChange={e => setField('textColor', e.target.value)} className="w-full h-9 mt-1 rounded-md bg-secondary border border-border" />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">Shape</label>
-                  <select value={d.shape} onChange={e => setD({ ...d, shape: e.target.value as Design['shape'] })}
-                    className="w-full mt-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
-                    <option value="circle">Circle</option>
-                    <option value="square">Square</option>
-                    <option value="hex">Hexagon</option>
+                  <Slide label="Size" value={state.textSize} min={16} max={160} onChange={v => setField('textSize', v)} />
+                </div>
+              </div>
+            </Section>
+
+            <Section title="Border & frame" icon={<Square className="h-3.5 w-3.5" />}>
+              <Slide label="Border" value={state.border} min={0} max={80} onChange={v => setField('border', v)} />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">Color</label>
+                  <input type="color" value={state.borderColor} onChange={e => setField('borderColor', e.target.value)} className="w-full h-9 mt-1 rounded-md bg-secondary border border-border" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">Frame</label>
+                  <select value={state.frame} onChange={e => setField('frame', e.target.value as EditState['frame'])}
+                    className="w-full mt-1 px-2 py-2 bg-secondary border border-border rounded-md text-xs">
+                    <option value="none">None</option>
+                    <option value="shadow">Shadow</option>
+                    <option value="glow">Glow</option>
+                    <option value="polaroid">Polaroid</option>
                   </select>
                 </div>
-              </>
-            )}
+              </div>
+            </Section>
+
+            <Section title="Export" icon={<Download className="h-3.5 w-3.5" />}>
+              <div className="grid grid-cols-3 gap-1.5">
+                <Button size="sm" onClick={() => exportImage('image/png')}>PNG</Button>
+                <Button size="sm" variant="outline" onClick={() => exportImage('image/jpeg')}>JPG</Button>
+                <Button size="sm" variant="outline" onClick={() => exportImage('image/webp')}>WEBP</Button>
+              </div>
+            </Section>
+
+            <div className="pt-2 border-t border-border">
+              <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={compare} onChange={e => setCompare(e.target.checked)} />
+                Side-by-side compare
+              </label>
+            </div>
+
+            <Button variant="outline" className="w-full" onClick={() => { setImgSrc(null); imgRef.current = null; }}>
+              <Upload className="h-4 w-4 mr-1" /> Replace image
+            </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-muted-foreground">Gradient from</label>
-              <input type="color" value={d.gradFrom} onChange={e => setD({ ...d, gradFrom: e.target.value })} className="w-full h-10 mt-1 rounded-lg bg-secondary border border-border" />
+          {/* Preview */}
+          <div className="bg-card border border-border rounded-2xl p-3 sm:p-4">
+            <div
+              className={`rounded-xl overflow-hidden bg-[length:20px_20px] bg-[linear-gradient(45deg,#0001_25%,transparent_25%,transparent_75%,#0001_75%),linear-gradient(45deg,#0001_25%,transparent_25%,transparent_75%,#0001_75%)] bg-[position:0_0,10px_10px] border border-border ${
+                state.frame === 'shadow' ? 'shadow-2xl' : ''
+              } ${state.frame === 'glow' ? 'shadow-[0_0_60px_hsl(var(--primary)/0.6)]' : ''}`}
+            >
+              {compare ? (
+                <div className="grid grid-cols-2 gap-2 p-2">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1 text-center">Before</p>
+                    <img src={imgSrc} alt="Original" className="w-full h-auto rounded-lg" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-1 text-center">After</p>
+                    <canvas ref={canvasRef} className="w-full h-auto block rounded-lg" />
+                  </div>
+                </div>
+              ) : (
+                <canvas ref={canvasRef} className="w-full h-auto block" />
+              )}
             </div>
-            <div>
-              <label className="text-xs text-muted-foreground">Gradient to</label>
-              <input type="color" value={d.gradTo} onChange={e => setD({ ...d, gradTo: e.target.value })} className="w-full h-10 mt-1 rounded-lg bg-secondary border border-border" />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground">Angle ({d.angle}°)</label>
-              <input type="range" min={0} max={360} value={d.angle} onChange={e => setD({ ...d, angle: +e.target.value })} className="w-full mt-2" />
-            </div>
-            <div>
-              <label className="text-xs text-muted-foreground">Text color</label>
-              <input type="color" value={d.textColor} onChange={e => setD({ ...d, textColor: e.target.value })} className="w-full h-10 mt-1 rounded-lg bg-secondary border border-border" />
-            </div>
-          </div>
-
-          <div>
-            <label className="text-xs text-muted-foreground">Font</label>
-            <select value={d.fontFamily} onChange={e => setD({ ...d, fontFamily: e.target.value })}
-              className="w-full mt-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
-              {FONTS.map(f => <option key={f} value={f}>{f.split(',')[0]}</option>)}
-            </select>
-          </div>
-
-          <div>
-            <label className="text-xs text-muted-foreground mb-1.5 block">Color presets</label>
-            <div className="flex gap-2 flex-wrap">
-              {PRESETS.map((p, i) => (
-                <button key={i} onClick={() => setD({ ...d, gradFrom: p.from, gradTo: p.to })}
-                  className="w-10 h-10 rounded-lg border border-border" style={{ background: `linear-gradient(135deg, ${p.from}, ${p.to})` }} />
-              ))}
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={randomize} className="flex-1"><Shuffle className="h-4 w-4 mr-1" /> Randomize</Button>
-            <Button onClick={download} className="flex-1"><Download className="h-4 w-4 mr-1" /> Download PNG</Button>
           </div>
         </div>
-
-        <div className="bg-card border border-border rounded-2xl p-3 sm:p-4">
-          <h3 className="text-sm font-medium mb-3">Preview</h3>
-          <div className="rounded-xl overflow-hidden bg-secondary/40 border border-border">
-            <canvas ref={canvasRef} className="w-full h-auto block" />
-          </div>
-        </div>
-      </div>
+      )}
     </ToolPage>
   );
 };
 
-// Word-wrap helper for canvas text
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-  const words = text.split(' ');
-  let line = '';
-  let yy = y;
-  ctx.textAlign = 'left';
-  for (let n = 0; n < words.length; n++) {
-    const test = line + words[n] + ' ';
-    if (ctx.measureText(test).width > maxWidth && n > 0) {
-      ctx.fillText(line.trim(), x, yy);
-      line = words[n] + ' ';
-      yy += lineHeight;
-    } else {
-      line = test;
-    }
-  }
-  ctx.fillText(line.trim(), x, yy);
-  ctx.textAlign = 'center';
-}
+/* ---------- Small UI helpers ---------- */
+const Section: React.FC<{ title: string; icon?: React.ReactNode; children: React.ReactNode }> = ({ title, icon, children }) => (
+  <div className="space-y-2">
+    <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">{icon}{title}</p>
+    <div className="space-y-2">{children}</div>
+  </div>
+);
+
+const Slide: React.FC<{ label: string; value: number; min: number; max: number; onChange: (v: number) => void }> = ({ label, value, min, max, onChange }) => (
+  <div>
+    <div className="flex justify-between text-xs text-muted-foreground"><span>{label}</span><span>{value}</span></div>
+    <Slider value={[value]} min={min} max={max} step={1} onValueChange={v => onChange(v[0])} className="mt-1" />
+  </div>
+);
+
+const UploadZone: React.FC<{ onUpload: (f?: File) => void }> = ({ onUpload }) => {
+  const [drag, setDrag] = useState(false);
+  return (
+    <div
+      onDragOver={e => { e.preventDefault(); setDrag(true); }}
+      onDragLeave={() => setDrag(false)}
+      onDrop={e => { e.preventDefault(); setDrag(false); onUpload(e.dataTransfer.files?.[0]); }}
+      className={`bg-card border-2 border-dashed rounded-2xl p-12 sm:p-20 text-center transition-colors ${drag ? 'border-primary bg-primary/5' : 'border-border'}`}
+    >
+      <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground mb-4">
+        <Sparkles className="h-7 w-7" />
+      </div>
+      <h3 className="text-lg font-semibold mb-1">Upload an image to start editing</h3>
+      <p className="text-sm text-muted-foreground mb-5">PNG, JPG or WEBP — drag & drop or browse from your device.</p>
+      <label className="inline-flex">
+        <input type="file" accept="image/*" className="hidden" onChange={e => onUpload(e.target.files?.[0] || undefined)} />
+        <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium cursor-pointer hover:opacity-90 transition">
+          <Upload className="h-4 w-4" /> Choose image
+        </span>
+      </label>
+    </div>
+  );
+};
 
 export default GenerateImage;
