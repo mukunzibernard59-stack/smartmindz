@@ -8,6 +8,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
 import FloatingInstallButton from "@/components/FloatingInstallButton";
+import ThemeToggle from "@/components/ThemeToggle";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import UpdateNotification from "@/components/UpdateNotification";
 import OfflineBanner from "@/components/OfflineBanner";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
@@ -39,6 +41,7 @@ const AppContent = () => {
       <Toaster />
       <Sonner />
       <FloatingInstallButton />
+      <ThemeToggle />
       <UpdateNotification />
       <AppRatingBanner />
       <BrowserRouter>
@@ -75,9 +78,11 @@ const App = () => (
   <HelmetProvider>
     <QueryClientProvider client={queryClient}>
       <LanguageProvider>
-        <TooltipProvider>
-          <AppContent />
-        </TooltipProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <AppContent />
+          </TooltipProvider>
+        </ThemeProvider>
       </LanguageProvider>
     </QueryClientProvider>
   </HelmetProvider>
