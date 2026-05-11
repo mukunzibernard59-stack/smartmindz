@@ -16,7 +16,7 @@ import {
  * Exports: PDF (jsPDF), DOCX (docx), TXT, Copy, Print-friendly preview.
  * --------------------------------------------------------- */
 
-type Category = 'job' | 'email' | 'blog' | 'caption' | 'cv';
+type Category = 'job' | 'personal' | 'email' | 'blog' | 'caption' | 'cv';
 type Style = 'Professional' | 'Modern' | 'Concise' | 'Persuasive' | 'Friendly';
 
 interface FieldDef {
@@ -84,9 +84,41 @@ ${v.fullName || '[Your Name]'}`;
   return { title: `${v.fullName || 'Job'} – ${v.position || 'Application'}`, body, sender: v.fullName };
 };
 
+/* ---------- Friendly Letter (casual / personal) ---------- */
+const FRIENDLY_FIELDS: FieldDef[] = [
+  { key: 'senderName', label: 'Your name', placeholder: 'Alex' },
+  { key: 'senderLocation', label: 'Your location', placeholder: 'Kigali, Rwanda' },
+  { key: 'date', label: 'Date', type: 'date' },
+  { key: 'recipientName', label: 'Recipient name', placeholder: 'Sam' },
+  { key: 'greeting', label: 'Greeting', placeholder: 'Hi Sam,' },
+  { key: 'body', label: 'Message', multiline: true, placeholder: 'How are you doing? I wanted to share…' },
+  { key: 'closing', label: 'Closing', placeholder: 'With love,' },
+  { key: 'signature', label: 'Signature', placeholder: 'Alex' },
+];
+
+const buildFriendlyLetter = (v: Record<string, string>) => {
+  const date = v.date
+    ? new Date(v.date).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    : today();
+  const body =
+`${v.senderName || '[Your Name]'}
+${v.senderLocation || '[Your Location]'}
+
+${date}
+
+${v.greeting || `Dear ${v.recipientName || '[Friend]'},`}
+
+${v.body || '[Write your warm, personal message here. Share what is happening in your life, ask about theirs, and add the small details that make a letter feel real.]'}
+
+${v.closing || 'Warmly,'}
+${v.signature || v.senderName || '[Your Name]'}`;
+  return { title: `Letter to ${v.recipientName || 'Friend'}`, body, sender: v.senderName };
+};
+
 /* ---------- Other templates (kept simple/local) ---------- */
 const TEMPLATES: Template[] = [
   { id: 'job-application', category: 'job', label: 'Job Application Letter', fields: JOB_FIELDS, build: buildJobLetter },
+  { id: 'friendly-letter', category: 'personal', label: 'Friendly Letter', fields: FRIENDLY_FIELDS, build: (v) => buildFriendlyLetter(v) },
   {
     id: 'cover-letter', category: 'job', label: 'Short Cover Letter',
     fields: [
@@ -195,6 +227,7 @@ ${points.length ? points.map((p, i) => `   ${i + 1}. ${p}`).join('\n') : '   1. 
 
 const CATEGORIES: { id: Category; label: string }[] = [
   { id: 'job', label: 'Job Letters' },
+  { id: 'personal', label: 'Friendly Letters' },
   { id: 'email', label: 'Emails' },
   { id: 'blog', label: 'Blog Outlines' },
   { id: 'caption', label: 'Captions' },
