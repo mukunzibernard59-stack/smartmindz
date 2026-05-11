@@ -13,6 +13,8 @@ import ChatMessage from '@/components/chat/ChatMessage';
 import FileUploadMenu from '@/components/chat/FileUploadMenu';
 import AIImageGenerator from '@/components/chat/AIImageGenerator';
 import VoiceRecorder from '@/components/chat/VoiceRecorder';
+import { classifyQuestion, extractTopic } from '@/lib/questionAnalyzer';
+import { fetchWikipediaAnswer, formatWikiAnswer } from '@/lib/wikiSearch';
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
@@ -85,6 +87,23 @@ const AIAssistantTab: React.FC = () => {
     addMessage({ role: 'user', content: sanitizedText, attachments: files.map(f => ({ id: f.id, name: f.name, type: f.type, size: f.size })) });
     clearFiles();
     setIsLoading(true);
+
+    /* ---- Hybrid retrieval: simple definitional questions skip the AI
+       and answer instantly from Wikipedia. Falls back to AI on miss. ---- */
+    if (!fileContext && classifyQuestion(sanitizedText) === 'SIMPLE') {
+      try {
+        const topic = extractTopic(sanitizedText);
+        const wiki = await fetchWikipediaAnswer(topic);
+        if (wiki && wiki.extract && wiki.extract.length > 40) {
+          addMessage({ role: 'assistant', content: formatWikiAnswer(wiki) });
+          setIsLoading(false);
+          return;
+        }
+      } catch (e) {
+        // Silent fall-through to AI path.
+        console.warn('Wiki path failed, falling back to AI:', e);
+      }
+    }
 
     const MAX_RETRIES = 3;
     for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
