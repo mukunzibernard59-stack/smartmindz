@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Youtube, Check, Bookmark, BookmarkCheck, Search } from 'lucide-react';
+import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ToolPage from '@/components/tools/ToolPage';
 
@@ -133,6 +133,18 @@ const YouTubeTutor: React.FC = () => {
   const doneCount = Object.values(completed).filter(Boolean).length;
   const progressPct = Math.round((doneCount / TOPICS.length) * 100);
 
+  // Hybrid embed: try the curated video first; if user reports it's
+  // unavailable they can switch to a guaranteed search-results playlist.
+  const [useFallback, setUseFallback] = useState(false);
+  // Reset fallback when active topic changes.
+  useEffect(() => { setUseFallback(false); }, [activeId]);
+
+  const ytSearchQuery = `${active.title} ${active.level} tutorial`;
+  const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
+  const embedUrl = useFallback
+    ? `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(ytSearchQuery)}`
+    : `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0`;
+
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
 
@@ -231,13 +243,34 @@ const YouTubeTutor: React.FC = () => {
 
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
               <iframe
-                key={active.videoId}
-                src={`https://www.youtube-nocookie.com/embed/${active.videoId}`}
+                key={`${active.videoId}-${useFallback ? 'fb' : 'main'}`}
+                src={embedUrl}
                 title={active.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
                 className="w-full h-full"
               />
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
+              <button
+                onClick={() => setUseFallback(f => !f)}
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
+                title="Switch between curated video and live YouTube search results"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                {useFallback ? 'Curated video' : 'Find more videos'}
+              </button>
+              <a
+                href={ytSearchUrl}
+                target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Open on YouTube
+              </a>
+              {useFallback && (
+                <span className="text-muted-foreground">Showing live search results — always available.</span>
+              )}
             </div>
           </div>
 
