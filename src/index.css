@@ -107,6 +107,8 @@
     --sidebar-accent-foreground: 210 40% 90%;
     --sidebar-border: 222 30% 22%;
     --sidebar-ring: 187 85% 53%;
+  }
+
   /* ChatGPT-style Light Mode override (applied when <html> has .light) */
   html.light {
     --background: 0 0% 100%;
