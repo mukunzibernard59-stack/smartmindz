@@ -236,10 +236,28 @@ const GenerateImage: React.FC = () => {
               <Button size="sm" variant="outline" onClick={reset} className="ml-auto">Reset</Button>
             </div>
 
+            <Section title="Quick retouch" icon={<Wand2 className="h-3.5 w-3.5" />}>
+              <div className="grid grid-cols-2 gap-1.5">
+                {PRESETS.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => applyPreset(p.patch)}
+                    className="text-xs py-1.5 px-2 rounded-lg border border-border bg-secondary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                    title={`Apply ${p.label} preset`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </Section>
+
             <Section title="Adjustments">
               <Slide label="Brightness" value={state.brightness} min={0} max={200} onChange={v => setField('brightness', v)} />
               <Slide label="Contrast" value={state.contrast} min={0} max={200} onChange={v => setField('contrast', v)} />
               <Slide label="Saturation" value={state.saturation} min={0} max={200} onChange={v => setField('saturation', v)} />
+              <Slide label="Temperature" value={state.temperature} min={-100} max={100} onChange={v => setField('temperature', v)} />
+              <Slide label="Hue" value={state.hue} min={-180} max={180} onChange={v => setField('hue', v)} />
+              <Slide label="Vignette" value={state.vignette} min={0} max={100} onChange={v => setField('vignette', v)} />
               <Slide label="Blur" value={state.blur} min={0} max={20} onChange={v => setField('blur', v)} />
               <Slide label="Sharpen" value={state.sharpen} min={0} max={100} onChange={v => setField('sharpen', v)} />
             </Section>
