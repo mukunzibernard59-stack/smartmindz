@@ -41,24 +41,40 @@ const Translate: React.FC = () => {
     if (source === target) { setOutput(text); return; }
     setLoading(true); setOutput('');
     try {
-      // MyMemory has a 500-char per-call limit — split the input safely.
+      // Split into safe-size chunks (works for any length).
       const chunks: string[] = [];
       const sentences = text.split(/(?<=[.!?])\s+/);
       let buf = '';
       for (const s of sentences) {
-        if ((buf + ' ' + s).length > 480) { if (buf) chunks.push(buf); buf = s; }
+        if ((buf + ' ' + s).length > 1500) { if (buf) chunks.push(buf); buf = s; }
         else buf = buf ? buf + ' ' + s : s;
       }
       if (buf) chunks.push(buf);
 
+      // Primary: Google Translate public gtx endpoint — supports Kinyarwanda (rw)
+      // and ~100 languages reliably. Fallback: MyMemory (limited language coverage).
+      const translateChunk = async (chunk: string): Promise<string> => {
+        try {
+          const gUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(source)}&tl=${encodeURIComponent(target)}&dt=t&q=${encodeURIComponent(chunk)}`;
+          const r = await fetch(gUrl);
+          if (r.ok) {
+            const j = await r.json();
+            // j[0] is array of [translatedSegment, originalSegment, ...]
+            const out = Array.isArray(j?.[0]) ? j[0].map((seg: any[]) => seg?.[0] || '').join('') : '';
+            if (out) return out;
+          }
+        } catch { /* fall through */ }
+        // Fallback to MyMemory (max 480 chars per call)
+        const safe = chunk.slice(0, 480);
+        const mUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(safe)}&langpair=${source}|${target}`;
+        const mr = await fetch(mUrl);
+        if (!mr.ok) throw new Error('Translation service unavailable');
+        const mj = await mr.json();
+        return mj?.responseData?.translatedText || '';
+      };
+
       const parts: string[] = [];
-      for (const chunk of chunks) {
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunk)}&langpair=${source}|${target}`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Translation service error');
-        const json = await res.json();
-        parts.push(json?.responseData?.translatedText || '');
-      }
+      for (const chunk of chunks) parts.push(await translateChunk(chunk));
       setOutput(parts.join(' '));
     } catch (e: any) {
       toast.error(e?.message || 'Translation failed.');
