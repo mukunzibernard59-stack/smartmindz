@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { ImagePlus, Upload, Download, RotateCw, Crop as CropIcon, Undo2, Redo2, Type, Square, Sparkles } from 'lucide-react';
+import { ImagePlus, Upload, Download, RotateCw, Crop as CropIcon, Undo2, Redo2, Type, Square, Sparkles, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
@@ -20,6 +20,9 @@ interface EditState {
   saturation: number;  // %
   blur: number;        // px
   sharpen: number;     // 0-100
+  hue: number;         // deg -180..180
+  temperature: number; // -100 (cool) .. 100 (warm)
+  vignette: number;    // 0-100 strength
   rotation: number;    // deg (0/90/180/270)
   filter: 'none' | 'grayscale' | 'sepia' | 'invert' | 'vintage' | 'cool' | 'warm';
   text: string;
@@ -32,11 +35,26 @@ interface EditState {
 
 const DEFAULT_STATE: EditState = {
   brightness: 100, contrast: 100, saturation: 100, blur: 0, sharpen: 0,
+  hue: 0, temperature: 0, vignette: 0,
   rotation: 0, filter: 'none',
   text: '', textColor: '#ffffff', textSize: 48,
   border: 0, borderColor: '#ffffff',
   frame: 'none',
 };
+
+// Quick retouching presets — one-click professional looks
+const PRESETS: { id: string; label: string; patch: Partial<EditState> }[] = [
+  { id: 'auto', label: 'Auto Enhance', patch: { brightness: 108, contrast: 112, saturation: 110, sharpen: 25 } },
+  { id: 'portrait', label: 'Portrait', patch: { brightness: 105, contrast: 105, saturation: 95, blur: 0, sharpen: 15, temperature: 10 } },
+  { id: 'smooth', label: 'Smooth Skin', patch: { brightness: 104, contrast: 98, saturation: 100, blur: 1, sharpen: 0 } },
+  { id: 'pop', label: 'Pop Color', patch: { brightness: 105, contrast: 120, saturation: 140, sharpen: 30 } },
+  { id: 'bw', label: 'B & W', patch: { saturation: 0, contrast: 115, brightness: 102, filter: 'grayscale' } },
+  { id: 'sunset', label: 'Sunset', patch: { temperature: 45, saturation: 125, contrast: 108 } },
+  { id: 'cool', label: 'Cool Tone', patch: { temperature: -35, saturation: 105, contrast: 105 } },
+  { id: 'hdr', label: 'HDR Boost', patch: { brightness: 105, contrast: 130, saturation: 125, sharpen: 45 } },
+  { id: 'vintage', label: 'Vintage', patch: { filter: 'vintage', vignette: 35, contrast: 95 } },
+  { id: 'dramatic', label: 'Dramatic', patch: { contrast: 140, brightness: 95, saturation: 115, vignette: 50 } },
+];
 
 const FILTER_CSS: Record<EditState['filter'], string> = {
   none: '',
@@ -75,19 +93,32 @@ const GenerateImage: React.FC = () => {
   const undo = () => { if (hIndex > 0) { setHIndex(hIndex - 1); setState(history[hIndex - 1]); } };
   const redo = () => { if (hIndex < history.length - 1) { setHIndex(hIndex + 1); setState(history[hIndex + 1]); } };
 
-  // ---------- Upload ----------
+  // ---------- Upload (instant: createObjectURL — no base64 read) ----------
   const onUpload = (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) { toast.error('Please upload an image'); return; }
-    const reader = new FileReader();
-    reader.onload = e => {
-      const src = e.target?.result as string;
-      setImgSrc(src);
-      const img = new Image();
-      img.onload = () => { imgRef.current = img; setState(DEFAULT_STATE); setHistory([DEFAULT_STATE]); setHIndex(0); };
-      img.src = src;
+    if (file.size > 25 * 1024 * 1024) { toast.error('Image too large (max 25 MB)'); return; }
+    // Object URLs are synchronous and ~instant — much faster than FileReader/base64.
+    const objUrl = URL.createObjectURL(file);
+    setImgSrc(objUrl);
+    const img = new Image();
+    img.onload = () => {
+      imgRef.current = img;
+      setState(DEFAULT_STATE);
+      setHistory([DEFAULT_STATE]);
+      setHIndex(0);
+      toast.success('Image loaded');
     };
-    reader.readAsDataURL(file);
+    img.onerror = () => toast.error('Could not read image');
+    img.src = objUrl;
+  };
+
+  // Revoke object URL when image changes/unmounts to avoid leaks
+  useEffect(() => () => { if (imgSrc?.startsWith('blob:')) URL.revokeObjectURL(imgSrc); }, [imgSrc]);
+
+  // Apply a quick-retouch preset on top of current state
+  const applyPreset = (patch: Partial<EditState>) => {
+    commit({ ...DEFAULT_STATE, ...patch, text: state.text, textColor: state.textColor, textSize: state.textSize, border: state.border, borderColor: state.borderColor, frame: state.frame, rotation: state.rotation });
   };
 
   // ---------- Render to canvas whenever state/img changes ----------
@@ -111,11 +142,14 @@ const GenerateImage: React.FC = () => {
       ctx.fillRect(0, 0, c.width, c.height);
     }
 
-    // Apply CSS filter chain to image draw
+    // Apply CSS filter chain to image draw (incl. hue + temperature)
+    const tempHue = state.temperature !== 0 ? `hue-rotate(${state.temperature * 0.18}deg) saturate(${100 + Math.abs(state.temperature) * 0.2}%)` : '';
     const filterStr = [
       `brightness(${state.brightness}%)`,
       `contrast(${state.contrast}%)`,
       `saturate(${state.saturation}%)`,
+      state.hue !== 0 ? `hue-rotate(${state.hue}deg)` : '',
+      tempHue,
       state.blur > 0 ? `blur(${state.blur}px)` : '',
       // Sharpen approximated via contrast boost (true convolution is heavy)
       state.sharpen > 0 ? `contrast(${100 + state.sharpen * 0.6}%)` : '',
@@ -128,6 +162,21 @@ const GenerateImage: React.FC = () => {
     ctx.rotate((state.rotation * Math.PI) / 180);
     ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
     ctx.restore();
+
+    // Vignette overlay
+    if (state.vignette > 0) {
+      ctx.save();
+      (ctx as any).filter = 'none';
+      const grad = ctx.createRadialGradient(
+        c.width / 2, c.height / 2, Math.min(c.width, c.height) * 0.35,
+        c.width / 2, c.height / 2, Math.max(c.width, c.height) * 0.75,
+      );
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, `rgba(0,0,0,${state.vignette / 100})`);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.restore();
+    }
 
     // Frame effects (drawn over image)
     if (state.frame === 'polaroid') {
@@ -187,10 +236,28 @@ const GenerateImage: React.FC = () => {
               <Button size="sm" variant="outline" onClick={reset} className="ml-auto">Reset</Button>
             </div>
 
+            <Section title="Quick retouch" icon={<Wand2 className="h-3.5 w-3.5" />}>
+              <div className="grid grid-cols-2 gap-1.5">
+                {PRESETS.map(p => (
+                  <button
+                    key={p.id}
+                    onClick={() => applyPreset(p.patch)}
+                    className="text-xs py-1.5 px-2 rounded-lg border border-border bg-secondary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+                    title={`Apply ${p.label} preset`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </Section>
+
             <Section title="Adjustments">
               <Slide label="Brightness" value={state.brightness} min={0} max={200} onChange={v => setField('brightness', v)} />
               <Slide label="Contrast" value={state.contrast} min={0} max={200} onChange={v => setField('contrast', v)} />
               <Slide label="Saturation" value={state.saturation} min={0} max={200} onChange={v => setField('saturation', v)} />
+              <Slide label="Temperature" value={state.temperature} min={-100} max={100} onChange={v => setField('temperature', v)} />
+              <Slide label="Hue" value={state.hue} min={-180} max={180} onChange={v => setField('hue', v)} />
+              <Slide label="Vignette" value={state.vignette} min={0} max={100} onChange={v => setField('vignette', v)} />
               <Slide label="Blur" value={state.blur} min={0} max={20} onChange={v => setField('blur', v)} />
               <Slide label="Sharpen" value={state.sharpen} min={0} max={100} onChange={v => setField('sharpen', v)} />
             </Section>
