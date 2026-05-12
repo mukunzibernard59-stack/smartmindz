@@ -20,6 +20,7 @@ import {
 import { toast } from 'sonner';
 import { usePWAInstall } from '@/hooks/usePWAInstall';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
@@ -98,8 +99,8 @@ const Navbar: React.FC = () => {
             {/* Top nav links removed — now in left sidebar */}
             <div className="hidden md:block" />
 
-            {/* Right Side */}
-            <div className="hidden md:flex items-center gap-3">
+            {/* Right Side — balanced spacing across install / language / theme / profile */}
+            <div className="hidden md:flex items-center gap-4 lg:gap-5">
               {isInstallable && (
                 <TooltipProvider>
                   <Tooltip>
@@ -113,6 +114,7 @@ const Navbar: React.FC = () => {
                 </TooltipProvider>
               )}
               <LanguageSelector />
+              <ThemeToggle floating={false} className="-ml-1" />
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -155,6 +157,7 @@ const Navbar: React.FC = () => {
 
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
+              <ThemeToggle floating={false} className="h-8 w-8" />
               <LanguageSelector />
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

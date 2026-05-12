@@ -41,7 +41,6 @@ const AppContent = () => {
       <Toaster />
       <Sonner />
       <FloatingInstallButton />
-      <ThemeToggle />
       <UpdateNotification />
       <AppRatingBanner />
       <BrowserRouter>
