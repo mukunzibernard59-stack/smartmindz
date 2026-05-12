@@ -20,6 +20,9 @@ interface EditState {
   saturation: number;  // %
   blur: number;        // px
   sharpen: number;     // 0-100
+  hue: number;         // deg -180..180
+  temperature: number; // -100 (cool) .. 100 (warm)
+  vignette: number;    // 0-100 strength
   rotation: number;    // deg (0/90/180/270)
   filter: 'none' | 'grayscale' | 'sepia' | 'invert' | 'vintage' | 'cool' | 'warm';
   text: string;
@@ -32,11 +35,26 @@ interface EditState {
 
 const DEFAULT_STATE: EditState = {
   brightness: 100, contrast: 100, saturation: 100, blur: 0, sharpen: 0,
+  hue: 0, temperature: 0, vignette: 0,
   rotation: 0, filter: 'none',
   text: '', textColor: '#ffffff', textSize: 48,
   border: 0, borderColor: '#ffffff',
   frame: 'none',
 };
+
+// Quick retouching presets — one-click professional looks
+const PRESETS: { id: string; label: string; patch: Partial<EditState> }[] = [
+  { id: 'auto', label: 'Auto Enhance', patch: { brightness: 108, contrast: 112, saturation: 110, sharpen: 25 } },
+  { id: 'portrait', label: 'Portrait', patch: { brightness: 105, contrast: 105, saturation: 95, blur: 0, sharpen: 15, temperature: 10 } },
+  { id: 'smooth', label: 'Smooth Skin', patch: { brightness: 104, contrast: 98, saturation: 100, blur: 1, sharpen: 0 } },
+  { id: 'pop', label: 'Pop Color', patch: { brightness: 105, contrast: 120, saturation: 140, sharpen: 30 } },
+  { id: 'bw', label: 'B & W', patch: { saturation: 0, contrast: 115, brightness: 102, filter: 'grayscale' } },
+  { id: 'sunset', label: 'Sunset', patch: { temperature: 45, saturation: 125, contrast: 108 } },
+  { id: 'cool', label: 'Cool Tone', patch: { temperature: -35, saturation: 105, contrast: 105 } },
+  { id: 'hdr', label: 'HDR Boost', patch: { brightness: 105, contrast: 130, saturation: 125, sharpen: 45 } },
+  { id: 'vintage', label: 'Vintage', patch: { filter: 'vintage', vignette: 35, contrast: 95 } },
+  { id: 'dramatic', label: 'Dramatic', patch: { contrast: 140, brightness: 95, saturation: 115, vignette: 50 } },
+];
 
 const FILTER_CSS: Record<EditState['filter'], string> = {
   none: '',
