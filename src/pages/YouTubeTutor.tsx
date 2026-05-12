@@ -239,7 +239,7 @@ const YouTubeTutor: React.FC = () => {
 
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
               <iframe
-                key={`${active.videoId}-${useFallback ? 'fb' : 'main'}`}
+                key={active.videoId}
                 src={embedUrl}
                 title={active.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -249,24 +249,22 @@ const YouTubeTutor: React.FC = () => {
               />
             </div>
             <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
-              <button
-                onClick={() => setUseFallback(f => !f)}
-                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
-                title="Switch between curated video and live YouTube search results"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-                {useFallback ? 'Curated video' : 'Find more videos'}
-              </button>
               <a
                 href={ytSearchUrl}
+                target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
+                title="Browse more videos for this topic on YouTube"
+              >
+                <RefreshCw className="h-3.5 w-3.5" /> Find more videos
+              </a>
+              <a
+                href={`https://www.youtube.com/watch?v=${active.videoId}`}
                 target="_blank" rel="noopener noreferrer"
                 className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
               >
                 <ExternalLink className="h-3.5 w-3.5" /> Open on YouTube
               </a>
-              {useFallback && (
-                <span className="text-muted-foreground">Showing live search results — always available.</span>
-              )}
+              <span className="text-muted-foreground">If a video doesn't play in your region, use "Find more videos".</span>
             </div>
           </div>
 
