@@ -137,9 +137,6 @@ const YouTubeTutor: React.FC = () => {
   // default to the curated video (privacy-enhanced domain). If a specific
   // video ever becomes unavailable in a region, the user can click
   // "Find more videos" to open a fresh YouTube search in a new tab.
-  const ytSearchQuery = `${active.title} ${active.level} tutorial`;
-  const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0&modestbranding=1`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
