@@ -141,9 +141,11 @@ const YouTubeTutor: React.FC = () => {
 
   const ytSearchQuery = `${active.title} ${active.level} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
+  // Always-available videos: use a YouTube search-based playlist so a topic
+  // never shows "video unavailable". Users can still toggle to the curated single video.
   const embedUrl = useFallback
-    ? `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(ytSearchQuery)}`
-    : `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0`;
+    ? `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0`
+    : `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(ytSearchQuery)}`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
