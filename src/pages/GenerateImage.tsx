@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { ImagePlus, Upload, Download, RotateCw, Crop as CropIcon, Undo2, Redo2, Type, Square, Sparkles } from 'lucide-react';
+import { ImagePlus, Upload, Download, RotateCw, Crop as CropIcon, Undo2, Redo2, Type, Square, Sparkles, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
