@@ -133,19 +133,13 @@ const YouTubeTutor: React.FC = () => {
   const doneCount = Object.values(completed).filter(Boolean).length;
   const progressPct = Math.round((doneCount / TOPICS.length) * 100);
 
-  // Hybrid embed: try the curated video first; if user reports it's
-  // unavailable they can switch to a guaranteed search-results playlist.
-  const [useFallback, setUseFallback] = useState(false);
-  // Reset fallback when active topic changes.
-  useEffect(() => { setUseFallback(false); }, [activeId]);
-
+  // Embed strategy: YouTube deprecated `listType=search` for embeds, so we
+  // default to the curated video (privacy-enhanced domain). If a specific
+  // video ever becomes unavailable in a region, the user can click
+  // "Find more videos" to open a fresh YouTube search in a new tab.
   const ytSearchQuery = `${active.title} ${active.level} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  // Always-available videos: use a YouTube search-based playlist so a topic
-  // never shows "video unavailable". Users can still toggle to the curated single video.
-  const embedUrl = useFallback
-    ? `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0`
-    : `https://www.youtube.com/embed?listType=search&list=${encodeURIComponent(ytSearchQuery)}`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0&modestbranding=1`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
