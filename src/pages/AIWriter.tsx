@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
 import jsPDF from 'jspdf';
+import SEO from '@/components/SEO';
 import {
   Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel,
 } from 'docx';
