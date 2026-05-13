@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
+import SEO from '@/components/SEO';
 
 /* -----------------------------------------------------------
  * Local Text Analyzer — replaces AI detection.
