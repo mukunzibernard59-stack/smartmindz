@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import ToolPage from '@/components/tools/ToolPage';
+import SEO from '@/components/SEO';
 
 /* -----------------------------------------------------------
  * Universal Learning Hub — covers all major learning fields,
@@ -150,6 +151,11 @@ const YouTubeTutor: React.FC = () => {
       description="Universal categories with embedded video lessons, roadmaps, progress and bookmarks."
       icon={<Youtube className="h-5 w-5" />}
     >
+      <SEO
+        title="Learning Hub — Free Video Courses & Roadmaps | SmartMind"
+        description="Learn coding, languages, design, business and more with curated video lessons, roadmaps, progress tracking and bookmarks. Free."
+        path="/youtube-tutor"
+      />
       <div className="grid lg:grid-cols-3 gap-5">
         {/* Sidebar: filters + topic list */}
         <div className="lg:col-span-1 space-y-3">

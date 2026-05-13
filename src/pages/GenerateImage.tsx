@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import ToolPage from '@/components/tools/ToolPage';
+import SEO from '@/components/SEO';
 import { toast } from 'sonner';
 
 /* -----------------------------------------------------------
@@ -224,6 +225,11 @@ const GenerateImage: React.FC = () => {
       description="Upload an image and edit it with adjustments, filters, text overlays, frames and exports."
       icon={<ImagePlus className="h-5 w-5" />}
     >
+      <SEO
+        title="Design Studio — Free Online Image Editor | SmartMind"
+        description="Edit images in your browser: brightness, filters, crop, rotate, text overlays and more. Free, fast, no signup. Export PNG, JPG or WEBP."
+        path="/generate-image"
+      />
       {!imgSrc ? (
         <UploadZone onUpload={onUpload} />
       ) : (

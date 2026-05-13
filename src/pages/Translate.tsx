@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
+import SEO from '@/components/SEO';
 
 /* -----------------------------------------------------------
  * Lightweight translation — uses MyMemory's free public API.
@@ -97,6 +98,11 @@ const Translate: React.FC = () => {
       description="Fast translations powered by a lightweight free dictionary API."
       icon={<Languages className="h-5 w-5" />}
     >
+      <SEO
+        title="Free Translator — 100+ Languages incl. Kinyarwanda | SmartMind"
+        description="Translate text instantly between 100+ languages including English, French, Swahili and Kinyarwanda. Free, no signup, no limits."
+        path="/translate"
+      />
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-3">
           <div className="flex items-center gap-2">

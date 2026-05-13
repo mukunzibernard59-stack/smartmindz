@@ -4,12 +4,18 @@ import BackButton from '@/components/BackButton';
 import LearnTabs from '@/components/learn/LearnTabs';
 import BannerAd from '@/components/ads/BannerAd';
 import { getAdConfig } from '@/lib/adManager';
+import SEO from '@/components/SEO';
 
 const Learn: React.FC = () => {
   const adConfig = getAdConfig();
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
+      <SEO
+        title="Learn — AI Tutor, Quizzes & Smart Chat | SmartMind"
+        description="Hybrid learning hub: ask any question, take AI-generated quizzes, and chat with your personal AI tutor. Free for students."
+        path="/learn"
+      />
       <Navbar />
       <main className="flex-1 flex flex-col pt-16 pb-2 overflow-hidden">
         <div className="container mx-auto px-3 flex flex-col flex-1 overflow-hidden">
