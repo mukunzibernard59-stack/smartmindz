@@ -334,6 +334,11 @@ const AIWriter: React.FC = () => {
       description="Smart templates with instant generation — fill the blanks, preview, then copy or export to PDF, DOCX or TXT."
       icon={<Sparkles className="h-5 w-5" />}
     >
+      <SEO
+        title="AI Writer — Letters, Emails, CVs & Blogs | SmartMind"
+        description="Free AI Writer with smart templates for cover letters, emails, blogs, captions and CVs. Export to PDF, DOCX or TXT instantly."
+        path="/ai-writer"
+      />
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Form */}
         <div className="space-y-3 bg-card border border-border rounded-2xl p-4 sm:p-5">
