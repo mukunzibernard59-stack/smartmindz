@@ -29,6 +29,7 @@ import BuildAppPrompt from "./pages/BuildAppPrompt";
 import Translate from "./pages/Translate";
 import YouTubeTutor from "./pages/YouTubeTutor";
 import HomeworkHelper from "./pages/HomeworkHelper";
+import OfflineGate from "@/components/OfflineGate";
 
 const queryClient = new QueryClient();
 
@@ -49,20 +50,22 @@ const AppContent = () => {
             <AppSidebar />
             <div className="flex-1 flex flex-col min-w-0">
               <Routes>
+                {/* Offline-friendly routes (no internet required) */}
                 <Route path="/" element={<Index />} />
-                <Route path="/learn" element={<Learn />} />
-                <Route path="/quiz" element={<Learn />} />
-                <Route path="/dev" element={<DevMode />} />
-                <Route path="/chat" element={<Learn />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
                 <Route path="/ai-writer" element={<AIWriter />} />
-                <Route path="/ai-detector" element={<AIDetector />} />
-                <Route path="/generate-image" element={<GenerateImage />} />
                 <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
-                <Route path="/translate" element={<Translate />} />
-                <Route path="/youtube-tutor" element={<YouTubeTutor />} />
-                <Route path="/ai-homework-helper" element={<HomeworkHelper />} />
+                {/* Internet-required routes (gated when offline) */}
+                <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
+                <Route path="/quiz" element={<OfflineGate toolName="Quiz"><Learn /></OfflineGate>} />
+                <Route path="/chat" element={<OfflineGate toolName="Chat"><Learn /></OfflineGate>} />
+                <Route path="/dev" element={<OfflineGate toolName="Dev Mode"><DevMode /></OfflineGate>} />
+                <Route path="/ai-detector" element={<OfflineGate toolName="AI Detector"><AIDetector /></OfflineGate>} />
+                <Route path="/generate-image" element={<OfflineGate toolName="Design Studio"><GenerateImage /></OfflineGate>} />
+                <Route path="/translate" element={<OfflineGate toolName="Translate"><Translate /></OfflineGate>} />
+                <Route path="/youtube-tutor" element={<OfflineGate toolName="Learning Hub"><YouTubeTutor /></OfflineGate>} />
+                <Route path="/ai-homework-helper" element={<OfflineGate toolName="Homework Helper"><HomeworkHelper /></OfflineGate>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>
