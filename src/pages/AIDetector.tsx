@@ -153,6 +153,11 @@ const AIDetector: React.FC = () => {
       description="Grammar, readability, repeated words, sentence length, keyword density and spelling — all instant, all local."
       icon={<Brain className="h-5 w-5" />}
     >
+      <SEO
+        title="AI Text Analyzer — Grammar & Readability | SmartMind"
+        description="Instant local text analyzer: grammar hints, readability, repeated words, sentence length, keyword density and spelling — no signup."
+        path="/ai-detector"
+      />
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="space-y-3 bg-card border border-border rounded-2xl p-4 sm:p-5">
           <label className="text-sm font-medium">Text to analyze</label>
