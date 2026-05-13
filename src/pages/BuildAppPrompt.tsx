@@ -123,6 +123,11 @@ const BuildAppPrompt: React.FC = () => {
       description="Describe your app — get a feature checklist, page structure, schema and roadmap, instantly."
       icon={<Wand2 className="h-5 w-5" />}
     >
+      <SEO
+        title="App Planner — Feature & Roadmap Generator | SmartMind"
+        description="Describe your app idea and get an instant feature checklist, page structure, database schema and roadmap. Free, no signup."
+        path="/build-app-prompt"
+      />
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-3">
           <div>
