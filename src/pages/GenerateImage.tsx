@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import ToolPage from '@/components/tools/ToolPage';
+import SEO from '@/components/SEO';
 import { toast } from 'sonner';
 
 /* -----------------------------------------------------------
