@@ -19,6 +19,28 @@ const HomeworkHelper: React.FC = () => {
     "mainEntityOfPage": "https://smartmindz.lovable.app/ai-homework-helper"
   };
 
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Is SmartMind really free?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes. You can use it free every day. No paywall before you try it." }
+      },
+      {
+        "@type": "Question",
+        "name": "Will my teacher know I used AI?",
+        "acceptedAnswer": { "@type": "Answer", "text": "If you copy-paste, maybe. But if you actually read the steps and write the answer in your own words, you'll learn the topic — that's the whole point." }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on my phone?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Yes — phone, tablet, laptop. It also works as an installable app." }
+      }
+    ]
+  };
+
   return (
     <div className="min-h-screen relative">
       <Helmet>
@@ -30,6 +52,7 @@ const HomeworkHelper: React.FC = () => {
         <meta property="og:type" content="article" />
         <meta property="og:url" content="https://smartmindz.lovable.app/ai-homework-helper" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
       </Helmet>
 
       <ParticlesBackground />
