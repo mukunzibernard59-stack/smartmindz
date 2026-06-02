@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, GraduationCap, Sparkles, Brain, Youtube, Code2,
-  ImagePlus, Wand2, Languages,
+  ImagePlus, Wand2, Languages, Library as LibraryIcon,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 const mainItems = [
   { title: 'Home', url: '/', icon: Home },
   { title: 'Learn', url: '/learn', icon: GraduationCap },
+  { title: 'TVET Library', url: '/library', icon: LibraryIcon },
   { title: 'Dev Mode', url: '/dev', icon: Code2 },
 ];
 

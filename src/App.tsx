@@ -30,6 +30,7 @@ import Translate from "./pages/Translate";
 import YouTubeTutor from "./pages/YouTubeTutor";
 import HomeworkHelper from "./pages/HomeworkHelper";
 import OfflineGate from "@/components/OfflineGate";
+import Library from "./pages/Library";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const AppContent = () => {
                 <Route path="/translate" element={<OfflineGate toolName="Translate"><Translate /></OfflineGate>} />
                 <Route path="/youtube-tutor" element={<OfflineGate toolName="Learning Hub"><YouTubeTutor /></OfflineGate>} />
                 <Route path="/ai-homework-helper" element={<OfflineGate toolName="Homework Helper"><HomeworkHelper /></OfflineGate>} />
+                <Route path="/library" element={<OfflineGate toolName="TVET Library"><Library /></OfflineGate>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>

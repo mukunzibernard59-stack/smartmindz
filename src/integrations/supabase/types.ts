@@ -159,6 +159,185 @@ export type Database = {
         }
         Relationships: []
       }
+      tvet_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      tvet_courses: {
+        Row: {
+          category_id: string
+          created_at: string
+          description: string | null
+          id: string
+          slug: string
+          sort_order: number
+          title: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug: string
+          sort_order?: number
+          title: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          slug?: string
+          sort_order?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tvet_courses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "tvet_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tvet_levels: {
+        Row: {
+          course_id: string
+          created_at: string
+          description: string | null
+          id: string
+          level: Database["public"]["Enums"]["tvet_level"]
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          level: Database["public"]["Enums"]["tvet_level"]
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          level?: Database["public"]["Enums"]["tvet_level"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tvet_levels_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "tvet_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tvet_modules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          level_id: string
+          sort_order: number
+          source_url: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          level_id: string
+          sort_order?: number
+          source_url?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          level_id?: string
+          sort_order?: number
+          source_url?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tvet_modules_level_id_fkey"
+            columns: ["level_id"]
+            isOneToOne: false
+            referencedRelation: "tvet_levels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tvet_resources: {
+        Row: {
+          created_at: string
+          extracted_text: string | null
+          id: string
+          module_id: string
+          sort_order: number
+          title: string
+          type: Database["public"]["Enums"]["tvet_resource_type"]
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          extracted_text?: string | null
+          id?: string
+          module_id: string
+          sort_order?: number
+          title: string
+          type?: Database["public"]["Enums"]["tvet_resource_type"]
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          extracted_text?: string | null
+          id?: string
+          module_id?: string
+          sort_order?: number
+          title?: string
+          type?: Database["public"]["Enums"]["tvet_resource_type"]
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tvet_resources_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "tvet_modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       usage_logs: {
         Row: {
           action_type: string
@@ -198,11 +377,15 @@ export type Database = {
       }
       get_user_plan: { Args: { _user_id: string }; Returns: string }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       payment_status: "pending" | "confirmed" | "failed"
       subscription_plan: "free" | "pro" | "family"
       subscription_status: "active" | "inactive" | "pending" | "cancelled"
+      tvet_level: "L3" | "L4" | "L5"
+      tvet_resource_type: "pdf" | "note" | "link" | "quiz" | "video"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -333,6 +516,8 @@ export const Constants = {
       payment_status: ["pending", "confirmed", "failed"],
       subscription_plan: ["free", "pro", "family"],
       subscription_status: ["active", "inactive", "pending", "cancelled"],
+      tvet_level: ["L3", "L4", "L5"],
+      tvet_resource_type: ["pdf", "note", "link", "quiz", "video"],
     },
   },
 } as const
