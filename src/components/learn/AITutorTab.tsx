@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ChatInterface from '@/components/ChatInterface';
 import SubjectNotes from '@/components/SubjectNotes';
 import QuickQuiz from '@/components/learn/QuickQuiz';
-import { BookOpen, Brain, Lightbulb, Target, Search, ArrowRight, HelpCircle } from 'lucide-react';
+import { BookOpen, Brain, Lightbulb, Target, Search, ArrowRight, HelpCircle, Library as LibraryIcon, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const AITutorTab: React.FC = () => {
+  const navigate = useNavigate();
   const { t } = useLanguage();
   const [subjectSearch, setSubjectSearch] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
