@@ -36,6 +36,29 @@ const AITutorTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Rwanda TVET Library CTA */}
+      <button
+        onClick={() => navigate('/library')}
+        className="group relative w-full text-left rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-accent/10 p-5 overflow-hidden hover:border-primary/60 hover:shadow-[0_0_30px_-8px_hsl(var(--primary)/0.5)] transition-all"
+      >
+        <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/20 blur-3xl opacity-50 group-hover:opacity-80 transition-opacity" />
+        <div className="relative flex items-start justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-semibold uppercase tracking-wider mb-2">
+              <Sparkles className="h-3 w-3" /> New
+            </div>
+            <h2 className="text-lg font-bold mb-1 flex items-center gap-2">
+              <LibraryIcon className="h-5 w-5 text-primary" />
+              Rwanda TVET Learning Library
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Official sectors • L3/L4/L5 levels • Modules, notes, PDFs & quizzes — all inside the app.
+            </p>
+          </div>
+          <ArrowRight className="h-5 w-5 text-primary shrink-0 group-hover:translate-x-1 transition-transform" />
+        </div>
+      </button>
+
       {/* Subject Notes Search */}
       <div className="bg-card rounded-2xl border border-border p-5">
         <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
