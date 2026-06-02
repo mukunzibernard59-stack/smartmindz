@@ -1,78 +1,71 @@
-## Overview
+# Rwanda TVET Learning Library
 
-Three independent improvements, all preserving the existing app design, routes, sidebar, and Supabase integration:
+Transform the Learn menu into a full in-app TVET LMS with categories → courses → levels (L3/L4/L5) → modules → notes/PDFs/quizzes, all rendered inside the app with embedded viewers. Dark neon UI preserved.
 
-1. **Hybrid Learn Q&A system** (simple = non-AI / Wikipedia, complex = AI)
-2. **AI Writer "Friendly Letter" template + Learning Hub video reliability + Kinyarwanda already in Translate (verify)**
-3. **Light/Dark theme toggle in the header** (ChatGPT-style light mode)
+This is a large build. I'll ship it in 3 phases so each phase is reviewable and the app stays working. Phase 1 starts as soon as you approve.
 
 ---
 
-## 1. Hybrid Learn System
+## Phase 1 — Foundation + UI shell (this round)
 
-**Files**
-- New: `src/lib/questionAnalyzer.ts` — classifies SIMPLE vs COMPLEX
-- New: `src/lib/wikiSearch.ts` — fetches Wikipedia summary + related links + YouTube search URL
-- Edit: `src/components/learn/AIAssistantTab.tsx` (and/or `AITutorTab.tsx`) — route question through analyzer; if SIMPLE call non-AI path, else fall back to existing AI flow
-- Cache: in-memory `Map` + `localStorage` for repeated simple queries
+### Database (Supabase migration)
+- `tvet_categories` (slug, name, icon, sort_order)
+- `tvet_courses` (category_id, slug, title, description)
+- `tvet_levels` (course_id, level enum: L3/L4/L5)
+- `tvet_modules` (level_id, title, sort_order, source_url)
+- `tvet_resources` (module_id, type: pdf|note|link|quiz, title, url, extracted_text)
+- Full-text index on `extracted_text` + trigram on titles for smart search
+- RLS: public SELECT, service_role write
+- GRANTs to anon/authenticated/service_role
+- Seed: all 9 categories + initial course tree (ICT, Energy, Construction, Hospitality, Agriculture, Manufacturing, Transport, Crafts, Technical Services)
 
-**Analyzer rules (lightweight, deterministic)**
-- SIMPLE if matches `^(what is|who is|who was|define|meaning of|who discovered|when was)\b` AND length < 12 words AND no complex keywords
-- COMPLEX keywords: `explain ... deeply|compare|debug|analyze|strategy|why does|how does .* work|step by step|create a|build a|write code|optimize`
-- Default fallback: COMPLEX (safer)
+### Routes & components
+- New `/library` route
+- `LibraryHub` — animated category grid (dark neon, glowing hover, skeletons)
+- `CategoryView` — courses list, collapsible
+- `CourseView` — L3/L4/L5 tabs → modules
+- `ModuleView` — notes, PDFs, quiz launcher
+- `EmbeddedViewer` — priority chain: iframe → react-pdf → in-app modal → new tab (last resort)
+- `TVETSearch` — searches courses/modules/resources/extracted_text
+- Install `react-pdf` + `pdfjs-dist` for in-app PDF preview (zoom, page nav, search)
 
-**Non-AI source: Wikipedia REST**
-- `https://en.wikipedia.org/api/rest_v1/page/summary/<title>` → extract, thumbnail, description
-- Related: `https://en.wikipedia.org/w/api.php?action=opensearch&search=...`
-- YouTube: link to `https://www.youtube.com/results?search_query=<topic>+tutorial`
-- Show source label "Wikipedia" with link; expandable answer card
-
-**UI**
-- Reuse existing message bubble; add a small "Source: Wikipedia" badge for non-AI answers
-- Loading indicator stays the same
-- No "powered by" labels for AI path
-
----
-
-## 2. AI Writer + Learning Hub + Translate
-
-**AI Writer (`src/pages/AIWriter.tsx`)**
-- Add `friendly` template alongside `job-application`
-- Fields: senderName, senderLocation, date, recipientName, greeting, body, closing, signature
-- Reuse existing PDF/DOCX/TXT export and live A4 preview pipeline
-- Keep job-application unchanged
-
-**Learning Hub videos (`src/pages/YouTubeTutor.tsx`)**
-- Replace any "Video not available" placeholders with **real YouTube search-embed URLs**: `https://www.youtube.com/embed?listType=search&list=<topic>+<level>+tutorial`
-- This guarantees always-playable results (YouTube returns matches)
-- Organize per topic in beginner / intermediate / advanced sections
-- Add `onError` fallback that swaps to a generic search embed if a specific video id fails
-
-**Translate (`src/pages/Translate.tsx`)**
-- Kinyarwanda (`rw`) already present in LANGUAGES — verify it works in MyMemory (it does: `en|rw`); no code changes required other than ensuring it's selectable (it is). No-op unless missing.
+### Learn menu rewire
+- Replace static "Explore Subject Notes" in `AITutorTab` with a featured-categories CTA linking to `/library`
+- Keep AI chat, QuickQuiz, SubjectNotes intact
 
 ---
 
-## 3. Theme Switcher (Light/Dark)
+## Phase 2 — Content importer + Admin (next round)
 
-**Files**
-- New: `src/contexts/ThemeContext.tsx` — provider, `useTheme()`, persists to `localStorage('theme')`, toggles `.light` class on `<html>` (default = dark since space theme is dark)
-- New: `src/components/ThemeToggle.tsx` — sun/moon button, fits header
-- Edit: `src/index.css` — add `html.light { … }` block overriding the same CSS variables with ChatGPT-like light palette:
-  - `--background: 0 0% 100%`
-  - `--foreground: 222 20% 12%`
-  - `--card: 0 0% 100%`, soft border `220 14% 90%`
-  - `--primary` kept (cyan) but `--primary-foreground` adjusted
-  - `--sidebar-background: 0 0% 98%`, sidebar foreground dark
-  - `--muted: 220 14% 96%`
-- Edit: `src/components/Navbar.tsx` — mount `<ThemeToggle />` next to existing right-side controls
-- Edit: `src/App.tsx` — wrap with `ThemeProvider`
-- Smooth transition: add `transition-colors` on body via index.css
-
-**No structural changes** — just CSS variable overrides, so all existing components automatically retheme.
+- Edge function `import-rtb` scraping https://elearning.rtb.gov.rw via Firecrawl connector (needs Firecrawl link)
+- `user_roles` table + `has_role()` security definer (admin role)
+- `/admin/library` — manual PDF upload to Storage bucket `tvet-resources`, edit modules, manage quizzes, trigger RTB import
+- Quiz integration with existing `QuickQuiz` per module
 
 ---
 
-## Out of scope
-- No route changes, no sidebar changes, no auth changes, no Supabase schema changes.
-- Existing AI Tutor/Assistant flows preserved; hybrid only short-circuits to Wikipedia for clearly simple lookups.
+## Phase 3 — Polish & future-proof (later)
+
+- Bookmark page / continue reading (per-user `tvet_progress`)
+- Offline PDF download (IndexedDB cache)
+- Kinyarwanda translation toggle on notes
+- Student progress dashboard
+- Teacher uploads
+- Lazy loading, category preload, mobile polish
+
+---
+
+## Technical notes
+
+- PDF.js worker served from `/pdf.worker.min.js` to avoid CDN/CSP issues
+- iframe fallback detection via `onLoad` timeout + `X-Frame-Options` heuristic
+- Search uses Postgres `tsvector` on `extracted_text` + `pg_trgm` on titles
+- All RLS policies follow project convention (PERMISSIVE, public read for library tables)
+
+---
+
+## Quick confirmations before I start Phase 1
+
+1. Proceed with Phase 1 now (DB + UI shell + `/library` + react-pdf), defer RTB scraping & admin to Phase 2?
+2. Seed with placeholder modules referencing public RTB PDF links, or empty until Phase 2 importer runs?
+3. Admin email for Phase 2 role grant — which account?
