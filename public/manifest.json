@@ -1,10 +1,10 @@
 {
-  "name": "smartmindz",
-  "short_name": "smartmindz",
-  "description": "Get instant answers for Math, Science, English and all subjects with AI-powered learning.",
+  "name": "SmartMind — AI Learning App",
+  "short_name": "SmartMind",
+  "description": "SmartMind is the #1 fast learning platform powered by AI. Learn faster with personalized lessons, AI tutor, quizzes and the Rwanda TVET Library.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf8f5",
+  "background_color": "#0a0a1a",
   "theme_color": "#14a38b",
   "icons": [
     {
