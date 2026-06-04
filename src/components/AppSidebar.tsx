@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, GraduationCap, Sparkles, Brain, Youtube, Code2,
-  ImagePlus, Wand2, Languages, Library as LibraryIcon,
+  ImagePlus, Wand2, Languages, Library as LibraryIcon, ShieldCheck,
 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Sidebar,
   SidebarContent,
@@ -38,6 +40,17 @@ const AppSidebar: React.FC = () => {
   const collapsed = state === 'collapsed';
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (!user) { setIsAdmin(false); return; }
+    (async () => {
+      const { data } = await (supabase as any)
+        .from('user_roles').select('id').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
+      setIsAdmin(!!data);
+    })();
+  }, [user]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -74,6 +87,23 @@ const AppSidebar: React.FC = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Library Admin"
+                    className={cn(
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive('/admin/library') && 'bg-primary/15 text-primary font-semibold'
+                    )}
+                  >
+                    <button onClick={() => go('/admin/library')} className="w-full flex items-center gap-3">
+                      <ShieldCheck className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>Library Admin</span>}
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
