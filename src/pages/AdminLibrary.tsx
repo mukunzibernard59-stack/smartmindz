@@ -34,7 +34,7 @@ const AdminLibrary: React.FC = () => {
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
     (async () => {
-      const { data } = await supabase
+      const { data } = await sb
         .from('user_roles').select('id').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
       setIsAdmin(!!data);
     })();
