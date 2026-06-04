@@ -41,13 +41,13 @@ const AdminLibrary: React.FC = () => {
   }, [user]);
 
   const loadJobs = async () => {
-    const { data } = await supabase.from('tvet_import_jobs')
+    const { data } = await sb.from('tvet_import_jobs')
       .select('*').order('created_at', { ascending: false }).limit(20);
     setJobs((data as Job[]) || []);
   };
 
   const loadModules = async () => {
-    const { data } = await supabase.from('tvet_modules').select('id, title').order('title').limit(500);
+    const { data } = await sb.from('tvet_modules').select('id, title').order('title').limit(500);
     setModules(data || []);
   };
 
@@ -56,7 +56,7 @@ const AdminLibrary: React.FC = () => {
   const runImporter = async () => {
     setRunning(true);
     try {
-      const { data, error } = await supabase.functions.invoke('import-rtb', {
+      const { data, error } = await sb.functions.invoke('import-rtb', {
         body: { rootUrl, limit },
       });
       if (error) throw error;
@@ -73,11 +73,11 @@ const AdminLibrary: React.FC = () => {
       return;
     }
     const path = `${moduleId}/${Date.now()}-${uploadFile.name}`;
-    const { error: upErr } = await supabase.storage.from('tvet-resources').upload(path, uploadFile);
+    const { error: upErr } = await sb.storage.from('tvet-resources').upload(path, uploadFile);
     if (upErr) return toast({ title: 'Upload failed', description: upErr.message, variant: 'destructive' });
-    const { data: pub } = supabase.storage.from('tvet-resources').getPublicUrl(path);
+    const { data: pub } = sb.storage.from('tvet-resources').getPublicUrl(path);
     const isPdf = /\.pdf$/i.test(uploadFile.name);
-    const { error: insErr } = await supabase.from('tvet_resources').insert({
+    const { error: insErr } = await sb.from('tvet_resources').insert({
       module_id: moduleId, title: uploadTitle, type: isPdf ? 'pdf' : 'link', url: pub.publicUrl,
     });
     if (insErr) return toast({ title: 'Save failed', description: insErr.message, variant: 'destructive' });
