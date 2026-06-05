@@ -115,7 +115,7 @@ export const getTopicsForLanguage = (languageId: string): Topic[] => {
     {
       id: 'advanced',
       title: 'Advanced Concepts',
-      icon: '🚀',
+      icon: '⭐',
       order: 10,
       lessons: [
         { id: 'async', title: 'Async Programming', description: 'Handle async operations', order: 1, completed: false, locked: true },
