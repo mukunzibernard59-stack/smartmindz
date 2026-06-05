@@ -35,8 +35,7 @@ const Hero: React.FC = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Learn Smarter.{' '}
-            <span className="text-gradient-primary text-glow">Get Help Faster.</span>{' '}
-            <span className="inline-block">🚀</span>
+            <span className="text-gradient-primary text-glow">Get Help Faster.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -47,7 +46,7 @@ const Hero: React.FC = () => {
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
           >
             Get instant answers for <strong className="text-foreground">Math, Science, English</strong>, and more 
-            with the power of AI. Your personal tutor that never sleeps.
+            with the power of smart technology. Your personal tutor that never sleeps.
           </motion.p>
 
           {/* Feature Pills */}
@@ -58,7 +57,7 @@ const Hero: React.FC = () => {
             className="flex flex-wrap justify-center gap-3"
           >
             {[
-              { icon: Brain, label: 'AI Learning' },
+              { icon: Brain, label: 'Smart Learning' },
               { icon: MessageCircle, label: 'Personalized' },
               { icon: Mic, label: 'Voice Study' },
               { icon: BookOpen, label: 'All Subjects' },
@@ -81,7 +80,7 @@ const Hero: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="mt-16 text-center text-sm text-muted-foreground font-medium"
         >
-          🚀 The smart learning app trusted by thousands to learn new skills faster
+          The smart learning app trusted by thousands to learn new skills faster
         </motion.p>
       </div>
     </section>

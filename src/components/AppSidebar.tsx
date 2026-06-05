@@ -27,8 +27,8 @@ const mainItems = [
 ];
 
 const aiTools = [
-  { title: 'AI Writer', url: '/ai-writer', icon: Sparkles },
-  { title: 'AI Detector', url: '/ai-detector', icon: Brain },
+  { title: 'Writer', url: '/ai-writer', icon: Sparkles },
+  { title: 'Detector', url: '/ai-detector', icon: Brain },
   { title: 'YouTube Tutor', url: '/youtube-tutor', icon: Youtube },
   { title: 'Design Studio', url: '/generate-image', icon: ImagePlus },
   { title: 'Build App Prompt', url: '/build-app-prompt', icon: Wand2 },
@@ -109,7 +109,7 @@ const AppSidebar: React.FC = () => {
         </SidebarGroup>
 
         <SidebarGroup className="mt-3">
-          <SidebarGroupLabel className="mb-2">AI Tools</SidebarGroupLabel>
+          <SidebarGroupLabel className="mb-2">Smart Tools</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1.5">
               {aiTools.map((item) => (
