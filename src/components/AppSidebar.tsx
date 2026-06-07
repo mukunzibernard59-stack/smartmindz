@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Home, GraduationCap, Sparkles, Brain, Youtube, Code2,
+  Home, Sparkles, Brain, Youtube, Code2,
   ImagePlus, Wand2, Languages, Library as LibraryIcon, ShieldCheck,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,7 +21,6 @@ import { cn } from '@/lib/utils';
 
 const mainItems = [
   { title: 'Home', url: '/', icon: Home },
-  { title: 'Learn', url: '/learn', icon: GraduationCap },
   { title: 'TVET Library', url: '/library', icon: LibraryIcon },
   { title: 'Dev Mode', url: '/dev', icon: Code2 },
 ];
