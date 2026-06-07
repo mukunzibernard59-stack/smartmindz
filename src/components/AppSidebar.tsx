@@ -21,7 +21,6 @@ import { cn } from '@/lib/utils';
 
 const mainItems = [
   { title: 'Home', url: '/', icon: Home },
-  { title: 'Learn', url: '/learn', icon: GraduationCap },
   { title: 'TVET Library', url: '/library', icon: LibraryIcon },
   { title: 'Dev Mode', url: '/dev', icon: Code2 },
 ];
