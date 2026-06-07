@@ -362,6 +362,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -377,10 +398,18 @@ export type Database = {
       }
       get_user_plan: { Args: { _user_id: string }; Returns: string }
       has_active_subscription: { Args: { _user_id: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
+      app_role: "admin" | "moderator" | "user"
       payment_status: "pending" | "confirmed" | "failed"
       subscription_plan: "free" | "pro" | "family"
       subscription_status: "active" | "inactive" | "pending" | "cancelled"
@@ -513,6 +542,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "moderator", "user"],
       payment_status: ["pending", "confirmed", "failed"],
       subscription_plan: ["free", "pro", "family"],
       subscription_status: ["active", "inactive", "pending", "cancelled"],
