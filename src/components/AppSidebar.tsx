@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Home, GraduationCap, Sparkles, Brain, Youtube, Code2,
+  Home, Sparkles, Brain, Youtube, Code2,
   ImagePlus, Wand2, Languages, Library as LibraryIcon, ShieldCheck,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
