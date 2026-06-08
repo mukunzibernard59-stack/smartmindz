@@ -49,28 +49,6 @@ const Hero: React.FC = () => {
             with the power of smart technology. Your personal tutor that never sleeps.
           </motion.p>
 
-          {/* Feature Pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-3"
-          >
-            {[
-              { icon: Brain, label: 'Smart Learning' },
-              { icon: MessageCircle, label: 'Personalized' },
-              { icon: Mic, label: 'Voice Study' },
-              { icon: BookOpen, label: 'All Subjects' },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full glass text-sm"
-              >
-                <item.icon className="h-3.5 w-3.5 text-primary" />
-                <span className="text-muted-foreground font-medium">{item.label}</span>
-              </div>
-            ))}
-          </motion.div>
         </div>
 
         {/* SEO Tagline */}
