@@ -1,8 +1,13 @@
 // RTB Firecrawl importer — scrapes elearning.rtb.gov.rw and ingests
 // real PDFs / notes into the TVET library, attaching them to existing
 // modules (best fuzzy title match) or under an "Imported" module.
-import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+};
 
 const FIRECRAWL_V2 = 'https://api.firecrawl.dev/v2';
 const DEFAULT_ROOT = 'https://elearning.rtb.gov.rw';
