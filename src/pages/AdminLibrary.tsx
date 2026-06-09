@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 const sb = supabase as any;
 import { useAuth } from '@/hooks/useAuth';
@@ -6,7 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Loader2, Upload, RefreshCw, Download, ShieldAlert, Lock } from 'lucide-react';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Loader2, Upload, RefreshCw, Download, ShieldAlert, Lock, FolderTree } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 
@@ -20,6 +23,11 @@ interface Job {
   created_at: string;
   log?: any[] | null;
 }
+
+type Category = { id: string; name: string; sort_order?: number };
+type Course = { id: string; category_id: string; title: string };
+type Level = { id: string; course_id: string; level: 'L3' | 'L4' | 'L5' };
+type Module = { id: string; level_id: string; title: string };
 
 const ADMIN_EMAIL = 'mukunzibernard59@gmail.com';
 const ADMIN_PASSCODE = 'inzu2003';
@@ -35,10 +43,21 @@ const AdminLibrary: React.FC = () => {
   const [limit, setLimit] = useState(30);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [activeJob, setActiveJob] = useState<Job | null>(null);
+
+  // Hierarchical picker state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [levels, setLevels] = useState<Level[]>([]);
+  const [modules, setModules] = useState<Module[]>([]);
+  const [categoryId, setCategoryId] = useState('');
+  const [courseId, setCourseId] = useState('');
+  const [levelId, setLevelId] = useState('');
+  const [moduleId, setModuleId] = useState('');
+
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadTitle, setUploadTitle] = useState('');
-  const [moduleId, setModuleId] = useState('');
-  const [modules, setModules] = useState<{ id: string; title: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
+
   const pollRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -59,16 +78,46 @@ const AdminLibrary: React.FC = () => {
     if (live) setActiveJob(live);
   };
 
-  const loadModules = async () => {
-    const { data } = await sb.from('tvet_modules').select('id, title').order('title').limit(500);
-    setModules(data || []);
+  const loadCategories = async () => {
+    const { data } = await sb.from('tvet_categories').select('id, name, sort_order').order('sort_order');
+    setCategories(data || []);
   };
 
-  useEffect(() => { if (isAdmin && unlocked) { loadJobs(); loadModules(); } }, [isAdmin, unlocked]);
+  useEffect(() => { if (isAdmin && unlocked) { loadJobs(); loadCategories(); } }, [isAdmin, unlocked]);
+
+  // Cascade: category -> courses
+  useEffect(() => {
+    setCourseId(''); setLevelId(''); setModuleId('');
+    setCourses([]); setLevels([]); setModules([]);
+    if (!categoryId) return;
+    sb.from('tvet_courses').select('id, category_id, title')
+      .eq('category_id', categoryId).order('title')
+      .then(({ data }: any) => setCourses(data || []));
+  }, [categoryId]);
+
+  // Cascade: course -> levels
+  useEffect(() => {
+    setLevelId(''); setModuleId('');
+    setLevels([]); setModules([]);
+    if (!courseId) return;
+    sb.from('tvet_levels').select('id, course_id, level')
+      .eq('course_id', courseId).order('level')
+      .then(({ data }: any) => setLevels(data || []));
+  }, [courseId]);
+
+  // Cascade: level -> modules
+  useEffect(() => {
+    setModuleId('');
+    setModules([]);
+    if (!levelId) return;
+    sb.from('tvet_modules').select('id, level_id, title')
+      .eq('level_id', levelId).order('title')
+      .then(({ data }: any) => setModules(data || []));
+  }, [levelId]);
 
   // Poll the active job for live progress
   useEffect(() => {
-    if (!activeJob || activeJob.status !== 'running') {
+    if (!activeJob || activeJob.status !== 'running' || activeJob.id === 'pending') {
       if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
       return;
     }
@@ -77,9 +126,7 @@ const AdminLibrary: React.FC = () => {
         .select('*').eq('id', activeJob.id).maybeSingle();
       if (data) {
         setActiveJob(data as Job);
-        if ((data as Job).status !== 'running') {
-          loadJobs();
-        }
+        if ((data as Job).status !== 'running') loadJobs();
       }
     }, 2000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
@@ -87,7 +134,6 @@ const AdminLibrary: React.FC = () => {
 
   const runImporter = async () => {
     setRunning(true);
-    // Optimistically create a placeholder active job for instant progress UI
     setActiveJob({
       id: 'pending', source_url: rootUrl, status: 'running',
       pages_processed: 0, resources_added: 0, error: null,
@@ -98,7 +144,11 @@ const AdminLibrary: React.FC = () => {
         body: { rootUrl, limit },
       });
       if (error) throw error;
-      toast({ title: 'Import finished', description: `Added ${data.resourcesAdded} resources from ${data.pagesProcessed} pages` });
+      if (data?.error) throw new Error(data.error);
+      toast({
+        title: 'Import finished',
+        description: `Added ${data.resourcesAdded} resources from ${data.pagesProcessed} pages`,
+      });
       loadJobs();
       setActiveJob(null);
     } catch (e: any) {
@@ -108,21 +158,40 @@ const AdminLibrary: React.FC = () => {
   };
 
   const handleUpload = async () => {
-    if (!uploadFile || !moduleId || !uploadTitle) {
-      toast({ title: 'Missing fields', description: 'Pick a module, title, and file', variant: 'destructive' });
-      return;
+    if (!moduleId) return toast({ title: 'Pick a module', description: 'Select Category → Course → Level → Module', variant: 'destructive' });
+    if (!uploadFile) return toast({ title: 'Pick a file', variant: 'destructive' });
+    if (!uploadTitle.trim()) return toast({ title: 'Enter a title', variant: 'destructive' });
+
+    setUploading(true);
+    try {
+      const safeName = uploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${moduleId}/${Date.now()}-${safeName}`;
+      const { error: upErr } = await sb.storage.from('tvet-resources').upload(path, uploadFile, {
+        contentType: uploadFile.type || undefined,
+        upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data: pub } = sb.storage.from('tvet-resources').getPublicUrl(path);
+      const lower = uploadFile.name.toLowerCase();
+      const type = /\.pdf$/.test(lower) ? 'pdf'
+                 : /\.(doc|docx|txt|md)$/.test(lower) ? 'note'
+                 : 'link';
+      const { error: insErr } = await sb.from('tvet_resources').insert({
+        module_id: moduleId,
+        title: uploadTitle.trim(),
+        type,
+        url: pub.publicUrl,
+      });
+      if (insErr) throw insErr;
+      toast({ title: 'Uploaded', description: `${uploadTitle} is now available to users in the library.` });
+      setUploadFile(null); setUploadTitle('');
+      const input = document.getElementById('admin-upload-file') as HTMLInputElement | null;
+      if (input) input.value = '';
+    } catch (e: any) {
+      toast({ title: 'Upload failed', description: e.message || String(e), variant: 'destructive' });
+    } finally {
+      setUploading(false);
     }
-    const path = `${moduleId}/${Date.now()}-${uploadFile.name}`;
-    const { error: upErr } = await sb.storage.from('tvet-resources').upload(path, uploadFile);
-    if (upErr) return toast({ title: 'Upload failed', description: upErr.message, variant: 'destructive' });
-    const { data: pub } = sb.storage.from('tvet-resources').getPublicUrl(path);
-    const isPdf = /\.pdf$/i.test(uploadFile.name);
-    const { error: insErr } = await sb.from('tvet_resources').insert({
-      module_id: moduleId, title: uploadTitle, type: isPdf ? 'pdf' : 'link', url: pub.publicUrl,
-    });
-    if (insErr) return toast({ title: 'Save failed', description: insErr.message, variant: 'destructive' });
-    toast({ title: 'Uploaded', description: uploadTitle });
-    setUploadFile(null); setUploadTitle('');
   };
 
   if (isAdmin === null) {
@@ -141,9 +210,13 @@ const AdminLibrary: React.FC = () => {
     );
   }
 
-  // Extra passcode gate (only for the assigned admin email)
   if (!unlocked) {
     const isAssignedEmail = user?.email?.toLowerCase() === ADMIN_EMAIL;
+    const tryUnlock = () => {
+      if (isAssignedEmail && passcode === ADMIN_PASSCODE) {
+        sessionStorage.setItem(UNLOCK_KEY, '1'); setUnlocked(true);
+      } else { toast({ title: 'Incorrect passcode', variant: 'destructive' }); }
+    };
     return (
       <div className="flex items-center justify-center min-h-screen p-6">
         <Card className="w-full max-w-sm p-6 space-y-4 border-primary/30">
@@ -157,20 +230,9 @@ const AdminLibrary: React.FC = () => {
           <Input
             type="password" placeholder="Passcode"
             value={passcode} onChange={(e) => setPasscode(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') {
-              if (isAssignedEmail && passcode === ADMIN_PASSCODE) {
-                sessionStorage.setItem(UNLOCK_KEY, '1'); setUnlocked(true);
-              } else { toast({ title: 'Incorrect passcode', variant: 'destructive' }); }
-            }}}
+            onKeyDown={(e) => { if (e.key === 'Enter') tryUnlock(); }}
           />
-          <Button
-            className="w-full" variant="hero"
-            onClick={() => {
-              if (isAssignedEmail && passcode === ADMIN_PASSCODE) {
-                sessionStorage.setItem(UNLOCK_KEY, '1'); setUnlocked(true);
-              } else { toast({ title: 'Incorrect passcode', variant: 'destructive' }); }
-            }}
-          >Unlock</Button>
+          <Button className="w-full" variant="hero" onClick={tryUnlock}>Unlock</Button>
           <Link to="/library" className="block text-xs text-center text-muted-foreground hover:text-foreground">
             ← Back to library
           </Link>
@@ -182,7 +244,6 @@ const AdminLibrary: React.FC = () => {
   const percent = activeJob
     ? Math.min(100, Math.round(((activeJob.pages_processed || 0) / Math.max(1, limit)) * 100))
     : 0;
-
   const liveLog = (activeJob?.log as any[]) || [];
 
   return (
@@ -238,17 +299,77 @@ const AdminLibrary: React.FC = () => {
       </Card>
 
       <Card className="p-6 space-y-4 border-primary/20">
-        <h2 className="font-semibold flex items-center gap-2"><Upload className="h-4 w-4" /> Manual upload</h2>
+        <h2 className="font-semibold flex items-center gap-2">
+          <Upload className="h-4 w-4" /> Manual upload
+        </h2>
+        <p className="text-xs text-muted-foreground flex items-center gap-1">
+          <FolderTree className="h-3 w-3" /> Pick where this note belongs — same structure as the public TVET Library.
+        </p>
+
         <div className="grid sm:grid-cols-2 gap-3">
-          <select className="bg-background border border-border rounded-md px-3 py-2 text-sm"
-                  value={moduleId} onChange={(e) => setModuleId(e.target.value)}>
-            <option value="">Select module…</option>
-            {modules.map((m) => <option key={m.id} value={m.id}>{m.title}</option>)}
-          </select>
-          <Input placeholder="Resource title" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} />
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">1. Sector / Category</label>
+            <Select value={categoryId} onValueChange={setCategoryId}>
+              <SelectTrigger><SelectValue placeholder="Select category…" /></SelectTrigger>
+              <SelectContent className="bg-popover">
+                {categories.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">2. Course</label>
+            <Select value={courseId} onValueChange={setCourseId} disabled={!categoryId || courses.length === 0}>
+              <SelectTrigger>
+                <SelectValue placeholder={!categoryId ? 'Pick a category first' : courses.length === 0 ? 'No courses yet' : 'Select course…'} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                {courses.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">3. Level</label>
+            <Select value={levelId} onValueChange={setLevelId} disabled={!courseId || levels.length === 0}>
+              <SelectTrigger>
+                <SelectValue placeholder={!courseId ? 'Pick a course first' : levels.length === 0 ? 'No levels yet' : 'Select level…'} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                {levels.map((l) => (
+                  <SelectItem key={l.id} value={l.id}>{l.level}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs text-muted-foreground">4. Module</label>
+            <Select value={moduleId} onValueChange={setModuleId} disabled={!levelId || modules.length === 0}>
+              <SelectTrigger>
+                <SelectValue placeholder={!levelId ? 'Pick a level first' : modules.length === 0 ? 'No modules yet' : 'Select module…'} />
+              </SelectTrigger>
+              <SelectContent className="bg-popover">
+                {modules.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>{m.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Input type="file" accept=".pdf,.doc,.docx,.txt" onChange={(e) => setUploadFile(e.target.files?.[0] || null)} />
-        <Button onClick={handleUpload} variant="hero"><Upload className="h-4 w-4 mr-2" /> Upload</Button>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          <Input placeholder="Resource title (shown to users)" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} />
+          <Input id="admin-upload-file" type="file" accept=".pdf,.doc,.docx,.txt,.md" onChange={(e) => setUploadFile(e.target.files?.[0] || null)} />
+        </div>
+
+        <Button onClick={handleUpload} variant="hero" disabled={uploading}>
+          {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading…</> : <><Upload className="h-4 w-4 mr-2" /> Upload to library</>}
+        </Button>
       </Card>
 
       <Card className="p-6 space-y-3 border-primary/20">
