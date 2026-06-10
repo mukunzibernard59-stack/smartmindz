@@ -28,6 +28,7 @@ const Library: React.FC = () => {
   const [levels, setLevels] = useState<Level[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [resourcesByModule, setResourcesByModule] = useState<Record<string, Resource[]>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [searchResults, setSearchResults] = useState<{ courses: Course[]; modules: Module[]; resources: Resource[] } | null>(null);
@@ -51,29 +52,53 @@ const Library: React.FC = () => {
     }
   }, [view]);
 
-  // Load levels + modules for a course
+  // Load levels + modules for a course and prefetch module resources
   useEffect(() => {
     if (view.kind === 'course' || view.kind === 'module') {
       const courseId = view.course.id;
       supabase.from('tvet_levels').select('*').eq('course_id', courseId).order('level')
         .then(async ({ data: lvls }) => {
-          setLevels(lvls || []);
-          if (lvls?.length) {
-            const ids = lvls.map(l => l.id);
+          const levelsData = lvls || [];
+          setLevels(levelsData);
+          if (levelsData.length) {
+            const ids = levelsData.map(l => l.id);
             const { data: mods } = await supabase.from('tvet_modules').select('*').in('level_id', ids).order('sort_order');
-            setModules(mods || []);
+            const modulesData = mods || [];
+            setModules(modulesData);
+            if (modulesData.length) {
+              const moduleIds = modulesData.map((m) => m.id);
+              const { data: allResources } = await supabase.from('tvet_resources')
+                .select('*')
+                .in('module_id', moduleIds)
+                .order('sort_order');
+              const grouped: Record<string, Resource[]> = {};
+              (allResources || []).forEach((resource) => {
+                grouped[resource.module_id] = grouped[resource.module_id] || [];
+                grouped[resource.module_id].push(resource);
+              });
+              setResourcesByModule(grouped);
+              if (view.kind === 'module') {
+                setResources(grouped[view.module.id] || []);
+              }
+            }
           }
         });
     }
-  }, [view.kind === 'course' || view.kind === 'module' ? (view as any).course.id : null]);
+  }, [view.kind === 'course' || view.kind === 'module' ? view.course.id : null]);
 
-  // Load resources for a module
+  // Load resources for a module when not cached yet
   useEffect(() => {
     if (view.kind === 'module') {
+      const cached = resourcesByModule[view.module.id];
+      if (cached) {
+        setResources(cached);
+        return;
+      }
+      setResources([]);
       supabase.from('tvet_resources').select('*').eq('module_id', view.module.id).order('sort_order')
         .then(({ data }) => setResources(data || []));
     }
-  }, [view.kind === 'module' ? (view as any).module.id : null]);
+  }, [view.kind === 'module' ? view.module.id : null, resourcesByModule]);
 
   // Smart search
   useEffect(() => {
@@ -241,8 +266,14 @@ const Library: React.FC = () => {
                     </div>
                     <div className="grid sm:grid-cols-2 gap-2">
                       {lvlModules.map(m => (
-                        <button key={m.id} onClick={() => setView({ kind: 'module', category: view.category, course: view.course, level, module: m })}
-                          className="flex items-center justify-between gap-2 p-3 rounded-xl bg-secondary/50 border border-transparent hover:border-primary/40 hover:bg-secondary transition-all text-left">
+                        <button
+                          key={m.id}
+                          onClick={() => {
+                            setResources(resourcesByModule[m.id] || []);
+                            setView({ kind: 'module', category: view.category, course: view.course, level, module: m });
+                          }}
+                          className="flex items-center justify-between gap-2 p-3 rounded-xl bg-secondary/50 border border-transparent hover:border-primary/40 hover:bg-secondary transition-all text-left"
+                        >
                           <div>
                             <div className="text-sm font-medium">{m.title}</div>
                             {m.description && <div className="text-xs text-muted-foreground">{m.description}</div>}
