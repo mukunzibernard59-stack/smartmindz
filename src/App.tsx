@@ -1,3 +1,4 @@
+import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,23 +16,24 @@ import OfflineBanner from "@/components/OfflineBanner";
 import { useOfflineMode } from "@/hooks/useOfflineMode";
 
 import AppRatingBanner from "@/components/AppRatingBanner";
-import Index from "./pages/Index";
-import Learn from "./pages/Learn";
-import Quiz from "./pages/Quiz";
-import DevMode from "./pages/DevMode";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsOfService from "./pages/TermsOfService";
-import NotFound from "./pages/NotFound";
-import AIWriter from "./pages/AIWriter";
-import AIDetector from "./pages/AIDetector";
-import GenerateImage from "./pages/GenerateImage";
-import BuildAppPrompt from "./pages/BuildAppPrompt";
-import Translate from "./pages/Translate";
-import YouTubeTutor from "./pages/YouTubeTutor";
-import HomeworkHelper from "./pages/HomeworkHelper";
 import OfflineGate from "@/components/OfflineGate";
-import Library from "./pages/Library";
-import AdminLibrary from "./pages/AdminLibrary";
+
+const Index = lazy(() => import("./pages/Index"));
+const Learn = lazy(() => import("./pages/Learn"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const DevMode = lazy(() => import("./pages/DevMode"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AIWriter = lazy(() => import("./pages/AIWriter"));
+const AIDetector = lazy(() => import("./pages/AIDetector"));
+const GenerateImage = lazy(() => import("./pages/GenerateImage"));
+const BuildAppPrompt = lazy(() => import("./pages/BuildAppPrompt"));
+const Translate = lazy(() => import("./pages/Translate"));
+const YouTubeTutor = lazy(() => import("./pages/YouTubeTutor"));
+const HomeworkHelper = lazy(() => import("./pages/HomeworkHelper"));
+const Library = lazy(() => import("./pages/Library"));
+const AdminLibrary = lazy(() => import("./pages/AdminLibrary"));
 
 const queryClient = new QueryClient();
 
@@ -51,27 +53,33 @@ const AppContent = () => {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <div className="flex-1 flex flex-col min-w-0">
-              <Routes>
-                {/* Offline-friendly routes (no internet required) */}
-                <Route path="/" element={<Index />} />
-                <Route path="/privacy" element={<PrivacyPolicy />} />
-                <Route path="/terms" element={<TermsOfService />} />
-                <Route path="/ai-writer" element={<AIWriter />} />
-                <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
-                {/* Internet-required routes (gated when offline) */}
-                <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
-                <Route path="/quiz" element={<OfflineGate toolName="Quiz"><Learn /></OfflineGate>} />
-                <Route path="/chat" element={<OfflineGate toolName="Chat"><Learn /></OfflineGate>} />
-                <Route path="/dev" element={<OfflineGate toolName="Dev Mode"><DevMode /></OfflineGate>} />
-                <Route path="/ai-detector" element={<OfflineGate toolName="AI Detector"><AIDetector /></OfflineGate>} />
-                <Route path="/generate-image" element={<OfflineGate toolName="Design Studio"><GenerateImage /></OfflineGate>} />
-                <Route path="/translate" element={<OfflineGate toolName="Translate"><Translate /></OfflineGate>} />
-                <Route path="/youtube-tutor" element={<OfflineGate toolName="Learning Hub"><YouTubeTutor /></OfflineGate>} />
-                <Route path="/ai-homework-helper" element={<OfflineGate toolName="Homework Helper"><HomeworkHelper /></OfflineGate>} />
-                <Route path="/library" element={<OfflineGate toolName="TVET Library"><Library /></OfflineGate>} />
-                <Route path="/admin/library" element={<OfflineGate toolName="Admin"><AdminLibrary /></OfflineGate>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Suspense fallback={(
+                <div className="min-h-screen flex items-center justify-center text-sm text-slate-600">
+                  Loading application...
+                </div>
+              )}>
+                <Routes>
+                  {/* Offline-friendly routes (no internet required) */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/ai-writer" element={<AIWriter />} />
+                  <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
+                  {/* Internet-required routes (gated when offline) */}
+                  <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
+                  <Route path="/quiz" element={<OfflineGate toolName="Quiz"><Learn /></OfflineGate>} />
+                  <Route path="/chat" element={<OfflineGate toolName="Chat"><Learn /></OfflineGate>} />
+                  <Route path="/dev" element={<OfflineGate toolName="Dev Mode"><DevMode /></OfflineGate>} />
+                  <Route path="/ai-detector" element={<OfflineGate toolName="AI Detector"><AIDetector /></OfflineGate>} />
+                  <Route path="/generate-image" element={<OfflineGate toolName="Design Studio"><GenerateImage /></OfflineGate>} />
+                  <Route path="/translate" element={<OfflineGate toolName="Translate"><Translate /></OfflineGate>} />
+                  <Route path="/youtube-tutor" element={<OfflineGate toolName="Learning Hub"><YouTubeTutor /></OfflineGate>} />
+                  <Route path="/ai-homework-helper" element={<OfflineGate toolName="Homework Helper"><HomeworkHelper /></OfflineGate>} />
+                  <Route path="/library" element={<OfflineGate toolName="TVET Library"><Library /></OfflineGate>} />
+                  <Route path="/admin/library" element={<OfflineGate toolName="Admin"><AdminLibrary /></OfflineGate>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
             </div>
           </div>
         </SidebarProvider>
