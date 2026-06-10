@@ -299,6 +299,7 @@ export type Database = {
       }
       tvet_resources: {
         Row: {
+          content: string | null
           created_at: string
           extracted_text: string | null
           id: string
@@ -307,8 +308,10 @@ export type Database = {
           title: string
           type: Database["public"]["Enums"]["tvet_resource_type"]
           url: string | null
+          user_id: string | null
         }
         Insert: {
+          content?: string | null
           created_at?: string
           extracted_text?: string | null
           id?: string
@@ -317,8 +320,10 @@ export type Database = {
           title: string
           type?: Database["public"]["Enums"]["tvet_resource_type"]
           url?: string | null
+          user_id?: string | null
         }
         Update: {
+          content?: string | null
           created_at?: string
           extracted_text?: string | null
           id?: string
@@ -327,6 +332,7 @@ export type Database = {
           title?: string
           type?: Database["public"]["Enums"]["tvet_resource_type"]
           url?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {

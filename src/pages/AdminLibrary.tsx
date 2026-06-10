@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 const sb = supabase as any;
+import mammoth from 'mammoth';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,9 +55,14 @@ const AdminLibrary: React.FC = () => {
   const [levelId, setLevelId] = useState('');
   const [moduleId, setModuleId] = useState('');
 
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadContent, setUploadContent] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [selectedFileType, setSelectedFileType] = useState<'pdf' | 'docx' | 'txt' | 'md' | null>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const [fileError, setFileError] = useState('');
+  const [fileLoading, setFileLoading] = useState(false);
 
   const pollRef = useRef<number | null>(null);
 
@@ -81,6 +87,73 @@ const AdminLibrary: React.FC = () => {
   const loadCategories = async () => {
     const { data } = await sb.from('tvet_categories').select('id, name, sort_order').order('sort_order');
     setCategories(data || []);
+  };
+
+  const extractPdfDataUrl = async (file: File) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const base64 = btoa(binary);
+    return `data:application/pdf;base64,${base64}`;
+  };
+
+  const extractHtmlFromDocx = async (file: File) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const { value } = await mammoth.convertToHtml({ arrayBuffer });
+    return value;
+  };
+
+  const extractTextFromFile = async (file: File) => {
+    const extension = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (extension === 'pdf') return { content: await extractPdfDataUrl(file), type: 'pdf' as const };
+    if (extension === 'docx') return { content: await extractHtmlFromDocx(file), type: 'docx' as const };
+    if (extension === 'txt' || extension === 'md') return { content: await file.text(), type: extension as 'txt' | 'md' };
+    throw new Error('Unsupported file type. Use PDF, DOCX, TXT, or MD.');
+  };
+
+  const handleSelectedFile = async (file: File) => {
+    setFileError('');
+    setFileLoading(true);
+    try {
+      const result = await extractTextFromFile(file);
+      setSelectedFileName(file.name);
+      setSelectedFileType(result.type);
+      if (!uploadTitle.trim()) {
+        setUploadTitle(file.name.replace(/\.[^/.]+$/, ''));
+      }
+      setUploadContent(result.content.trim ? result.content.trim() : result.content);
+    } catch (error: any) {
+      setFileError(error?.message || 'Failed to process file.');
+    } finally {
+      setFileLoading(false);
+      setDragActive(false);
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    await handleSelectedFile(file);
+  };
+
+  const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragActive(false);
+    const file = event.dataTransfer.files?.[0];
+    if (!file) return;
+    await handleSelectedFile(file);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    setDragActive(true);
+  };
+
+  const handleDragLeave = () => {
+    setDragActive(false);
   };
 
   useEffect(() => { if (isAdmin && unlocked) { loadJobs(); loadCategories(); } }, [isAdmin, unlocked]);
@@ -159,34 +232,30 @@ const AdminLibrary: React.FC = () => {
 
   const handleUpload = async () => {
     if (!moduleId) return toast({ title: 'Pick a module', description: 'Select Category → Course → Level → Module', variant: 'destructive' });
-    if (!uploadFile) return toast({ title: 'Pick a file', variant: 'destructive' });
     if (!uploadTitle.trim()) return toast({ title: 'Enter a title', variant: 'destructive' });
+    if (!uploadContent.trim()) return toast({ title: 'Enter content', variant: 'destructive' });
 
     setUploading(true);
     try {
-      const safeName = uploadFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-      const path = `${moduleId}/${Date.now()}-${safeName}`;
-      const { error: upErr } = await sb.storage.from('tvet-resources').upload(path, uploadFile, {
-        contentType: uploadFile.type || undefined,
-        upsert: false,
-      });
-      if (upErr) throw upErr;
-      const { data: pub } = sb.storage.from('tvet-resources').getPublicUrl(path);
-      const lower = uploadFile.name.toLowerCase();
-      const type = /\.pdf$/.test(lower) ? 'pdf'
-                 : /\.(doc|docx|txt|md)$/.test(lower) ? 'note'
-                 : 'link';
-      const { error: insErr } = await sb.from('tvet_resources').insert({
-        module_id: moduleId,
-        title: uploadTitle.trim(),
-        type,
-        url: pub.publicUrl,
-      });
+      const { data: { user } } = await supabase.auth.getUser();
+      const uploadType = selectedFileType === 'pdf' ? 'pdf' : 'note';
+
+      const { error: insErr } = await supabase
+        .from('tvet_resources')
+        .insert({
+          module_id: moduleId,
+          title: uploadTitle.trim(),
+          content: uploadContent.trim(),
+          user_id: user?.id ?? null,
+          type: uploadType,
+        });
+
       if (insErr) throw insErr;
       toast({ title: 'Uploaded', description: `${uploadTitle} is now available to users in the library.` });
-      setUploadFile(null); setUploadTitle('');
-      const input = document.getElementById('admin-upload-file') as HTMLInputElement | null;
-      if (input) input.value = '';
+      setUploadTitle('');
+      setUploadContent('');
+      setSelectedFileName('');
+      setSelectedFileType(null);
     } catch (e: any) {
       toast({ title: 'Upload failed', description: e.message || String(e), variant: 'destructive' });
     } finally {
@@ -362,12 +431,37 @@ const AdminLibrary: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-3">
+        <div className="space-y-3">
           <Input placeholder="Resource title (shown to users)" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} />
-          <Input id="admin-upload-file" type="file" accept=".pdf,.doc,.docx,.txt,.md" onChange={(e) => setUploadFile(e.target.files?.[0] || null)} />
+          <div
+            className={`rounded-3xl border-2 ${dragActive ? 'border-primary bg-primary/10' : 'border-border bg-slate-900/5'} p-4 transition-all`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-slate-900">Drag and drop a PDF, DOCX, TXT, or MD file here</p>
+                <p className="text-xs text-slate-500">The extracted text will populate the note content automatically.</p>
+              </div>
+              <label className="inline-flex items-center gap-2 rounded-full border border-border bg-slate-50 px-3 py-2 text-sm font-medium text-slate-900 cursor-pointer hover:bg-slate-100">
+                Select file
+                <input type="file" accept=".pdf,.docx,.txt,.md" className="hidden" onChange={handleFileChange} />
+              </label>
+            </div>
+            {selectedFileName && <p className="pt-3 text-sm text-slate-600">Selected file: {selectedFileName}</p>}
+            {fileLoading && <p className="pt-2 text-sm text-muted-foreground">Extracting file text…</p>}
+            {fileError && <p className="pt-2 text-sm text-destructive">{fileError}</p>}
+          </div>
+          <textarea
+            placeholder="Resource content (text, notes, or summaries)"
+            value={uploadContent}
+            onChange={(e) => setUploadContent(e.target.value)}
+            className="w-full min-h-32 p-4 rounded-2xl border border-input bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+          />
         </div>
 
-        <Button onClick={handleUpload} variant="hero" disabled={uploading}>
+        <Button onClick={handleUpload} variant="hero" disabled={uploading || fileLoading}>
           {uploading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading…</> : <><Upload className="h-4 w-4 mr-2" /> Upload to library</>}
         </Button>
       </Card>

@@ -13,7 +13,7 @@ type Category = { id: string; slug: string; name: string; description: string | 
 type Course = { id: string; category_id: string; title: string; description: string | null };
 type Level = { id: string; course_id: string; level: 'L3' | 'L4' | 'L5' };
 type Module = { id: string; level_id: string; title: string; description: string | null };
-type Resource = { id: string; module_id: string; type: 'pdf' | 'note' | 'link' | 'quiz' | 'video'; title: string; url: string | null; extracted_text: string | null };
+type Resource = { id: string; module_id: string; type: 'pdf' | 'note' | 'link' | 'quiz' | 'video'; title: string; content: string | null; user_id: string | null; created_at: string };
 
 type View =
   | { kind: 'hub' }
@@ -83,7 +83,7 @@ const Library: React.FC = () => {
       const [c, m, r] = await Promise.all([
         supabase.from('tvet_courses').select('*').ilike('title', `%${q}%`).limit(10),
         supabase.from('tvet_modules').select('*').ilike('title', `%${q}%`).limit(10),
-        supabase.from('tvet_resources').select('*').or(`title.ilike.%${q}%,extracted_text.ilike.%${q}%`).limit(10),
+        supabase.from('tvet_resources').select('*').or(`title.ilike.%${q}%,content.ilike.%${q}%`).limit(10),
       ]);
       setSearchResults({ courses: c.data || [], modules: m.data || [], resources: r.data || [] });
     }, 300);

@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ExternalLink } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import PdfViewer from './PdfViewer';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import remarkBreaks from 'remark-breaks';
+import { Document, Page, pdfjs } from 'react-pdf';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
   title: string;
-  url?: string | null;
-  extracted_text?: string | null;
+  content?: string | null;
 }
 
 interface Props {
@@ -17,54 +19,77 @@ interface Props {
 }
 
 const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
-  const [iframeFailed, setIframeFailed] = useState(false);
-
-  useEffect(() => {
-    setIframeFailed(false);
-  }, [resource]);
+  const [numPages, setNumPages] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
 
   if (!resource) return null;
-  const url = resource.url || '';
-  const isPdf = resource.type === 'pdf' || /\.pdf($|\?)/i.test(url);
+
+  const content = resource.content || '';
+  const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
+  const isPdfData = resource.type === 'pdf' && content.length > 0;
+  const pdfData = isPdfData
+    ? content.startsWith('data:application/pdf;base64,')
+      ? content
+      : `data:application/pdf;base64,${content}`
+    : null;
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
+    setPageNumber(1);
+  };
 
   return (
     <Dialog open={!!resource} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 flex flex-col bg-card border-primary/20">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-border shrink-0">
-          <DialogTitle className="text-sm font-semibold truncate">{resource.title}</DialogTitle>
-          {url && (
-            <a href={url} target="_blank" rel="noopener noreferrer" className="mr-8">
-              <Button size="sm" variant="ghost" className="gap-1 text-xs">
-                <ExternalLink className="h-3.5 w-3.5" /> New tab
-              </Button>
-            </a>
-          )}
-        </div>
-        <div className="flex-1 overflow-hidden">
-          {resource.type === 'note' && resource.extracted_text ? (
-            <div className="p-6 overflow-auto h-full prose prose-invert max-w-none whitespace-pre-wrap text-sm">
-              {resource.extracted_text}
+      <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 flex flex-col bg-slate-50/90 border-primary/20">
+        <div className="overflow-auto h-full p-6">
+          <div className="mx-auto w-full max-w-5xl rounded-[2rem] bg-white text-slate-900 shadow-2xl ring-1 ring-slate-200/70">
+            <div className="border-b border-slate-200 px-8 py-6 bg-slate-50 rounded-t-[2rem]">
+              <DialogTitle className="text-5xl font-black tracking-tight text-slate-900">
+                {resource.title}
+              </DialogTitle>
             </div>
-          ) : isPdf && url ? (
-            <PdfViewer url={url} />
-          ) : url && !iframeFailed ? (
-            <iframe
-              src={url}
-              className="w-full h-full border-0 bg-white"
-              onError={() => setIframeFailed(true)}
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
-              title={resource.title}
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-center p-6">
-              <p className="text-muted-foreground">This content can't be embedded directly.</p>
-              {url && (
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  <Button variant="hero" className="gap-2"><ExternalLink className="h-4 w-4" />Open in new tab</Button>
-                </a>
+            <div className="px-8 py-6">
+              {isPdfData && pdfData ? (
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <span className="text-sm text-slate-600">PDF preview</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setPageNumber((prev) => Math.max(1, prev - 1))}
+                        className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-900"
+                        disabled={pageNumber <= 1}
+                      >
+                        Prev
+                      </button>
+                      <span className="text-sm text-slate-700">Page {pageNumber} / {numPages || '–'}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPageNumber((prev) => Math.min(numPages, prev + 1))}
+                        className="rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-900"
+                        disabled={pageNumber >= numPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                    <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} loading="Loading PDF...">
+                      <Page pageNumber={pageNumber} width={840} />
+                    </Document>
+                  </div>
+                </div>
+              ) : (
+                <div className="prose prose-slate prose-lg prose-headings:font-semibold prose-headings:text-slate-900 prose-headings:tracking-tight prose-p:text-slate-800 prose-li:text-slate-800 prose-strong:text-slate-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-blockquote:border-l-slate-300 prose-blockquote:text-slate-600 prose-pre:bg-slate-100 prose-code:text-slate-900 prose-code:bg-slate-100 prose-img:rounded-xl max-w-none break-words">
+                  {isHtml ? (
+                    <div dangerouslySetInnerHTML={{ __html: content }} />
+                  ) : (
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{content}</ReactMarkdown>
+                  )}
+                </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
