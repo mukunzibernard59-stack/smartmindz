@@ -53,11 +53,7 @@ const AppContent = () => {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <div className="flex-1 flex flex-col min-w-0">
-              <Suspense fallback={(
-                <div className="min-h-screen flex items-center justify-center text-sm text-slate-600">
-                  Loading application...
-                </div>
-              )}>
+              <Suspense fallback={null}>
                 <Routes>
                   {/* Offline-friendly routes (no internet required) */}
                   <Route path="/" element={<Index />} />
