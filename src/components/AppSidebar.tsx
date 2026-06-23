@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home, Sparkles, Brain, Youtube, Code2,
   ImagePlus, Wand2, Languages, Library as LibraryIcon, ShieldCheck,
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import {
   Sidebar,
   SidebarContent,
@@ -40,16 +40,7 @@ const AppSidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    (async () => {
-      const { data } = await (supabase as any)
-        .from('user_roles').select('id').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
-      setIsAdmin(!!data);
-    })();
-  }, [user]);
+  const { data: isAdmin = false } = useAdminStatus(user);
 
   const isActive = (path: string) => location.pathname === path;
 

@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
       started_by: userId,
       source_url: rootUrl,
       status: 'running',
-    }).select().single();
+    }).select('id').single();
     const jobId = job!.id;
     const log: any[] = [];
     const pushLog = (entry: any) => { log.push({ at: new Date().toISOString(), ...entry }); };
@@ -123,7 +123,7 @@ Deno.serve(async (req) => {
       if (!cat) {
         const { data: created } = await admin.from('tvet_categories')
           .insert({ name: 'Imports', slug: 'imports', icon: '📥', sort_order: 99 })
-          .select().single();
+          .select('id').single();
         cat = created!;
       }
       let { data: course } = await admin.from('tvet_courses')
@@ -131,21 +131,21 @@ Deno.serve(async (req) => {
       if (!course) {
         const { data: created } = await admin.from('tvet_courses')
           .insert({ category_id: cat!.id, slug: 'rtb-imports', title: 'RTB Imports', sort_order: 0 })
-          .select().single();
+          .select('id').single();
         course = created!;
       }
       let { data: level } = await admin.from('tvet_levels')
         .select('id').eq('course_id', course!.id).eq('level', 'L3').maybeSingle();
       if (!level) {
         const { data: created } = await admin.from('tvet_levels')
-          .insert({ course_id: course!.id, level: 'L3' }).select().single();
+          .insert({ course_id: course!.id, level: 'L3' }).select('id').single();
         level = created!;
       }
       let { data: mod } = await admin.from('tvet_modules')
         .select('id').eq('level_id', level!.id).eq('title', 'Imported from RTB').maybeSingle();
       if (!mod) {
         const { data: created } = await admin.from('tvet_modules')
-          .insert({ level_id: level!.id, title: 'Imported from RTB', sort_order: 0 }).select().single();
+          .insert({ level_id: level!.id, title: 'Imported from RTB', sort_order: 0 }).select('id').single();
         mod = created!;
       }
       return mod!.id;

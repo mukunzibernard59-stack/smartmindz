@@ -5,11 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
-import jsPDF from 'jspdf';
 import SEO from '@/components/SEO';
-import {
-  Document, Packer, Paragraph, TextRun, AlignmentType, HeadingLevel,
-} from 'docx';
 
 /* -----------------------------------------------------------
  * Smart Template Engine — fully local, no AI calls.
@@ -269,8 +265,9 @@ const AIWriter: React.FC = () => {
   };
 
   // PDF export — A4, professional margins, Times font for letter feel.
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     try {
+      const { default: jsPDF } = await import('jspdf');
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
       const marginX = 22;
       const marginTop = 24;
@@ -298,7 +295,8 @@ const AIWriter: React.FC = () => {
   // DOCX export — clean A4 layout, Times-style heading + body.
   const downloadDocx = async () => {
     try {
-      const paragraphs: Paragraph[] = output.split('\n').map(line =>
+      const { Document, Packer, Paragraph, TextRun, AlignmentType } = await import('docx');
+      const paragraphs = output.split('\n').map(line =>
         new Paragraph({
           children: [new TextRun({ text: line || ' ', font: 'Times New Roman', size: 24 })],
           alignment: AlignmentType.LEFT,

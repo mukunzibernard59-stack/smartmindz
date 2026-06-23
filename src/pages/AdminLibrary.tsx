@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 const sb = supabase as any;
-import mammoth from 'mammoth';
 import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -30,13 +30,15 @@ type Course = { id: string; category_id: string; title: string };
 type Level = { id: string; course_id: string; level: 'L3' | 'L4' | 'L5' };
 type Module = { id: string; level_id: string; title: string };
 
+const JOB_COLUMNS = 'id, source_url, status, pages_processed, resources_added, error, created_at, log';
+
 const ADMIN_EMAIL = 'mukunzibernard59@gmail.com';
 const ADMIN_PASSCODE = 'inzu2003';
 const UNLOCK_KEY = 'sm_admin_unlocked_v1';
 
 const AdminLibrary: React.FC = () => {
   const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { data: isAdmin = false, isPending: isAdminPending } = useAdminStatus(user);
   const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(UNLOCK_KEY) === '1');
   const [passcode, setPasscode] = useState('');
   const [running, setRunning] = useState(false);
@@ -66,18 +68,9 @@ const AdminLibrary: React.FC = () => {
 
   const pollRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!user) { setIsAdmin(false); return; }
-    (async () => {
-      const { data } = await sb
-        .from('user_roles').select('id').eq('user_id', user.id).eq('role', 'admin').maybeSingle();
-      setIsAdmin(!!data);
-    })();
-  }, [user]);
-
   const loadJobs = async () => {
     const { data } = await sb.from('tvet_import_jobs')
-      .select('*').order('created_at', { ascending: false }).limit(20);
+      .select(JOB_COLUMNS).order('created_at', { ascending: false }).limit(20);
     const list = (data as Job[]) || [];
     setJobs(list);
     const live = list.find((j) => j.status === 'running');
@@ -101,6 +94,7 @@ const AdminLibrary: React.FC = () => {
   };
 
   const extractHtmlFromDocx = async (file: File) => {
+    const mammoth = await import('mammoth');
     const arrayBuffer = await file.arrayBuffer();
     const { value } = await mammoth.convertToHtml({ arrayBuffer });
     return value;
@@ -196,7 +190,7 @@ const AdminLibrary: React.FC = () => {
     }
     pollRef.current = window.setInterval(async () => {
       const { data } = await sb.from('tvet_import_jobs')
-        .select('*').eq('id', activeJob.id).maybeSingle();
+        .select(JOB_COLUMNS).eq('id', activeJob.id).maybeSingle();
       if (data) {
         setActiveJob(data as Job);
         if ((data as Job).status !== 'running') loadJobs();
@@ -263,8 +257,14 @@ const AdminLibrary: React.FC = () => {
     }
   };
 
-  if (isAdmin === null) {
-    return <div className="flex items-center justify-center h-screen"><Loader2 className="animate-spin" /></div>;
+  if (isAdminPending && user) {
+    return (
+      <div className="container mx-auto px-4 py-8 space-y-6 max-w-5xl">
+        <div className="h-9 w-64 rounded-lg bg-muted animate-pulse" />
+        <div className="h-48 rounded-lg bg-muted animate-pulse" />
+        <div className="h-64 rounded-lg bg-muted animate-pulse" />
+      </div>
+    );
   }
   if (!isAdmin) {
     return (

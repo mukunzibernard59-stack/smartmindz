@@ -2,7 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -12,11 +12,10 @@ import FloatingInstallButton from "@/components/FloatingInstallButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import UpdateNotification from "@/components/UpdateNotification";
-import OfflineBanner from "@/components/OfflineBanner";
-import { useOfflineMode } from "@/hooks/useOfflineMode";
-
 import AppRatingBanner from "@/components/AppRatingBanner";
 import OfflineGate from "@/components/OfflineGate";
+import { Skeleton } from "@/components/ui/skeleton";
+import { queryClient } from "@/lib/queryClient";
 
 const Index = lazy(() => import("./pages/Index"));
 const Learn = lazy(() => import("./pages/Learn"));
@@ -35,14 +34,26 @@ const HomeworkHelper = lazy(() => import("./pages/HomeworkHelper"));
 const Library = lazy(() => import("./pages/Library"));
 const AdminLibrary = lazy(() => import("./pages/AdminLibrary"));
 
-const queryClient = new QueryClient();
+const RouteSkeleton = () => (
+  <div className="min-h-screen bg-background">
+    <div className="sticky top-0 z-20 h-16 border-b border-border bg-background/95 backdrop-blur" />
+    <main className="container mx-auto max-w-6xl px-4 py-6 space-y-6">
+      <div className="space-y-3">
+        <Skeleton className="h-8 w-2/3 max-w-md" />
+        <Skeleton className="h-4 w-full max-w-xl" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Skeleton key={index} className="h-32 rounded-lg" />
+        ))}
+      </div>
+    </main>
+  </div>
+);
 
 const AppContent = () => {
-  const { isOnline } = useOfflineMode();
-
   return (
     <>
-      <OfflineBanner isOnline={isOnline} />
       <Toaster />
       <Sonner />
       <FloatingInstallButton />
@@ -53,7 +64,7 @@ const AppContent = () => {
           <div className="min-h-screen flex w-full">
             <AppSidebar />
             <div className="flex-1 flex flex-col min-w-0">
-              <Suspense fallback={null}>
+              <Suspense fallback={<RouteSkeleton />}>
                 <Routes>
                   {/* Offline-friendly routes (no internet required) */}
                   <Route path="/" element={<Index />} />

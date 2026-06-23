@@ -6,7 +6,6 @@ export interface Profile {
   id: string;
   user_id: string;
   full_name: string | null;
-  email: string | null;
   avatar_url: string | null;
   created_at: string;
   updated_at: string;
@@ -30,7 +29,7 @@ export const useAuth = () => {
   const fetchProfile = useCallback(async (userId: string) => {
     const { data, error } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, user_id, full_name, avatar_url, created_at, updated_at')
       .eq('user_id', userId)
       .single();
     
@@ -118,7 +117,7 @@ export const useAuth = () => {
       .from('profiles')
       .update(updates)
       .eq('user_id', authState.user.id)
-      .select()
+      .select('id, user_id, full_name, avatar_url, created_at, updated_at')
       .single();
     
     if (!error && data) {

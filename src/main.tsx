@@ -3,9 +3,17 @@ import App from "./App.tsx";
 import "./index.css";
 import clearAppCache from "./lib/cacheCleaner";
 
-// Clear older cached UI and service workers before mounting app
-// This prevents stale UI from flashing on startup.
-(async () => {
-	try { await clearAppCache({ preserveChat: true }); } catch (e) { /* ignore */ }
-	createRoot(document.getElementById("root")!).render(<App />);
-})();
+createRoot(document.getElementById("root")!).render(<App />);
+
+// Keep stale cache cleanup off the critical rendering path.
+const cleanStaleCaches = () => {
+  clearAppCache({ preserveChat: true }).catch(() => {});
+};
+
+const requestIdleCallback = window.requestIdleCallback?.bind(window);
+
+if (requestIdleCallback) {
+  requestIdleCallback(cleanStaleCaches, { timeout: 5000 });
+} else {
+  globalThis.setTimeout(cleanStaleCaches, 2500);
+}
