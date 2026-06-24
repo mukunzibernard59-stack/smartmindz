@@ -60,6 +60,21 @@ const Hero: React.FC = () => {
         >
           The smart learning app trusted by thousands to learn new skills faster
         </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.0 }}
+          className="mt-8 flex justify-center px-4"
+        >
+          <div className="relative w-full max-w-[1000px] rounded-[2rem] p-1 bg-gradient-to-br from-primary/30 via-transparent to-accent/30 shadow-[0_40px_120px_rgba(15,23,42,0.35)]">
+            <img
+              src="/smartpc.jpg"
+              alt="SmartMindz learning app"
+              className="w-full h-auto rounded-[1.75rem] object-cover"
+            />
+          </div>
+        </motion.div>
       </div>
     </section>
   );
