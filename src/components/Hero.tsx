@@ -45,7 +45,7 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-10 leading-relaxed"
           >
-            Get instant answers for <strong className="text-foreground">Math, Science, English</strong>, and more 
+            Get instant answers/help for <strong className="text-foreground">Tvet notes,letter writing,language translation</strong>, and more 
             with the power of smart technology. Your personal tutor that never sleeps.
           </motion.p>
 
@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="mt-16 text-center text-sm text-muted-foreground font-medium"
         >
-          The smart learning app trusted by thousands to learn new skills faster
+          The smart learning app trusted by thousands to learn/get help faster
         </motion.p>
 
         <motion.div
