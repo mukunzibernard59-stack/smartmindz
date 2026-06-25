@@ -26,18 +26,17 @@ const SEOContent: React.FC = () => {
             </h2>
             <div className="prose prose-lg max-w-none text-muted-foreground">
               <p className="text-lg leading-relaxed mb-6">
-                <strong className="text-foreground">Smart Mind</strong> is an innovative <strong className="text-foreground">AI learning app</strong> designed to help you 
+                <strong className="text-foreground">Smart Mind</strong> is an innovative <strong className="text-foreground"> learning app</strong> designed to help you 
                 <strong className="text-foreground"> learn faster online</strong> than ever before. Whether you're a student preparing for exams, 
                 a professional looking to upskill, or a lifelong learner exploring new topics, our 
                 <strong className="text-foreground"> fast learning platform</strong> adapts to your unique learning style and pace.
               </p>
               <p className="text-lg leading-relaxed mb-6">
-                Unlike traditional learning apps, the Smart Mind app uses advanced artificial intelligence to 
-                create a truly <strong className="text-foreground">personalized learning app</strong> experience. Our AI tutor understands 
-                how you learn best and adjusts content delivery in real-time.
+                Unlike traditional learning apps, the Smart Mind app uses advanced technology to 
+                create a truly <strong className="text-foreground">personalized learning app</strong> experience.
               </p>
               <p className="text-lg leading-relaxed">
-                Join thousands of learners who have discovered the power of AI-powered education with Smart Mind.
+                Join thousands of learners who have discovered the power of Smartmindz.
               </p>
             </div>
           </motion.div>
@@ -52,19 +51,17 @@ const SEOContent: React.FC = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               How Our AI Helps You <span className="text-gradient-primary">Learn Faster</span>
             </h2>
-            <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Cutting-edge AI technology transforms how you learn
-            </p>
+
           </motion.div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
               { icon: Brain, title: 'Adaptive Learning Engine', desc: 'Our AI analyzes your learning patterns to create a personalized curriculum that evolves with you.' },
-              { icon: Zap, title: 'Instant AI Tutoring', desc: 'Get immediate answers to any question with step-by-step explanations in seconds.' },
-              { icon: Target, title: 'Smart Quizzes', desc: 'AI-generated quizzes using spaced repetition to maximize long-term retention.' },
-              { icon: Clock, title: 'Time-Optimized Sessions', desc: 'Learn more in less time with AI-identified most efficient paths to mastery.' },
+              
+            
+              { icon: Clock, title: 'Time-Optimized Sessions', desc: 'Learn more in less time.' },
               { icon: TrendingUp, title: 'Progress Analytics', desc: 'Track improvement with detailed insights and data-driven metrics.' },
-              { icon: BookOpen, title: 'Multi-Subject Coverage', desc: 'From mathematics to languages, science to history—every subject covered.' },
+              { icon: BookOpen, title: 'Multi-Subject Coverage', desc: 'All tvet course available.' },
             ].map((item, index) => (
               <motion.div
                 key={item.title}
@@ -91,7 +88,7 @@ const SEOContent: React.FC = () => {
         <div className="container mx-auto px-4">
           <motion.div {...fadeUp}>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-              Who Benefits from <span className="text-gradient-primary">Smart Mind</span>?
+              Who Benefits from <span className="text-gradient-primary">SmartMindz</span>?
             </h2>
             <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
               Our fast learning app for students, professionals, and adults of all ages
@@ -155,7 +152,7 @@ const SEOContent: React.FC = () => {
             
             <div className="space-y-4">
               {[
-                { icon: Sparkles, title: 'Personalized AI Education', desc: 'Every lesson, quiz, and recommendation is tailored specifically to your learning goals.' },
+              
                 { icon: Zap, title: 'Learn New Skills Faster', desc: 'Users report learning up to 3x faster compared to traditional study methods.' },
                 { icon: Brain, title: 'Brain Training Benefits', desc: 'Regular use helps improve memory, focus, and problem-solving skills.' },
                 { icon: Target, title: 'Unlimited Access', desc: 'AI tutor, voice learning, smart quizzes, and downloadable study materials.' },
