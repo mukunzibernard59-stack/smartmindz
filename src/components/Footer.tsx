@@ -24,20 +24,24 @@ const Footer: React.FC = () => {
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Product</h4>
             <ul className="space-y-2">
-              {['Features', 'Subjects', 'Voice Mode', 'Mobile App'].map((item) => (
-                <li key={item}><a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">{item}</a></li>
-              ))}
+              <li><Link to="/library" className="text-muted-foreground hover:text-primary text-sm transition-colors">TVET Library</Link></li>
+              <li><Link to="/learn" className="text-muted-foreground hover:text-primary text-sm transition-colors">Smart Tutor</Link></li>
+              <li><Link to="/ai-writer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Writer Studio</Link></li>
+              <li><Link to="/translate" className="text-muted-foreground hover:text-primary text-sm transition-colors">Translator</Link></li>
+              <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">How-To Guides</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Company</h4>
             <ul className="space-y-2">
-              {['About Us', 'Blog', 'Careers', 'Press', 'Partners'].map((item) => (
-                <li key={item}><a href="#" className="text-muted-foreground hover:text-primary text-sm transition-colors">{item}</a></li>
-              ))}
+              <li><Link to="/about" className="text-muted-foreground hover:text-primary text-sm transition-colors">About Us</Link></li>
+              <li><Link to="/blog" className="text-muted-foreground hover:text-primary text-sm transition-colors">Blog</Link></li>
+              <li><Link to="/faq" className="text-muted-foreground hover:text-primary text-sm transition-colors">FAQ</Link></li>
+              <li><a href="mailto:mukunzibernard59@gmail.com" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact</a></li>
             </ul>
           </div>
+
 
           <div>
             <h4 className="font-semibold mb-4 text-foreground">Support</h4>
