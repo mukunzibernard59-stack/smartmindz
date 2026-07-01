@@ -91,9 +91,9 @@ const AITutorTab: React.FC = () => {
         <SubjectNotes
           subject={selectedSubject}
           onClose={() => setSelectedSubject(null)}
-          onStartQuiz={handleStartQuiz}
         />
       )}
+
 
       {quizSubject && (
         <QuickQuiz
