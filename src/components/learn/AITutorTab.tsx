@@ -87,8 +87,24 @@ const AITutorTab: React.FC = () => {
           ))}
         </div>
       </div>
+      {selectedSubject && (
+        <SubjectNotes
+          subject={selectedSubject}
+          onClose={() => setSelectedSubject(null)}
+          onStartQuiz={handleStartQuiz}
+        />
+      )}
 
+      {quizSubject && (
+        <QuickQuiz
+          subject={quizSubject}
+          onClose={() => setQuizSubject(null)}
+        />
+      )}
 
-     
-        
-       
+      <ChatInterface />
+    </div>
+  );
+};
+
+export default AITutorTab;
