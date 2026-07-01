@@ -33,6 +33,12 @@ const YouTubeTutor = lazy(() => import("./pages/YouTubeTutor"));
 const HomeworkHelper = lazy(() => import("./pages/HomeworkHelper"));
 const Library = lazy(() => import("./pages/Library"));
 const AdminLibrary = lazy(() => import("./pages/AdminLibrary"));
+const About = lazy(() => import("./pages/About"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const HowTo = lazy(() => import("./pages/HowTo"));
+
 
 const RouteSkeleton = () => (
   <div className="min-h-screen bg-background">
@@ -72,6 +78,12 @@ const AppContent = () => {
                   <Route path="/terms" element={<TermsOfService />} />
                   <Route path="/ai-writer" element={<AIWriter />} />
                   <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/how-to" element={<HowTo />} />
+
                   {/* Internet-required routes (gated when offline) */}
                   <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
                   <Route path="/quiz" element={<OfflineGate toolName="Quiz"><Learn /></OfflineGate>} />
