@@ -113,7 +113,6 @@ const Navbar: React.FC = () => {
                   </Tooltip>
                 </TooltipProvider>
               )}
-              <LanguageSelector />
               <ThemeToggle floating={false} className="-ml-1" />
               {isAuthenticated ? (
                 <DropdownMenu>
