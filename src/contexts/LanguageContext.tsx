@@ -528,9 +528,3 @@ export const useLanguage = (): LanguageContextType => {
   return context;
 };
 
-export const languages = [
-  { code: 'en' as Language, name: 'English', flag: '🇬🇧' },
-  { code: 'fr' as Language, name: 'Français', flag: '🇫🇷' },
-  { code: 'rw' as Language, name: 'Kinyarwanda', flag: '🇷🇼' },
-  { code: 'sw' as Language, name: 'Kiswahili', flag: '🇰🇪' },
-];

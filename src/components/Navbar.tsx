@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageSelector from './LanguageSelector';
+
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
 import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
@@ -113,7 +113,6 @@ const Navbar: React.FC = () => {
                   </Tooltip>
                 </TooltipProvider>
               )}
-              <LanguageSelector />
               <ThemeToggle floating={false} className="-ml-1" />
               {isAuthenticated ? (
                 <DropdownMenu>
@@ -158,7 +157,6 @@ const Navbar: React.FC = () => {
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
               <ThemeToggle floating={false} className="h-8 w-8" />
-              <LanguageSelector />
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
