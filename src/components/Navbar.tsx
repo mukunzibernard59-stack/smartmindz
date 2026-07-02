@@ -157,7 +157,6 @@ const Navbar: React.FC = () => {
             {/* Mobile Menu Button */}
             <div className="flex md:hidden items-center gap-2">
               <ThemeToggle floating={false} className="h-8 w-8" />
-              <LanguageSelector />
               <Button variant="ghost" size="icon" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                 {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </Button>
