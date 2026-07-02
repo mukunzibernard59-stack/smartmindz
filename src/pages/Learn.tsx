@@ -2,12 +2,9 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import BackButton from '@/components/BackButton';
 import LearnTabs from '@/components/learn/LearnTabs';
-import BannerAd from '@/components/ads/BannerAd';
-import { getAdConfig } from '@/lib/adManager';
 import SEO from '@/components/SEO';
 
 const Learn: React.FC = () => {
-  const adConfig = getAdConfig();
 
   return (
     <div className="h-screen flex flex-col bg-background overflow-hidden">
