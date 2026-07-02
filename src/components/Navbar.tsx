@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import LanguageSelector from './LanguageSelector';
+
 import LoginModal from './LoginModal';
 import { Button } from '@/components/ui/button';
 import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
