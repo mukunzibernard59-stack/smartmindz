@@ -206,6 +206,134 @@ The one habit that ruins students is copying AI answers into their homework and 
 
 Students who learn to use AI as a smart study partner while still respecting and using their human teachers will run circles around students who use only one or the other. The tools are new; the fundamental principles of learning are not.`,
   },
+  {
+    slug: 'time-management-for-students-rwanda',
+    title: 'Time Management for Rwandan Students: A Realistic System',
+    description: 'Practical time-management strategies for Rwandan secondary and TVET students juggling long school days, chores, and self-study.',
+    author: 'SmartMind Team',
+    date: '2026-05-28',
+    readMinutes: 7,
+    tags: ['Study', 'Productivity', 'Rwanda'],
+    content: `Most time-management advice on the internet is written for adults with quiet home offices and flexible schedules. That is not the life of a Rwandan student. You wake up early, you help at home, you spend eight hours in class, you may travel long distances, and by the time you sit down to study, the electricity might be unreliable and your phone battery low. This guide is written for that reality.
+
+## Start With A Weekly Skeleton, Not A Daily Plan
+
+Daily to-do lists fail because a single interruption breaks the whole day. A weekly skeleton is different: you decide which two-hour blocks in your week are protected study time, and everything else flexes around them. For most students, the best blocks are early morning (5:30–7:00 AM) before the household wakes, and a focused session on Saturday morning. If you protect just three of these blocks per week, you will study more than 90% of your classmates.
+
+## The 25-5 Rule
+
+Long study sessions feel productive but retain little. Break every study block into 25 minutes of focused work, then 5 minutes off your seat — stretch, drink water, look outside. Four cycles equal a two-hour session. Use your phone timer, put the phone face-down across the room, and do not touch it during the 25 minutes. This single rule doubles most students' effective study output.
+
+## Batch Similar Tasks
+
+Switching between subjects burns mental energy. Instead of "one hour math, one hour English, one hour biology," do a full two-hour math block on Monday, a full block of language work on Tuesday, and so on. Your brain stays in one mode and goes deeper.
+
+## Protect One Full Rest Day
+
+Sunday afternoon should be genuinely off. Rest is not laziness — it is when your brain consolidates the week's learning into long-term memory. Students who study seven days a week almost always score lower than students who study six days and rest one.
+
+## Track, Do Not Judge
+
+At the end of each week, count how many of your protected blocks you actually used. Do not judge yourself; just count. If you did three of four, next week aim for four of four. Small honest tracking beats big guilty promises.`,
+  },
+  {
+    slug: 'digital-skills-every-tvet-student-needs',
+    title: 'Digital Skills Every Rwandan TVET Student Needs in 2026',
+    description: 'The core digital skills — beyond typing — that employers in Rwanda now expect from every TVET graduate, and how to learn them for free.',
+    author: 'SmartMind Team',
+    date: '2026-06-05',
+    readMinutes: 6,
+    tags: ['TVET', 'Digital Skills', 'Career'],
+    content: `The Rwanda you will graduate into is not the Rwanda your teachers graduated into. Government offices, private companies, cooperatives, and even small shops now assume that a competent young worker can handle basic digital tasks without hand-holding. If your TVET training only covered your trade and not these cross-cutting digital skills, you will be at a disadvantage — no matter how skilled you are in your specialty.
+
+## 1. Confident File Management
+
+You must be able to create folders, rename files sensibly, move files between a phone and a computer, and find a file you saved last month without panicking. This sounds trivial; it is the number one complaint employers have about young hires.
+
+## 2. Email That Reads Like An Adult Wrote It
+
+A professional email has a clear subject line, a greeting, one focused paragraph, and a sign-off with your full name and phone number. No emojis, no "hi sir plz help me sir." Practice by writing three emails a week — to yourself if you have to.
+
+## 3. Google Docs And Sheets Basics
+
+Formatting text, inserting a table, sharing a document with view or edit permissions, and doing simple sums in Sheets. These four skills alone will put you ahead of most applicants for any office-adjacent role.
+
+## 4. Safe Internet Habits
+
+Recognize scam messages, do not reuse the same password everywhere, and never share your MTN Mobile Money PIN — not even with someone claiming to be from MTN. Digital safety is now a professional skill.
+
+## 5. Using AI Tools Responsibly
+
+Employers do not mind if you use tools like SmartMind or ChatGPT to draft a letter or explain a concept. They mind if you paste AI output without understanding it. Learn to use AI as a fast assistant, not a replacement for your own thinking.
+
+## How To Learn All Of This For Free
+
+You do not need a computer at home. Public libraries, community access centres, and many TVET schools now offer supervised computer time. Use it. One focused hour a week for three months is enough to master everything on this list.`,
+  },
+  {
+    slug: 'preparing-for-a-job-interview-in-rwanda',
+    title: 'How to Prepare for Your First Job Interview in Rwanda',
+    description: 'A step-by-step guide to preparing for entry-level job interviews in Rwanda — what to research, what to wear, what to say, and what to avoid.',
+    author: 'SmartMind Team',
+    date: '2026-06-12',
+    readMinutes: 7,
+    tags: ['Career', 'Interview', 'Rwanda'],
+    content: `You sent your CV, you got the call, and now you have one week to prepare. Most first-time applicants in Rwanda lose the job in the first five minutes of the interview — not because they lack skills, but because they were not prepared for the room. This guide fixes that.
+
+## Research The Employer, Not Just The Job
+
+Before the interview, spend one hour learning about the company: what they do, who they serve, how long they have existed, and one recent thing they announced (a new office, a new product, a partnership). Mentioning one specific fact naturally during the interview signals maturity that nine out of ten candidates never show.
+
+## Prepare Three Stories, Not Ten Answers
+
+Instead of memorizing answers to "tell me about yourself," prepare three short real stories from your studies, internships, or life: one about a time you solved a problem, one about a time you worked in a team, and one about a time you failed and what you learned. Almost every interview question can be answered by adapting one of these stories.
+
+## Dress One Level Above The Role
+
+If the daily uniform is casual, wear smart casual. If it is smart casual, wear formal. Clean shoes matter more than expensive clothes. Iron your shirt the night before, not the morning of.
+
+## Arrive Twenty Minutes Early, Enter Five Minutes Early
+
+Twenty minutes gives you a buffer for traffic and a chance to calm your breathing. Walking into reception exactly on time looks rushed; five minutes early looks respectful.
+
+## Ask Two Real Questions At The End
+
+When they ask "do you have any questions," never say no. Prepare two: one about what success looks like in the first three months of the role, and one about how the team works together. These questions signal that you are already thinking like an employee.
+
+## Follow Up The Same Day
+
+Send a short thank-you email within six hours of the interview. Three sentences: thank them for their time, mention one specific thing you enjoyed discussing, and confirm your interest. Almost no one does this in Rwanda yet — it will make you memorable.`,
+  },
+  {
+    slug: 'reading-more-books-as-a-busy-student',
+    title: 'How to Actually Read More Books as a Busy Rwandan Student',
+    description: 'A realistic reading system for busy students — how to pick books, find them cheaply in Rwanda, and finish more of what you start.',
+    author: 'SmartMind Team',
+    date: '2026-06-20',
+    readMinutes: 6,
+    tags: ['Study', 'Reading', 'Habits'],
+    content: `Reading is the single highest-leverage habit a young person can build. It expands your vocabulary in English and French, sharpens your thinking, and quietly separates you from peers who only consume short videos. But the "read one book a week" advice you see online ignores the reality of a Rwandan student's schedule and budget. Here is a system that actually works.
+
+## Pick Books You Would Steal, Not Books You Should Read
+
+The fastest way to kill your reading habit is to start with a heavy classic because someone told you it was important. Start with a book on a topic you already love — football, music, business, a favourite subject — even if it feels "not serious enough." Momentum matters more than prestige. Once reading is a habit, harder books get easier.
+
+## Twenty Pages A Day, No Exceptions
+
+Twenty pages a day is about thirty minutes. That is one book every two weeks and twenty-five books a year. Read the twenty pages before you touch your phone in the morning, or right after supper. The consistency matters more than the amount.
+
+## Find Books Cheaply
+
+You do not need to buy new books. Kigali Public Library, second-hand bookshops in town, book exchanges at universities, and free PDFs of out-of-copyright classics (Project Gutenberg, Standard Ebooks) will keep you supplied for years. Ask a teacher — most have shelves of books they will happily lend.
+
+## Keep A One-Line Notebook
+
+For every book you finish, write one line: what the book was about and the one idea you want to remember. This tiny practice turns reading from entertainment into education, and after a year you will have a small notebook that is more valuable than most courses.
+
+## Quit Books You Do Not Enjoy
+
+Life is too short to force yourself through a book you hate. If you are fifty pages in and still bored, close it and pick another. Reading is supposed to be a pleasure that happens to make you smarter.`,
+  },
 ];
 
 export function getPost(slug: string) {
