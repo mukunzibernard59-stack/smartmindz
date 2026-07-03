@@ -83,7 +83,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
               ) : (
                 <div className="prose prose-slate prose-lg prose-headings:font-semibold prose-headings:text-slate-900 prose-headings:tracking-tight prose-p:text-slate-800 prose-li:text-slate-800 prose-strong:text-slate-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-blockquote:border-l-slate-300 prose-blockquote:text-slate-600 prose-pre:bg-slate-100 prose-code:text-slate-900 prose-code:bg-slate-100 prose-img:rounded-xl max-w-none break-words">
                   {isHtml ? (
-                    <div dangerouslySetInnerHTML={{ __html: content }} />
+                    <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) }} />
                   ) : (
                     <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{content}</ReactMarkdown>
                   )}
