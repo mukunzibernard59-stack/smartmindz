@@ -32,9 +32,6 @@ type Module = { id: string; level_id: string; title: string };
 
 const JOB_COLUMNS = 'id, source_url, status, pages_processed, resources_added, error, created_at, log';
 
-const ADMIN_EMAIL = 'mukunzibernard59@gmail.com';
-const ADMIN_PASSCODE = 'inzu2003';
-const UNLOCK_KEY = 'sm_admin_unlocked_v1';
 
 const AdminLibrary: React.FC = () => {
   const { user } = useAuth();
