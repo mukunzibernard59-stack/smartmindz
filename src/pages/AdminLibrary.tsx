@@ -36,8 +36,6 @@ const JOB_COLUMNS = 'id, source_url, status, pages_processed, resources_added, e
 const AdminLibrary: React.FC = () => {
   const { user } = useAuth();
   const { data: isAdmin = false, isPending: isAdminPending } = useAdminStatus(user);
-  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem(UNLOCK_KEY) === '1');
-  const [passcode, setPasscode] = useState('');
   const [running, setRunning] = useState(false);
   const [rootUrl, setRootUrl] = useState('https://elearning.rtb.gov.rw');
   const [limit, setLimit] = useState(30);
