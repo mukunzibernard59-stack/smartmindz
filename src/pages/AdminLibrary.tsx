@@ -274,36 +274,6 @@ const AdminLibrary: React.FC = () => {
     );
   }
 
-  if (!unlocked) {
-    const isAssignedEmail = user?.email?.toLowerCase() === ADMIN_EMAIL;
-    const tryUnlock = () => {
-      if (isAssignedEmail && passcode === ADMIN_PASSCODE) {
-        sessionStorage.setItem(UNLOCK_KEY, '1'); setUnlocked(true);
-      } else { toast({ title: 'Incorrect passcode', variant: 'destructive' }); }
-    };
-    return (
-      <div className="flex items-center justify-center min-h-screen p-6">
-        <Card className="w-full max-w-sm p-6 space-y-4 border-primary/30">
-          <div className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-bold">Admin verification</h1>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Enter the admin passcode to continue. Signed in as <span className="font-mono">{user?.email}</span>.
-          </p>
-          <Input
-            type="password" placeholder="Passcode"
-            value={passcode} onChange={(e) => setPasscode(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') tryUnlock(); }}
-          />
-          <Button className="w-full" variant="hero" onClick={tryUnlock}>Unlock</Button>
-          <Link to="/library" className="block text-xs text-center text-muted-foreground hover:text-foreground">
-            ← Back to library
-          </Link>
-        </Card>
-      </div>
-    );
-  }
 
   const percent = activeJob
     ? Math.min(100, Math.round(((activeJob.pages_processed || 0) / Math.max(1, limit)) * 100))
