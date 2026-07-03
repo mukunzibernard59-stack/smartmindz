@@ -265,34 +265,80 @@ const YouTubeTutor: React.FC = () => {
         </div>
 
         {/* Active topic detail */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4" id="yt-player">
+          {/* YouTube API search */}
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-medium">Search any learning topic</h3>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={ytQuery}
+                onChange={e => setYtQuery(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') runYouTubeSearch(ytQuery); }}
+                placeholder="e.g. Excel pivot tables, calculus limits, Kinyarwanda grammar…"
+                className="flex-1"
+              />
+              <Button onClick={() => runYouTubeSearch(ytQuery)} disabled={ytLoading || !ytQuery.trim()} variant="hero" className="gap-1">
+                {ytLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                Search
+              </Button>
+            </div>
+            {ytError && <p className="text-xs text-destructive mt-2">{ytError}</p>}
+            {ytResults.length > 0 && (
+              <div className="mt-4 grid sm:grid-cols-2 gap-3">
+                {ytResults.map(r => (
+                  <button
+                    key={r.videoId}
+                    onClick={() => playSearchResult(r)}
+                    className={`text-left rounded-xl overflow-hidden border transition-all hover:border-primary/60 hover:shadow-[0_0_20px_-6px_hsl(var(--primary)/0.4)] ${
+                      activeId === r.videoId ? 'border-primary/60 bg-primary/5' : 'border-border bg-secondary/30'
+                    }`}
+                  >
+                    <div className="aspect-video bg-black">
+                      {r.thumbnail && <img src={r.thumbnail} alt={r.title} loading="lazy" className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="p-2.5">
+                      <p className="text-xs font-medium line-clamp-2">{r.title}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1 truncate">{r.channelTitle}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
               <div>
-                <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>
-                <h2 className="text-xl font-semibold">{active.title}</h2>
-                <p className="text-sm text-muted-foreground mt-1">{active.description}</p>
+                {!isSearchVideo && <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>}
+                {isSearchVideo && <p className="text-xs text-primary">YouTube search result</p>}
+                <h2 className="text-xl font-semibold">{playingTitle}</h2>
+                {!isSearchVideo && <p className="text-sm text-muted-foreground mt-1">{active.description}</p>}
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => toggleBookmark(active.id)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
-                  {bookmarks[active.id] ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
-                  {bookmarks[active.id] ? 'Saved' : 'Save'}
-                </button>
-                <button onClick={() => toggleDone(active.id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border flex items-center gap-1 ${
-                    completed[active.id] ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-secondary'
-                  }`}>
-                  <Check className="h-4 w-4" /> {completed[active.id] ? 'Completed' : 'Mark done'}
-                </button>
-              </div>
+              {!isSearchVideo && (
+                <div className="flex gap-2">
+                  <button onClick={() => toggleBookmark(active.id)}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
+                    {bookmarks[active.id] ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
+                    {bookmarks[active.id] ? 'Saved' : 'Save'}
+                  </button>
+                  <button onClick={() => toggleDone(active.id)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border flex items-center gap-1 ${
+                      completed[active.id] ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-secondary'
+                    }`}>
+                    <Check className="h-4 w-4" /> {completed[active.id] ? 'Completed' : 'Mark done'}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
               <iframe
-                key={active.videoId}
+                key={playingVideoId}
                 src={embedUrl}
-                title={active.title}
+                title={playingTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -300,37 +346,32 @@ const YouTubeTutor: React.FC = () => {
               />
             </div>
             <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
-              <a
-                href={ytSearchUrl}
-                target="_blank" rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
-                title="Browse more videos for this topic on YouTube"
-              >
+              <a href={ytSearchUrl} target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
                 <RefreshCw className="h-3.5 w-3.5" /> Find more videos
               </a>
-              <a
-                href={`https://www.youtube.com/watch?v=${active.videoId}`}
-                target="_blank" rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
-              >
+              <a href={`https://www.youtube.com/watch?v=${playingVideoId}`} target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
                 <ExternalLink className="h-3.5 w-3.5" /> Open on YouTube
               </a>
-              <span className="text-muted-foreground">If a video doesn't play in your region, use "Find more videos".</span>
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
-            <h3 className="text-sm font-medium mb-2">Topic roadmap</h3>
-            <ol className="space-y-2 text-sm">
-              {active.roadmap.map((step, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <span className="text-muted-foreground">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
+          {!isSearchVideo && (
+            <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+              <h3 className="text-sm font-medium mb-2">Topic roadmap</h3>
+              <ol className="space-y-2 text-sm">
+                {active.roadmap.map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="text-muted-foreground">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
+
       </div>
     </ToolPage>
   );
