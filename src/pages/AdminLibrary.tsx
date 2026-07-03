@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Upload, RefreshCw, Download, ShieldAlert, Lock, FolderTree } from 'lucide-react';
+import { Loader2, Upload, RefreshCw, Download, ShieldAlert, FolderTree } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 
