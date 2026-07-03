@@ -1,8 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw } from 'lucide-react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw, Loader2, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 /* -----------------------------------------------------------
  * Universal Learning Hub — covers all major learning fields,
@@ -106,9 +109,51 @@ const YouTubeTutor: React.FC = () => {
   const [level, setLevel] = useState<'All' | Level>('All');
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState<string>(TOPICS[0].id);
+  const [activeTitle, setActiveTitle] = useState<string>(TOPICS[0].title);
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
   const [showBookmarked, setShowBookmarked] = useState(false);
+
+  // YouTube API search state
+  const [ytQuery, setYtQuery] = useState('');
+  const [ytLoading, setYtLoading] = useState(false);
+  interface YtResult { videoId: string; title: string; description: string; channelTitle: string; thumbnail: string; publishedAt: string; }
+  const [ytResults, setYtResults] = useState<YtResult[]>([]);
+  const [ytError, setYtError] = useState<string | null>(null);
+  const searchCacheRef = useRef<Map<string, YtResult[]>>(new Map());
+
+  const runYouTubeSearch = async (q: string) => {
+    const term = q.trim();
+    if (!term) return;
+    setYtError(null);
+    const cached = searchCacheRef.current.get(term.toLowerCase());
+    if (cached) { setYtResults(cached); return; }
+    setYtLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('youtube-search', {
+        body: { q: term, maxResults: 12 },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const items: YtResult[] = (data as any)?.items ?? [];
+      searchCacheRef.current.set(term.toLowerCase(), items);
+      setYtResults(items);
+      if (items.length === 0) setYtError('No videos found. Try different keywords.');
+    } catch (e: any) {
+      const msg = e?.message || 'Search failed';
+      setYtError(msg);
+      toast({ title: 'YouTube search failed', description: msg, variant: 'destructive' });
+    } finally {
+      setYtLoading(false);
+    }
+  };
+
+  const playSearchResult = (r: YtResult) => {
+    setActiveId(r.videoId);
+    setActiveTitle(r.title);
+    // scroll player into view on mobile
+    setTimeout(() => document.getElementById('yt-player')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
 
   // Load persisted state
   useEffect(() => {
@@ -130,17 +175,17 @@ const YouTubeTutor: React.FC = () => {
       t.category.toLowerCase().includes(query.toLowerCase()))
   ), [category, level, query, showBookmarked, bookmarks]);
 
-  const active = TOPICS.find(t => t.id === activeId) || TOPICS[0];
+  const topicMatch = TOPICS.find(t => t.id === activeId);
+  const active = topicMatch || TOPICS[0];
+  const isSearchVideo = !topicMatch;
+  const playingVideoId = isSearchVideo ? activeId : active.videoId;
+  const playingTitle = isSearchVideo ? activeTitle : active.title;
   const doneCount = Object.values(completed).filter(Boolean).length;
   const progressPct = Math.round((doneCount / TOPICS.length) * 100);
 
-  // Embed strategy: YouTube deprecated `listType=search` for embeds, so we
-  // default to the curated video (privacy-enhanced domain). If a specific
-  // video ever becomes unavailable in a region, the user can click
-  // "Find more videos" to open a fresh YouTube search in a new tab.
-  const ytSearchQuery = `${active.title} ${active.level} tutorial`;
+  const ytSearchQuery = `${playingTitle} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0&modestbranding=1`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
@@ -200,7 +245,7 @@ const YouTubeTutor: React.FC = () => {
               <div key={t.id} className={`w-full p-2 rounded-lg flex items-start gap-2 transition-colors ${
                 activeId === t.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary/60'
               }`}>
-                <button onClick={() => setActiveId(t.id)} className="flex-1 text-left flex items-start gap-2 min-w-0">
+                <button onClick={() => { setActiveId(t.id); setActiveTitle(t.title); }} className="flex-1 text-left flex items-start gap-2 min-w-0">
                   <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                     completed[t.id] ? 'bg-emerald-500 border-emerald-500' : 'border-border'
                   }`}>
@@ -220,34 +265,80 @@ const YouTubeTutor: React.FC = () => {
         </div>
 
         {/* Active topic detail */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4" id="yt-player">
+          {/* YouTube API search */}
+          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-medium">Search any learning topic</h3>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={ytQuery}
+                onChange={e => setYtQuery(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') runYouTubeSearch(ytQuery); }}
+                placeholder="e.g. Excel pivot tables, calculus limits, Kinyarwanda grammar…"
+                className="flex-1"
+              />
+              <Button onClick={() => runYouTubeSearch(ytQuery)} disabled={ytLoading || !ytQuery.trim()} variant="hero" className="gap-1">
+                {ytLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                Search
+              </Button>
+            </div>
+            {ytError && <p className="text-xs text-destructive mt-2">{ytError}</p>}
+            {ytResults.length > 0 && (
+              <div className="mt-4 grid sm:grid-cols-2 gap-3">
+                {ytResults.map(r => (
+                  <button
+                    key={r.videoId}
+                    onClick={() => playSearchResult(r)}
+                    className={`text-left rounded-xl overflow-hidden border transition-all hover:border-primary/60 hover:shadow-[0_0_20px_-6px_hsl(var(--primary)/0.4)] ${
+                      activeId === r.videoId ? 'border-primary/60 bg-primary/5' : 'border-border bg-secondary/30'
+                    }`}
+                  >
+                    <div className="aspect-video bg-black">
+                      {r.thumbnail && <img src={r.thumbnail} alt={r.title} loading="lazy" className="w-full h-full object-cover" />}
+                    </div>
+                    <div className="p-2.5">
+                      <p className="text-xs font-medium line-clamp-2">{r.title}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1 truncate">{r.channelTitle}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
           <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
             <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
               <div>
-                <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>
-                <h2 className="text-xl font-semibold">{active.title}</h2>
-                <p className="text-sm text-muted-foreground mt-1">{active.description}</p>
+                {!isSearchVideo && <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>}
+                {isSearchVideo && <p className="text-xs text-primary">YouTube search result</p>}
+                <h2 className="text-xl font-semibold">{playingTitle}</h2>
+                {!isSearchVideo && <p className="text-sm text-muted-foreground mt-1">{active.description}</p>}
               </div>
-              <div className="flex gap-2">
-                <button onClick={() => toggleBookmark(active.id)}
-                  className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
-                  {bookmarks[active.id] ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
-                  {bookmarks[active.id] ? 'Saved' : 'Save'}
-                </button>
-                <button onClick={() => toggleDone(active.id)}
-                  className={`text-xs px-3 py-1.5 rounded-lg border flex items-center gap-1 ${
-                    completed[active.id] ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-secondary'
-                  }`}>
-                  <Check className="h-4 w-4" /> {completed[active.id] ? 'Completed' : 'Mark done'}
-                </button>
-              </div>
+              {!isSearchVideo && (
+                <div className="flex gap-2">
+                  <button onClick={() => toggleBookmark(active.id)}
+                    className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
+                    {bookmarks[active.id] ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
+                    {bookmarks[active.id] ? 'Saved' : 'Save'}
+                  </button>
+                  <button onClick={() => toggleDone(active.id)}
+                    className={`text-xs px-3 py-1.5 rounded-lg border flex items-center gap-1 ${
+                      completed[active.id] ? 'bg-primary text-primary-foreground border-primary' : 'border-border hover:bg-secondary'
+                    }`}>
+                    <Check className="h-4 w-4" /> {completed[active.id] ? 'Completed' : 'Mark done'}
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
               <iframe
-                key={active.videoId}
+                key={playingVideoId}
                 src={embedUrl}
-                title={active.title}
+                title={playingTitle}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
@@ -255,37 +346,32 @@ const YouTubeTutor: React.FC = () => {
               />
             </div>
             <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
-              <a
-                href={ytSearchUrl}
-                target="_blank" rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
-                title="Browse more videos for this topic on YouTube"
-              >
+              <a href={ytSearchUrl} target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
                 <RefreshCw className="h-3.5 w-3.5" /> Find more videos
               </a>
-              <a
-                href={`https://www.youtube.com/watch?v=${active.videoId}`}
-                target="_blank" rel="noopener noreferrer"
-                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1"
-              >
+              <a href={`https://www.youtube.com/watch?v=${playingVideoId}`} target="_blank" rel="noopener noreferrer"
+                className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
                 <ExternalLink className="h-3.5 w-3.5" /> Open on YouTube
               </a>
-              <span className="text-muted-foreground">If a video doesn't play in your region, use "Find more videos".</span>
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
-            <h3 className="text-sm font-medium mb-2">Topic roadmap</h3>
-            <ol className="space-y-2 text-sm">
-              {active.roadmap.map((step, i) => (
-                <li key={i} className="flex gap-2">
-                  <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center shrink-0">{i + 1}</span>
-                  <span className="text-muted-foreground">{step}</span>
-                </li>
-              ))}
-            </ol>
-          </div>
+          {!isSearchVideo && (
+            <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+              <h3 className="text-sm font-medium mb-2">Topic roadmap</h3>
+              <ol className="space-y-2 text-sm">
+                {active.roadmap.map((step, i) => (
+                  <li key={i} className="flex gap-2">
+                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-xs font-semibold flex items-center justify-center shrink-0">{i + 1}</span>
+                    <span className="text-muted-foreground">{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
+
       </div>
     </ToolPage>
   );
