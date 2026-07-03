@@ -109,9 +109,51 @@ const YouTubeTutor: React.FC = () => {
   const [level, setLevel] = useState<'All' | Level>('All');
   const [query, setQuery] = useState('');
   const [activeId, setActiveId] = useState<string>(TOPICS[0].id);
+  const [activeTitle, setActiveTitle] = useState<string>(TOPICS[0].title);
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
   const [bookmarks, setBookmarks] = useState<Record<string, boolean>>({});
   const [showBookmarked, setShowBookmarked] = useState(false);
+
+  // YouTube API search state
+  const [ytQuery, setYtQuery] = useState('');
+  const [ytLoading, setYtLoading] = useState(false);
+  interface YtResult { videoId: string; title: string; description: string; channelTitle: string; thumbnail: string; publishedAt: string; }
+  const [ytResults, setYtResults] = useState<YtResult[]>([]);
+  const [ytError, setYtError] = useState<string | null>(null);
+  const searchCacheRef = useRef<Map<string, YtResult[]>>(new Map());
+
+  const runYouTubeSearch = async (q: string) => {
+    const term = q.trim();
+    if (!term) return;
+    setYtError(null);
+    const cached = searchCacheRef.current.get(term.toLowerCase());
+    if (cached) { setYtResults(cached); return; }
+    setYtLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('youtube-search', {
+        body: { q: term, maxResults: 12 },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const items: YtResult[] = (data as any)?.items ?? [];
+      searchCacheRef.current.set(term.toLowerCase(), items);
+      setYtResults(items);
+      if (items.length === 0) setYtError('No videos found. Try different keywords.');
+    } catch (e: any) {
+      const msg = e?.message || 'Search failed';
+      setYtError(msg);
+      toast({ title: 'YouTube search failed', description: msg, variant: 'destructive' });
+    } finally {
+      setYtLoading(false);
+    }
+  };
+
+  const playSearchResult = (r: YtResult) => {
+    setActiveId(r.videoId);
+    setActiveTitle(r.title);
+    // scroll player into view on mobile
+    setTimeout(() => document.getElementById('yt-player')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
 
   // Load persisted state
   useEffect(() => {
