@@ -175,17 +175,17 @@ const YouTubeTutor: React.FC = () => {
       t.category.toLowerCase().includes(query.toLowerCase()))
   ), [category, level, query, showBookmarked, bookmarks]);
 
-  const active = TOPICS.find(t => t.id === activeId) || TOPICS[0];
+  const topicMatch = TOPICS.find(t => t.id === activeId);
+  const active = topicMatch || TOPICS[0];
+  const isSearchVideo = !topicMatch;
+  const playingVideoId = isSearchVideo ? activeId : active.videoId;
+  const playingTitle = isSearchVideo ? activeTitle : active.title;
   const doneCount = Object.values(completed).filter(Boolean).length;
   const progressPct = Math.round((doneCount / TOPICS.length) * 100);
 
-  // Embed strategy: YouTube deprecated `listType=search` for embeds, so we
-  // default to the curated video (privacy-enhanced domain). If a specific
-  // video ever becomes unavailable in a region, the user can click
-  // "Find more videos" to open a fresh YouTube search in a new tab.
-  const ytSearchQuery = `${active.title} ${active.level} tutorial`;
+  const ytSearchQuery = `${playingTitle} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${active.videoId}?rel=0&modestbranding=1`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
