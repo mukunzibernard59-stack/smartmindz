@@ -1,8 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw } from 'lucide-react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { Youtube, Check, Bookmark, BookmarkCheck, Search, ExternalLink, RefreshCw, Loader2, Sparkles } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 /* -----------------------------------------------------------
  * Universal Learning Hub — covers all major learning fields,
