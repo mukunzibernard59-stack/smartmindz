@@ -145,7 +145,7 @@ const AdminLibrary: React.FC = () => {
     setDragActive(false);
   };
 
-  useEffect(() => { if (isAdmin && unlocked) { loadJobs(); loadCategories(); } }, [isAdmin, unlocked]);
+  useEffect(() => { if (isAdmin) { loadJobs(); loadCategories(); } }, [isAdmin]);
 
   // Cascade: category -> courses
   useEffect(() => {
