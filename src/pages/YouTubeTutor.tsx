@@ -245,7 +245,7 @@ const YouTubeTutor: React.FC = () => {
               <div key={t.id} className={`w-full p-2 rounded-lg flex items-start gap-2 transition-colors ${
                 activeId === t.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary/60'
               }`}>
-                <button onClick={() => setActiveId(t.id)} className="flex-1 text-left flex items-start gap-2 min-w-0">
+                <button onClick={() => { setActiveId(t.id); setActiveTitle(t.title); }} className="flex-1 text-left flex items-start gap-2 min-w-0">
                   <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
                     completed[t.id] ? 'bg-emerald-500 border-emerald-500' : 'border-border'
                   }`}>
