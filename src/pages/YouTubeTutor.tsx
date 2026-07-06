@@ -205,10 +205,6 @@ const YouTubeTutor: React.FC = () => {
         {/* Sidebar: filters + topic list */}
         <div className="lg:col-span-1 space-y-3">
           <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search any topic…" className="pl-8" />
-            </div>
             <div>
               <label className="text-xs text-muted-foreground">Category</label>
               <select value={category} onChange={e => setCategory(e.target.value)}
