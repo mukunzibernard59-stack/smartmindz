@@ -185,7 +185,7 @@ const YouTubeTutor: React.FC = () => {
 
   const ytSearchQuery = `${playingTitle} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
