@@ -1,6 +1,4 @@
-// YouTube Data API v3 search proxy with JWT verification and in-memory cache.
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
-
+// YouTube Data API v3 search proxy with in-memory cache.
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -8,27 +6,15 @@ const corsHeaders = {
 };
 
 const API_KEY = Deno.env.get('youtube') ?? Deno.env.get('YOUTUBE_API_KEY');
-const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
-const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 
 interface CacheEntry { at: number; data: unknown }
 const cache = new Map<string, CacheEntry>();
-const TTL_MS = 24 * 60 * 60 * 1000; // 24h
+const TTL_MS = 24 * 60 * 60 * 1000;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
   try {
-    // JWT validation
-    const authHeader = req.headers.get('Authorization') ?? '';
-    const token = authHeader.replace('Bearer ', '');
-    if (!token) return json({ error: 'Missing auth' }, 401);
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: userData, error: userErr } = await sb.auth.getUser(token);
-    if (userErr || !userData?.user) return json({ error: 'Invalid auth' }, 401);
-
     if (!API_KEY) return json({ error: 'YouTube API key not configured' }, 500);
 
     const body = await req.json().catch(() => ({}));
