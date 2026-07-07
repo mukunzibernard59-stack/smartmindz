@@ -185,7 +185,7 @@ const YouTubeTutor: React.FC = () => {
 
   const ytSearchQuery = `${playingTitle} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&mute=1&enablejsapi=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+  const embedUrl = `https://www.youtube.com/embed/${playingVideoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&fs=1`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
@@ -335,10 +335,11 @@ const YouTubeTutor: React.FC = () => {
                 key={playingVideoId}
                 src={embedUrl}
                 title={playingTitle}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
-                referrerPolicy="strict-origin-when-cross-origin"
-                className="w-full h-full"
+                loading="lazy"
+                frameBorder={0}
+                className="w-full h-full border-0"
               />
             </div>
             <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
