@@ -185,7 +185,7 @@ const YouTubeTutor: React.FC = () => {
 
   const ytSearchQuery = `${playingTitle} tutorial`;
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ytSearchQuery)}`;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&mute=1&enablejsapi=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${playingVideoId}?rel=0&modestbranding=1&playsinline=1&autoplay=1&controls=1&fs=1&enablejsapi=1&origin=${encodeURIComponent(typeof window !== 'undefined' ? window.location.origin : '')}`;
 
   const toggleDone = (id: string) => setCompleted(c => ({ ...c, [id]: !c[id] }));
   const toggleBookmark = (id: string) => setBookmarks(b => ({ ...b, [id]: !b[id] }));
@@ -305,7 +305,8 @@ const YouTubeTutor: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+          <div id="yt-player" className="bg-card border border-border rounded-2xl p-4 sm:p-5 scroll-mt-20">
+
             <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
               <div>
                 {!isSearchVideo && <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>}
@@ -335,9 +336,10 @@ const YouTubeTutor: React.FC = () => {
                 key={playingVideoId}
                 src={embedUrl}
                 title={playingTitle}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
+                loading="eager"
                 className="w-full h-full"
               />
             </div>
