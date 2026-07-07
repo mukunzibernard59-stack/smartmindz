@@ -336,9 +336,10 @@ const YouTubeTutor: React.FC = () => {
                 key={playingVideoId}
                 src={embedUrl}
                 title={playingTitle}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                 allowFullScreen
                 referrerPolicy="strict-origin-when-cross-origin"
+                loading="eager"
                 className="w-full h-full"
               />
             </div>
