@@ -201,67 +201,9 @@ const YouTubeTutor: React.FC = () => {
         description="Learn coding, languages, design, business and more with curated video lessons, roadmaps, progress tracking and bookmarks. Free."
         path="/youtube-tutor"
       />
-      <div className="grid lg:grid-cols-3 gap-5">
-        {/* Sidebar: filters + topic list */}
-        <div className="lg:col-span-1 space-y-3">
-          <div className="bg-card border border-border rounded-2xl p-4 space-y-3">
-            <div>
-              <label className="text-xs text-muted-foreground">Category</label>
-              <select value={category} onChange={e => setCategory(e.target.value)}
-                className="w-full mt-1 px-3 py-2 bg-secondary border border-border rounded-lg text-sm">
-                {categories.map(c => <option key={c} value={c}>{c}</option>)}
-              </select>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {LEVELS.map(l => (
-                <button key={l} onClick={() => setLevel(l)}
-                  className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
-                    level === l ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary border-border'
-                  }`}
-                >{l}</button>
-              ))}
-            </div>
-            <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer">
-              <input type="checkbox" checked={showBookmarked} onChange={e => setShowBookmarked(e.target.checked)} />
-              Show only bookmarks
-            </label>
-            <div>
-              <div className="flex justify-between text-xs mb-1">
-                <span>Your progress</span><span className="font-medium">{doneCount}/{TOPICS.length}</span>
-              </div>
-              <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-primary to-accent" style={{ width: `${progressPct}%` }} />
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-card border border-border rounded-2xl p-2 max-h-[60vh] overflow-y-auto">
-            {filtered.length === 0 && <p className="p-3 text-sm text-muted-foreground">No topics match.</p>}
-            {filtered.map(t => (
-              <div key={t.id} className={`w-full p-2 rounded-lg flex items-start gap-2 transition-colors ${
-                activeId === t.id ? 'bg-primary/10 border border-primary/30' : 'hover:bg-secondary/60'
-              }`}>
-                <button onClick={() => { setActiveId(t.id); setActiveTitle(t.title); }} className="flex-1 text-left flex items-start gap-2 min-w-0">
-                  <div className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center shrink-0 ${
-                    completed[t.id] ? 'bg-emerald-500 border-emerald-500' : 'border-border'
-                  }`}>
-                    {completed[t.id] && <Check className="h-3 w-3 text-white" />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{t.title}</p>
-                    <p className="text-xs text-muted-foreground">{t.category} • {t.level}</p>
-                  </div>
-                </button>
-                <button onClick={() => toggleBookmark(t.id)} className="p-1 text-muted-foreground hover:text-primary" aria-label="Bookmark">
-                  {bookmarks[t.id] ? <BookmarkCheck className="h-4 w-4 text-primary" /> : <Bookmark className="h-4 w-4" />}
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
+      <div className="grid gap-5">
         {/* Active topic detail */}
-        <div className="lg:col-span-2 space-y-4" id="yt-player">
+        <div className="space-y-4" id="yt-player">
           {/* YouTube API search */}
           <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
             <div className="flex items-center gap-2 mb-3">
