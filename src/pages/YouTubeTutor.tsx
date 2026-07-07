@@ -305,7 +305,8 @@ const YouTubeTutor: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+          <div id="yt-player" className="bg-card border border-border rounded-2xl p-4 sm:p-5 scroll-mt-20">
+
             <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
               <div>
                 {!isSearchVideo && <p className="text-xs text-muted-foreground">{active.category} • {active.level}</p>}
