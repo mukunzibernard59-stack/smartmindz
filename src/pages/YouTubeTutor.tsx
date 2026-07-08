@@ -58,7 +58,7 @@ const YouTubeTutor: React.FC = () => {
   const playSearchResult = (r: YtResult) => {
     setActiveId(r.videoId);
     setActiveTitle(r.title);
-    setTimeout(() => document.getElementById('yt-player')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+    setTimeout(() => document.getElementById('yt-video-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
   };
 
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${activeTitle} tutorial`)}`;
@@ -118,7 +118,7 @@ const YouTubeTutor: React.FC = () => {
           )}
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
+        <div id="yt-video-player" className="bg-card border border-border rounded-2xl p-4 sm:p-5">
           <h2 className="text-xl font-semibold mb-3">{activeTitle}</h2>
           <div className="aspect-video rounded-xl overflow-hidden bg-black">
             <iframe
