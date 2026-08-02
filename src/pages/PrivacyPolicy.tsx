@@ -72,6 +72,34 @@ const PrivacyPolicy: React.FC = () => {
             </section>
 
             <section className="bg-card rounded-xl p-6 border">
+              <h2 className="text-xl font-semibold mb-4">Advertising &amp; Cookies</h2>
+              <p className="text-muted-foreground mb-4">
+                Smart Mind is free and supported by advertising. We use Google AdSense to display ads
+                on some pages of this site.
+              </p>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this or other websites.</li>
+                <li>Google's use of advertising cookies enables it and its partners to serve ads to you based on your visit to our site and/or other sites on the Internet.</li>
+                <li>Third parties may place and read cookies on your browser, or use web beacons and IP addresses, to collect information as a result of ad serving on this website.</li>
+                <li>
+                  You may opt out of personalized advertising by visiting{' '}
+                  <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google Ads Settings</a>
+                  , or opt out of third-party vendor cookies at{' '}
+                  <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">aboutads.info</a>.
+                </li>
+                <li>
+                  Learn more about{' '}
+                  <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    how Google uses data when you use our partners' sites or apps
+                  </a>.
+                </li>
+                <li>We do not use personalized advertising to target users we know to be under 13, and we do not send Google any personally identifiable or sensitive information.</li>
+                <li>We use Google Analytics, which sets cookies to measure how the site is used.</li>
+              </ul>
+            </section>
+
+
+            <section className="bg-card rounded-xl p-6 border">
               <h2 className="text-xl font-semibold mb-4">Children's Privacy</h2>
               <p className="text-muted-foreground">
                 Smart Mind is designed for educational purposes and may be used by students of all ages. 
