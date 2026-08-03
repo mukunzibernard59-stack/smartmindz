@@ -192,20 +192,26 @@ const Navbar: React.FC = () => {
                 ))}
                 <div className="flex gap-2 mt-4 px-4">
                   {isAuthenticated ? (
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setMobileMenuOpen(false); setProfileDialogOpen(true); }}
+                        className="flex items-center gap-3 flex-1 text-left rounded-lg p-1 -m-1 hover:bg-secondary/50 transition-colors"
+                      >
                         <Avatar className="h-10 w-10 border-2 border-primary/30">
                           <AvatarImage src={profile?.avatar_url || undefined} />
                           <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(profile?.full_name)}</AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-medium">{profile?.full_name || 'User'}</p>
-                          <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{profile?.full_name || 'Set your name'}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                         </div>
-                      </div>
+                        <UserCog className="h-4 w-4 text-muted-foreground shrink-0" />
+                      </button>
                       <Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-5 w-5" /></Button>
                     </div>
                   ) : (
+
                     <>
                       <Button variant="outline" className="flex-1 border-primary/20" onClick={openLogin}>{t('nav.login')}</Button>
                       <Button className="flex-1 gradient-primary text-primary-foreground" onClick={openSignup}>{t('nav.signup')}</Button>
