@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 import LoginModal from './LoginModal';
+import ProfileEditDialog from './ProfileEditDialog';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2, UserCog } from 'lucide-react';
+
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useRef, useCallback } from 'react';
@@ -25,13 +27,16 @@ import ThemeToggle from '@/components/ThemeToggle';
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile } = useAuth();
+  const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile, updateProfile } = useAuth();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const { isInstallable, install } = usePWAInstall();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleInstall = async () => {
     const installed = await install();
@@ -132,10 +137,14 @@ const Navbar: React.FC = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setProfileDialogOpen(true)} className="cursor-pointer">
+                      <UserCog className="mr-2 h-4 w-4" /><span>Edit profile</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => avatarInputRef.current?.click()} className="cursor-pointer" disabled={isUploadingAvatar}>
                       {isUploadingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
                       <span>{isUploadingAvatar ? 'Uploading...' : 'Change Photo'}</span>
                     </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" /><span>Sign out</span>
@@ -183,20 +192,26 @@ const Navbar: React.FC = () => {
                 ))}
                 <div className="flex gap-2 mt-4 px-4">
                   {isAuthenticated ? (
-                    <div className="flex items-center justify-between w-full">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between w-full gap-2">
+                      <button
+                        type="button"
+                        onClick={() => { setMobileMenuOpen(false); setProfileDialogOpen(true); }}
+                        className="flex items-center gap-3 flex-1 text-left rounded-lg p-1 -m-1 hover:bg-secondary/50 transition-colors"
+                      >
                         <Avatar className="h-10 w-10 border-2 border-primary/30">
                           <AvatarImage src={profile?.avatar_url || undefined} />
                           <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(profile?.full_name)}</AvatarFallback>
                         </Avatar>
-                        <div>
-                          <p className="font-medium">{profile?.full_name || 'User'}</p>
-                          <p className="text-xs text-muted-foreground">{user?.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{profile?.full_name || 'Set your name'}</p>
+                          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
                         </div>
-                      </div>
+                        <UserCog className="h-4 w-4 text-muted-foreground shrink-0" />
+                      </button>
                       <Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-5 w-5" /></Button>
                     </div>
                   ) : (
+
                     <>
                       <Button variant="outline" className="flex-1 border-primary/20" onClick={openLogin}>{t('nav.login')}</Button>
                       <Button className="flex-1 gradient-primary text-primary-foreground" onClick={openSignup}>{t('nav.signup')}</Button>
@@ -217,11 +232,30 @@ const Navbar: React.FC = () => {
         className="hidden"
       />
 
+      <ProfileEditDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        fullName={profile?.full_name}
+        avatarUrl={profile?.avatar_url}
+        email={user?.email}
+        onSaveName={async (name) => {
+          const res = await updateProfile({ full_name: name });
+          if (!res.error) refreshProfile();
+          return res;
+        }}
+        onUploadPhoto={async (file) => {
+          const res = await uploadAvatar(file);
+          if (!res.error) refreshProfile();
+          return res;
+        }}
+      />
+
       <LoginModal 
         open={loginModalOpen} 
         onOpenChange={setLoginModalOpen}
         defaultTab={signupMode ? 'signup' : 'login'}
       />
+
     </>
   );
 };
