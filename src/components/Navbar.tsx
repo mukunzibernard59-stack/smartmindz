@@ -232,11 +232,30 @@ const Navbar: React.FC = () => {
         className="hidden"
       />
 
+      <ProfileEditDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        fullName={profile?.full_name}
+        avatarUrl={profile?.avatar_url}
+        email={user?.email}
+        onSaveName={async (name) => {
+          const res = await updateProfile({ full_name: name });
+          if (!res.error) refreshProfile();
+          return res;
+        }}
+        onUploadPhoto={async (file) => {
+          const res = await uploadAvatar(file);
+          if (!res.error) refreshProfile();
+          return res;
+        }}
+      />
+
       <LoginModal 
         open={loginModalOpen} 
         onOpenChange={setLoginModalOpen}
         defaultTab={signupMode ? 'signup' : 'login'}
       />
+
     </>
   );
 };
