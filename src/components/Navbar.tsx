@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 import LoginModal from './LoginModal';
+import ProfileEditDialog from './ProfileEditDialog';
 import { Button } from '@/components/ui/button';
-import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2 } from 'lucide-react';
+import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, Loader2, UserCog } from 'lucide-react';
+
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
 import { useRef, useCallback } from 'react';
