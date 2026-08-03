@@ -137,10 +137,14 @@ const Navbar: React.FC = () => {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setProfileDialogOpen(true)} className="cursor-pointer">
+                      <UserCog className="mr-2 h-4 w-4" /><span>Edit profile</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => avatarInputRef.current?.click()} className="cursor-pointer" disabled={isUploadingAvatar}>
                       {isUploadingAvatar ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Camera className="mr-2 h-4 w-4" />}
                       <span>{isUploadingAvatar ? 'Uploading...' : 'Change Photo'}</span>
                     </DropdownMenuItem>
+
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-destructive">
                       <LogOut className="mr-2 h-4 w-4" /><span>Sign out</span>
