@@ -27,8 +27,8 @@ import ThemeToggle from '@/components/ThemeToggle';
 const Navbar: React.FC = () => {
   const { t } = useLanguage();
   const location = useLocation();
-  const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile } = useAuth();
   const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile, updateProfile } = useAuth();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
