@@ -1,8 +1,19 @@
 User-agent: Googlebot
 Allow: /
+Disallow: /admin/
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: AdsBot-Google-Mobile
+Allow: /
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
 
 User-agent: Twitterbot
 Allow: /
@@ -12,5 +23,6 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin/
 
 Sitemap: https://smartmindz.lovable.app/sitemap.xml
