@@ -28,12 +28,15 @@ const Navbar: React.FC = () => {
   const { t } = useLanguage();
   const location = useLocation();
   const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile } = useAuth();
+  const { user, profile, isAuthenticated, signOut, uploadAvatar, refreshProfile, updateProfile } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const { isInstallable, install } = usePWAInstall();
   const avatarInputRef = useRef<HTMLInputElement>(null);
+
 
   const handleInstall = async () => {
     const installed = await install();
