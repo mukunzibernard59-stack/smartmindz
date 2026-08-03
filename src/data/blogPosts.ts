@@ -20,7 +20,7 @@ export const posts: BlogPost[] = [
     description: 'A practical, step-by-step revision plan for Rwanda TVET students preparing for national assessments — from planning your week to the night before the exam.',
     author: 'SmartMind Team',
     date: '2026-05-12',
-    readMinutes: 8,
+    readMinutes: 4,
     tags: ['TVET', 'Study', 'Rwanda'],
     content: `Rwanda TVET national assessments are unlike most school exams. They are designed around practical competencies, not memorized theory, which means your revision needs to look very different from the "read the textbook three times" habit most of us grew up with. This guide walks you through a revision system that consistently helps our TVET students score in the top band — and it costs nothing but your time.
 
@@ -66,7 +66,7 @@ Week one: build the competency map and clear the easiest red items. Week two: at
     description: 'How bilingual learners in Rwanda can use SmartMind to grow both Kinyarwanda and English at the same time — with concrete daily habits.',
     author: 'SmartMind Team',
     date: '2026-05-18',
-    readMinutes: 6,
+    readMinutes: 3,
     tags: ['Language', 'Kinyarwanda', 'English'],
     content: `Rwandans grow up code-switching. In one conversation you might mix Kinyarwanda, English, French, and Swahili without noticing. That linguistic flexibility is a superpower — but it can also mean neither language reaches the depth needed for university, work, or writing. Here is how to deliberately grow both Kinyarwanda and English at the same time.
 
@@ -112,7 +112,7 @@ Fifteen minutes daily beats two hours on Sunday. A workable week looks like this
     description: 'A practical review of the most useful free study tools available to students across Africa this year — what each one is good for and what to skip.',
     author: 'SmartMind Team',
     date: '2026-06-02',
-    readMinutes: 7,
+    readMinutes: 3,
     tags: ['Tools', 'Study', 'Africa'],
     content: `The last two years have quietly transformed what a student with a phone and a data bundle can do. Below is our honest 2026 shortlist of free tools that actually help African students learn faster — and the ones we recommend skipping.
 
@@ -162,7 +162,7 @@ Generated answers remain confidently wrong on local curricula, recent events, an
     description: 'A step-by-step guide for TVET graduates and young Rwandans building their first professional CV — with examples of what employers actually look for.',
     author: 'SmartMind Team',
     date: '2026-06-14',
-    readMinutes: 7,
+    readMinutes: 4,
     tags: ['Career', 'CV', 'Jobs'],
     content: `A first CV is uniquely hard to write. You feel like you have nothing to say, so you either leave it too short or you pad it with things nobody will read. This guide shows what actually goes on a strong first-job CV in Rwanda, drawn from what recruiters at both local firms and international NGOs consistently tell us.
 
@@ -212,7 +212,7 @@ Use a professional email address. Name the file "Firstname-Lastname-CV.pdf". Exp
     description: 'Practical, tested strategies for studying effectively when a smartphone is your only device — and how to keep social media from stealing your revision hours.',
     author: 'SmartMind Team',
     date: '2026-06-21',
-    readMinutes: 6,
+    readMinutes: 3,
     tags: ['Study', 'Focus', 'Habits'],
     content: `For most African students the smartphone is not a study accessory — it is the entire computer. That means the same device you use to read notes is the one buzzing with WhatsApp, TikTok, and football updates. Here is how to make it work.
 
@@ -262,7 +262,7 @@ Try twenty-five minutes of work and five of rest, and treat the rest as mandator
     description: 'An honest comparison of what a smart AI tutor does well, what only a real teacher can give you, and how to combine both for the fastest learning.',
     author: 'SmartMind Team',
     date: '2026-06-28',
-    readMinutes: 6,
+    readMinutes: 3,
     tags: ['Learning', 'AI', 'Teaching'],
     content: `AI tutors have moved from curiosity to daily study tool in less than three years. Some students now rely on them almost exclusively, and some teachers worry about being replaced. The honest answer is that AI and human teachers are good at very different things, and combining them beats either one alone.
 
@@ -308,7 +308,7 @@ Practise daily with automated help, then bring your three hardest unresolved gap
     description: 'Practical time-management strategies for Rwandan secondary and TVET students juggling long school days, chores, and self-study.',
     author: 'SmartMind Team',
     date: '2026-05-28',
-    readMinutes: 7,
+    readMinutes: 3,
     tags: ['Study', 'Productivity', 'Rwanda'],
     content: `Most time-management advice on the internet is written for adults with quiet home offices and flexible schedules. That is not the life of a Rwandan student. You wake up early, you help at home, you spend eight hours in class, you may travel long distances, and by the time you sit down to study, the electricity might be unreliable and your phone battery low. This guide is written for that reality.
 
@@ -354,7 +354,7 @@ Every Sunday, count completed blocks and compare with planned blocks. If you com
     description: 'The core digital skills — beyond typing — that employers in Rwanda now expect from every TVET graduate, and how to learn them for free.',
     author: 'SmartMind Team',
     date: '2026-06-05',
-    readMinutes: 6,
+    readMinutes: 3,
     tags: ['TVET', 'Digital Skills', 'Career'],
     content: `The Rwanda you will graduate into is not the Rwanda your teachers graduated into. Government offices, private companies, cooperatives, and even small shops now assume that a competent young worker can handle basic digital tasks without hand-holding. If your TVET training only covered your trade and not these cross-cutting digital skills, you will be at a disadvantage — no matter how skilled you are in your specialty.
 
@@ -404,7 +404,7 @@ Choose a single practical capability each term and take it to a demonstrable lev
     description: 'A step-by-step guide to preparing for entry-level job interviews in Rwanda — what to research, what to wear, what to say, and what to avoid.',
     author: 'SmartMind Team',
     date: '2026-06-12',
-    readMinutes: 7,
+    readMinutes: 3,
     tags: ['Career', 'Interview', 'Rwanda'],
     content: `You sent your CV, you got the call, and now you have one week to prepare. Most first-time applicants in Rwanda lose the job in the first five minutes of the interview — not because they lack skills, but because they were not prepared for the room. This guide fixes that.
 
@@ -454,7 +454,7 @@ Confirm the location and time the day before, plan to arrive twenty minutes earl
     description: 'A realistic reading system for busy students — how to pick books, find them cheaply in Rwanda, and finish more of what you start.',
     author: 'SmartMind Team',
     date: '2026-06-20',
-    readMinutes: 6,
+    readMinutes: 3,
     tags: ['Study', 'Reading', 'Habits'],
     content: `Reading is the single highest-leverage habit a young person can build. It expands your vocabulary in English and French, sharpens your thinking, and quietly separates you from peers who only consume short videos. But the "read one book a week" advice you see online ignores the reality of a Rwandan student's schedule and budget. Here is a system that actually works.
 
