@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Languages, Loader2, Copy, Check, ArrowRightLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Languages, Loader2, Copy, Check, ArrowRightLeft, Mic, Square, Volume2, FileText, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+
 
 /* -----------------------------------------------------------
  * Lightweight translation — uses MyMemory's free public API.
