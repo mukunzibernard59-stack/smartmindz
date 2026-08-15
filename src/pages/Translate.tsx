@@ -159,11 +159,15 @@ const Translate: React.FC = () => {
 
       const parts: string[] = [];
       for (const chunk of chunks) parts.push(await translateChunk(chunk));
-      setOutput(parts.join(' '));
+      const result = parts.join(' ');
+      setOutput(result);
+      if (fromVoiceRef.current && result) setAskOutput(true);
+      fromVoiceRef.current = false;
     } catch (e: any) {
       toast.error(e?.message || 'Translation failed.');
     } finally { setLoading(false); }
   };
+
 
   const swap = () => {
     setSource(target); setTarget(source);
