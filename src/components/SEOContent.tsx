@@ -36,7 +36,7 @@ const SEOContent: React.FC = () => {
                 create a truly <strong className="text-foreground">personalized learning app</strong> experience.
               </p>
               <p className="text-lg leading-relaxed">
-                Join thousands of learners who have discovered the power of Smartmindz.
+                Everything on Smart Mind is free to use, works on any phone, and covers the Rwanda TVET curriculum alongside general study help.
               </p>
             </div>
           </motion.div>

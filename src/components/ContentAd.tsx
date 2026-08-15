@@ -1,9 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 
 /**
- * ContentAd — AdSense unit that only renders when placed near real page content.
- * Never place this on empty tool screens, loading states, auth, admin, or offline pages.
- * The parent should have visible written content above/below.
+ * ContentAd — policy-safe AdSense unit.
+ *
+ * Google's "Google-served ads on screens without publisher-content" policy means an ad
+ * must never render on a screen that lacks substantial publisher content (tool screens,
+ * loading states, auth, admin, offline, empty results, behind-app shells).
+ *
+ * This component therefore refuses to render unless ALL of these hold:
+ *  1. The current route is an editorial/content route (allowlist below).
+ *  2. The page actually contains a meaningful amount of rendered text.
+ *  3. The viewport is wide/tall enough for content + ad to coexist.
+ *
+ * If any check fails the component renders nothing at all — no empty <ins>, no
+ * ad request, no reserved space.
  */
 interface ContentAdProps {
   slot?: string;
@@ -14,17 +25,73 @@ declare global {
   interface Window { adsbygoogle?: unknown[] }
 }
 
+/** Routes that are genuine publisher content (articles, guides, editorial pages). */
+const CONTENT_ROUTES = [/^\/$/, /^\/about$/, /^\/faq$/, /^\/how-to$/, /^\/blog$/, /^\/blog\/[^/]+$/];
+
+/** Minimum rendered characters of publisher text required before any ad request. */
+const MIN_TEXT_CHARS = 1200;
+const MIN_VIEWPORT_WIDTH = 360;
+
+const isContentRoute = (path: string) => CONTENT_ROUTES.some((r) => r.test(path));
+
+const countPageText = () => {
+  const main = document.querySelector('main') ?? document.body;
+  if (!main) return 0;
+  return (main.innerText || '').replace(/\s+/g, ' ').trim().length;
+};
+
 const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = '' }) => {
+  const { pathname } = useLocation();
+  const [eligible, setEligible] = useState(false);
   const pushed = useRef(false);
+
+  // Re-evaluate eligibility whenever the route changes; content may still be mounting.
   useEffect(() => {
-    if (pushed.current) return;
+    setEligible(false);
+    pushed.current = false;
+
+    if (!isContentRoute(pathname)) return;
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth < MIN_VIEWPORT_WIDTH) return;
+    if (!navigator.onLine) return;
+
+    let attempts = 0;
+    const check = () => {
+      attempts += 1;
+      if (countPageText() >= MIN_TEXT_CHARS) {
+        setEligible(true);
+        return;
+      }
+      if (attempts < 12) timer = window.setTimeout(check, 400);
+    };
+    let timer = window.setTimeout(check, 300);
+    return () => window.clearTimeout(timer);
+  }, [pathname]);
+
+  // Only load the AdSense library + request an ad once content is confirmed present.
+  // Loading it lazily also prevents Auto ads from injecting units on tool/app screens.
+  useEffect(() => {
+    if (!eligible || pushed.current) return;
     pushed.current = true;
+
+    const CLIENT = 'ca-pub-4985844054229933';
+    const SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${CLIENT}`;
+    if (!document.querySelector(`script[src="${SRC}"]`)) {
+      const s = document.createElement('script');
+      s.src = SRC;
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    }
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
-      /* AdSense not loaded yet — will retry on next mount */
+      /* AdSense script blocked or not loaded — leave the slot empty */
     }
-  }, []);
+  }, [eligible]);
+
+
+  if (!eligible) return null;
 
   return (
     <aside
