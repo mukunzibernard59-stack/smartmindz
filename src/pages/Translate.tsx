@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Languages, Loader2, Copy, Check, ArrowRightLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Languages, Loader2, Copy, Check, ArrowRightLeft, Mic, Square, Volume2, FileText, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+
 
 /* -----------------------------------------------------------
  * Lightweight translation — uses MyMemory's free public API.
@@ -29,6 +30,16 @@ const LANGUAGES: Lang[] = [
   { code: 'no', name: 'Norwegian' }, { code: 'da', name: 'Danish' }, { code: 'fi', name: 'Finnish' },
 ];
 
+// Best-effort BCP-47 locales for speech recognition / synthesis.
+const LOCALES: Record<string, string> = {
+  en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE', it: 'it-IT', pt: 'pt-PT', nl: 'nl-NL',
+  ru: 'ru-RU', pl: 'pl-PL', tr: 'tr-TR', ar: 'ar-SA', he: 'he-IL', fa: 'fa-IR', hi: 'hi-IN',
+  bn: 'bn-IN', ur: 'ur-PK', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW', ja: 'ja-JP', ko: 'ko-KR',
+  vi: 'vi-VN', th: 'th-TH', id: 'id-ID', ms: 'ms-MY', sw: 'sw-KE', rw: 'rw-RW', yo: 'yo-NG',
+  am: 'am-ET', el: 'el-GR', cs: 'cs-CZ', hu: 'hu-HU', ro: 'ro-RO', uk: 'uk-UA', sv: 'sv-SE',
+  no: 'nb-NO', da: 'da-DK', fi: 'fi-FI',
+};
+
 const Translate: React.FC = () => {
   const [text, setText] = useState('');
   const [source, setSource] = useState('en');
@@ -36,15 +47,87 @@ const Translate: React.FC = () => {
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [askOutput, setAskOutput] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const fromVoiceRef = useRef(false);
 
-  const translate = async () => {
-    if (!text.trim()) { toast.error('Provide text to translate.'); return; }
-    if (source === target) { setOutput(text); return; }
+  useEffect(() => () => {
+    recognitionRef.current?.abort?.();
+    window.speechSynthesis?.cancel();
+  }, []);
+
+  const startRecording = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    try {
+      const rec = new SR();
+      recognitionRef.current = rec;
+      rec.lang = LOCALES[source] || 'en-US';
+      rec.continuous = true;
+      rec.interimResults = true;
+      let final = '';
+      rec.onresult = (e: any) => {
+        let interim = '';
+        final = '';
+        for (let i = 0; i < e.results.length; i++) {
+          const r = e.results[i];
+          if (r.isFinal) final += r[0].transcript + ' ';
+          else interim += r[0].transcript;
+        }
+        setText((final + interim).trim());
+      };
+      rec.onerror = (e: any) => {
+        if (e.error === 'not-allowed') toast.error('Microphone permission denied.');
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') toast.error('Voice input failed.');
+      };
+      rec.onend = () => { setRecording(false); recognitionRef.current = null; };
+      rec.start();
+      setRecording(true);
+      toast.info('Listening… speak now, then tap stop.');
+    } catch {
+      toast.error('Could not start voice input.');
+    }
+  };
+
+  const stopRecording = () => {
+    const rec = recognitionRef.current;
+    recognitionRef.current = null;
+    setRecording(false);
+    try { rec?.stop?.(); } catch { /* noop */ }
+    setTimeout(() => {
+      setText(prev => {
+        if (prev.trim()) { fromVoiceRef.current = true; void translate(prev); }
+        return prev;
+      });
+    }, 400);
+  };
+
+  const speak = (value: string, lang: string) => {
+    if (!('speechSynthesis' in window)) { toast.error('Speech is not supported in this browser.'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(value);
+    u.lang = LOCALES[lang] || lang;
+    u.onend = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(u);
+  };
+
+  const stopSpeaking = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
+
+
+  const translate = async (input?: string) => {
+    const src = (input ?? text).trim();
+    if (!src) { toast.error('Provide text to translate.'); return; }
+    if (source === target) { setOutput(src); return; }
     setLoading(true); setOutput('');
     try {
       // Split into safe-size chunks (works for any length).
       const chunks: string[] = [];
-      const sentences = text.split(/(?<=[.!?])\s+/);
+      const sentences = src.split(/(?<=[.!?])\s+/);
+
       let buf = '';
       for (const s of sentences) {
         if ((buf + ' ' + s).length > 1500) { if (buf) chunks.push(buf); buf = s; }
@@ -76,11 +159,15 @@ const Translate: React.FC = () => {
 
       const parts: string[] = [];
       for (const chunk of chunks) parts.push(await translateChunk(chunk));
-      setOutput(parts.join(' '));
+      const result = parts.join(' ');
+      setOutput(result);
+      if (fromVoiceRef.current && result) setAskOutput(true);
+      fromVoiceRef.current = false;
     } catch (e: any) {
       toast.error(e?.message || 'Translation failed.');
     } finally { setLoading(false); }
   };
+
 
   const swap = () => {
     setSource(target); setTarget(source);
@@ -117,19 +204,63 @@ const Translate: React.FC = () => {
             </select>
           </div>
           <Textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="Enter text to translate…" className="min-h-[220px] resize-y" />
-          <Button onClick={translate} disabled={loading} className="w-full">
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Translating…</> : <><Languages className="h-4 w-4 mr-2" />Translate</>}
-          </Button>
+            placeholder="Enter text to translate, or record your voice…" className="min-h-[220px] resize-y" />
+
+          <div className="flex gap-2">
+            <Button onClick={() => translate()} disabled={loading || recording} className="flex-1">
+              {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Translating…</> : <><Languages className="h-4 w-4 mr-2" />Translate</>}
+            </Button>
+            <Button
+              variant={recording ? 'destructive' : 'outline'}
+              onClick={recording ? stopRecording : startRecording}
+              disabled={loading}
+              title={recording ? 'Stop & translate' : 'Record your voice'}
+              className="gap-2"
+            >
+              {recording ? <><Square className="h-4 w-4" />Stop</> : <><Mic className="h-4 w-4" />Speak</>}
+            </Button>
+          </div>
+          {recording && (
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+              Listening in {LANGUAGES.find(l => l.code === source)?.name}… tap Stop to translate.
+            </p>
+          )}
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium">Translation</h3>
-            <Button variant="outline" size="sm" onClick={copy} disabled={!output}>
-              {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />} Copy
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (speaking ? stopSpeaking() : speak(output, target))}
+                disabled={!output}
+              >
+                {speaking ? <Pause className="h-4 w-4 mr-1" /> : <Volume2 className="h-4 w-4 mr-1" />}
+                {speaking ? 'Stop' : 'Listen'}
+              </Button>
+              <Button variant="outline" size="sm" onClick={copy} disabled={!output}>
+                {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />} Copy
+              </Button>
+            </div>
           </div>
+
+          {askOutput && output && (
+            <div className="mb-3 p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-2">
+              <p className="text-sm font-medium">How do you want the translation?</p>
+              <div className="flex gap-2">
+                <Button size="sm" className="flex-1 gap-2" onClick={() => { setAskOutput(false); speak(output, target); }}>
+                  <Volume2 className="h-4 w-4" /> Speak it out
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 gap-2" onClick={() => setAskOutput(false)}>
+                  <FileText className="h-4 w-4" /> Show as text
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="min-h-[260px] p-4 rounded-xl bg-secondary/40 text-sm whitespace-pre-wrap">
             {output || <span className="text-muted-foreground">Your translation will appear here.</span>}
           </div>
@@ -137,6 +268,7 @@ const Translate: React.FC = () => {
       </div>
     </ToolPage>
   );
+
 };
 
 export default Translate;
