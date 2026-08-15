@@ -68,16 +68,28 @@ const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = 
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
-  // Only request an ad once the surrounding content is confirmed present.
+  // Only load the AdSense library + request an ad once content is confirmed present.
+  // Loading it lazily also prevents Auto ads from injecting units on tool/app screens.
   useEffect(() => {
     if (!eligible || pushed.current) return;
     pushed.current = true;
+
+    const CLIENT = 'ca-pub-4985844054229933';
+    const SRC = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${CLIENT}`;
+    if (!document.querySelector(`script[src="${SRC}"]`)) {
+      const s = document.createElement('script');
+      s.src = SRC;
+      s.async = true;
+      s.crossOrigin = 'anonymous';
+      document.head.appendChild(s);
+    }
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch {
       /* AdSense script blocked or not loaded — leave the slot empty */
     }
   }, [eligible]);
+
 
   if (!eligible) return null;
 
