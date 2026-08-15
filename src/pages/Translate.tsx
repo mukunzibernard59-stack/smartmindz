@@ -204,19 +204,63 @@ const Translate: React.FC = () => {
             </select>
           </div>
           <Textarea value={text} onChange={e => setText(e.target.value)}
-            placeholder="Enter text to translate…" className="min-h-[220px] resize-y" />
-          <Button onClick={translate} disabled={loading} className="w-full">
-            {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Translating…</> : <><Languages className="h-4 w-4 mr-2" />Translate</>}
-          </Button>
+            placeholder="Enter text to translate, or record your voice…" className="min-h-[220px] resize-y" />
+
+          <div className="flex gap-2">
+            <Button onClick={() => translate()} disabled={loading || recording} className="flex-1">
+              {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Translating…</> : <><Languages className="h-4 w-4 mr-2" />Translate</>}
+            </Button>
+            <Button
+              variant={recording ? 'destructive' : 'outline'}
+              onClick={recording ? stopRecording : startRecording}
+              disabled={loading}
+              title={recording ? 'Stop & translate' : 'Record your voice'}
+              className="gap-2"
+            >
+              {recording ? <><Square className="h-4 w-4" />Stop</> : <><Mic className="h-4 w-4" />Speak</>}
+            </Button>
+          </div>
+          {recording && (
+            <p className="text-xs text-muted-foreground flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+              Listening in {LANGUAGES.find(l => l.code === source)?.name}… tap Stop to translate.
+            </p>
+          )}
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-medium">Translation</h3>
-            <Button variant="outline" size="sm" onClick={copy} disabled={!output}>
-              {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />} Copy
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => (speaking ? stopSpeaking() : speak(output, target))}
+                disabled={!output}
+              >
+                {speaking ? <Pause className="h-4 w-4 mr-1" /> : <Volume2 className="h-4 w-4 mr-1" />}
+                {speaking ? 'Stop' : 'Listen'}
+              </Button>
+              <Button variant="outline" size="sm" onClick={copy} disabled={!output}>
+                {copied ? <Check className="h-4 w-4 mr-1" /> : <Copy className="h-4 w-4 mr-1" />} Copy
+              </Button>
+            </div>
           </div>
+
+          {askOutput && output && (
+            <div className="mb-3 p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-2">
+              <p className="text-sm font-medium">How do you want the translation?</p>
+              <div className="flex gap-2">
+                <Button size="sm" className="flex-1 gap-2" onClick={() => { setAskOutput(false); speak(output, target); }}>
+                  <Volume2 className="h-4 w-4" /> Speak it out
+                </Button>
+                <Button size="sm" variant="outline" className="flex-1 gap-2" onClick={() => setAskOutput(false)}>
+                  <FileText className="h-4 w-4" /> Show as text
+                </Button>
+              </div>
+            </div>
+          )}
+
           <div className="min-h-[260px] p-4 rounded-xl bg-secondary/40 text-sm whitespace-pre-wrap">
             {output || <span className="text-muted-foreground">Your translation will appear here.</span>}
           </div>
@@ -224,6 +268,7 @@ const Translate: React.FC = () => {
       </div>
     </ToolPage>
   );
+
 };
 
 export default Translate;
