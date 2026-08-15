@@ -30,6 +30,16 @@ const LANGUAGES: Lang[] = [
   { code: 'no', name: 'Norwegian' }, { code: 'da', name: 'Danish' }, { code: 'fi', name: 'Finnish' },
 ];
 
+// Best-effort BCP-47 locales for speech recognition / synthesis.
+const LOCALES: Record<string, string> = {
+  en: 'en-US', fr: 'fr-FR', es: 'es-ES', de: 'de-DE', it: 'it-IT', pt: 'pt-PT', nl: 'nl-NL',
+  ru: 'ru-RU', pl: 'pl-PL', tr: 'tr-TR', ar: 'ar-SA', he: 'he-IL', fa: 'fa-IR', hi: 'hi-IN',
+  bn: 'bn-IN', ur: 'ur-PK', 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW', ja: 'ja-JP', ko: 'ko-KR',
+  vi: 'vi-VN', th: 'th-TH', id: 'id-ID', ms: 'ms-MY', sw: 'sw-KE', rw: 'rw-RW', yo: 'yo-NG',
+  am: 'am-ET', el: 'el-GR', cs: 'cs-CZ', hu: 'hu-HU', ro: 'ro-RO', uk: 'uk-UA', sv: 'sv-SE',
+  no: 'nb-NO', da: 'da-DK', fi: 'fi-FI',
+};
+
 const Translate: React.FC = () => {
   const [text, setText] = useState('');
   const [source, setSource] = useState('en');
@@ -37,6 +47,76 @@ const Translate: React.FC = () => {
   const [output, setOutput] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const [askOutput, setAskOutput] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const fromVoiceRef = useRef(false);
+
+  useEffect(() => () => {
+    recognitionRef.current?.abort?.();
+    window.speechSynthesis?.cancel();
+  }, []);
+
+  const startRecording = () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    try {
+      const rec = new SR();
+      recognitionRef.current = rec;
+      rec.lang = LOCALES[source] || 'en-US';
+      rec.continuous = true;
+      rec.interimResults = true;
+      let final = '';
+      rec.onresult = (e: any) => {
+        let interim = '';
+        final = '';
+        for (let i = 0; i < e.results.length; i++) {
+          const r = e.results[i];
+          if (r.isFinal) final += r[0].transcript + ' ';
+          else interim += r[0].transcript;
+        }
+        setText((final + interim).trim());
+      };
+      rec.onerror = (e: any) => {
+        if (e.error === 'not-allowed') toast.error('Microphone permission denied.');
+        else if (e.error !== 'no-speech' && e.error !== 'aborted') toast.error('Voice input failed.');
+      };
+      rec.onend = () => { setRecording(false); recognitionRef.current = null; };
+      rec.start();
+      setRecording(true);
+      toast.info('Listening… speak now, then tap stop.');
+    } catch {
+      toast.error('Could not start voice input.');
+    }
+  };
+
+  const stopRecording = () => {
+    const rec = recognitionRef.current;
+    recognitionRef.current = null;
+    setRecording(false);
+    try { rec?.stop?.(); } catch { /* noop */ }
+    setTimeout(() => {
+      setText(prev => {
+        if (prev.trim()) { fromVoiceRef.current = true; void translate(prev); }
+        return prev;
+      });
+    }, 400);
+  };
+
+  const speak = (value: string, lang: string) => {
+    if (!('speechSynthesis' in window)) { toast.error('Speech is not supported in this browser.'); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(value);
+    u.lang = LOCALES[lang] || lang;
+    u.onend = () => setSpeaking(false);
+    u.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(u);
+  };
+
+  const stopSpeaking = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
+
 
   const translate = async () => {
     if (!text.trim()) { toast.error('Provide text to translate.'); return; }
