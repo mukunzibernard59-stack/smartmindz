@@ -66,6 +66,7 @@ const AppContent = () => {
       <UpdateNotification />
       <AppRatingBanner />
       <BrowserRouter>
+        <RouteRobotsMeta />
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
             <AppSidebar />
