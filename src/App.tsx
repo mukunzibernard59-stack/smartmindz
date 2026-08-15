@@ -8,6 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
+import RouteRobotsMeta from "@/components/RouteRobotsMeta";
 import FloatingInstallButton from "@/components/FloatingInstallButton";
 import ThemeToggle from "@/components/ThemeToggle";
 import { ThemeProvider } from "@/contexts/ThemeContext";
