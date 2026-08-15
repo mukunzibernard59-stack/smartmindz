@@ -118,14 +118,16 @@ const Translate: React.FC = () => {
   const stopSpeaking = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
 
 
-  const translate = async () => {
-    if (!text.trim()) { toast.error('Provide text to translate.'); return; }
-    if (source === target) { setOutput(text); return; }
+  const translate = async (input?: string) => {
+    const src = (input ?? text).trim();
+    if (!src) { toast.error('Provide text to translate.'); return; }
+    if (source === target) { setOutput(src); return; }
     setLoading(true); setOutput('');
     try {
       // Split into safe-size chunks (works for any length).
       const chunks: string[] = [];
-      const sentences = text.split(/(?<=[.!?])\s+/);
+      const sentences = src.split(/(?<=[.!?])\s+/);
+
       let buf = '';
       for (const s of sentences) {
         if ((buf + ' ' + s).length > 1500) { if (buf) chunks.push(buf); buf = s; }
