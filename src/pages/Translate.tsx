@@ -5,6 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 /* -----------------------------------------------------------
