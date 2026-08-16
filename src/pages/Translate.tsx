@@ -49,6 +49,8 @@ const Translate: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [recording, setRecording] = useState(false);
   const [askOutput, setAskOutput] = useState(false);
+  const [askPermission, setAskPermission] = useState(false);
+
   const [speaking, setSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const fromVoiceRef = useRef(false);
