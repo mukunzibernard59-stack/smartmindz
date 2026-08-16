@@ -58,7 +58,20 @@ const Translate: React.FC = () => {
     window.speechSynthesis?.cancel();
   }, []);
 
+  // Tap handler: if permission is already granted, start immediately.
+  // Otherwise ask the user with a dialog before triggering the browser prompt.
+  const handleSpeakTap = async () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    try {
+      const status = await (navigator as any).permissions?.query?.({ name: 'microphone' as PermissionName });
+      if (status?.state === 'granted') { void startRecording(); return; }
+    } catch { /* permissions API unavailable — fall through to dialog */ }
+    setAskPermission(true);
+  };
+
   const startRecording = async () => {
+
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
     // Explicitly ask for microphone permission first so the browser prompt appears.
