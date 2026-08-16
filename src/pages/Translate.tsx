@@ -58,9 +58,26 @@ const Translate: React.FC = () => {
     window.speechSynthesis?.cancel();
   }, []);
 
-  const startRecording = () => {
+  const startRecording = async () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    // Explicitly ask for microphone permission first so the browser prompt appears.
+    try {
+      if (navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(t => t.stop());
+      }
+    } catch (err: any) {
+      if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
+        toast.error('Microphone blocked. Allow microphone access in your browser settings, then try again.');
+      } else if (err?.name === 'NotFoundError') {
+        toast.error('No microphone found on this device.');
+      } else {
+        toast.error('Could not access the microphone.');
+      }
+      return;
+    }
+
     try {
       const rec = new SR();
       recognitionRef.current = rec;
