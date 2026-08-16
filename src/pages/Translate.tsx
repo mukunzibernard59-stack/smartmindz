@@ -338,6 +338,20 @@ const Translate: React.FC = () => {
           </div>
         </div>
       </div>
+      <AlertDialog open={askPermission} onOpenChange={setAskPermission}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Allow microphone access?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We need your microphone to record and translate your voice. Audio is only used for this translation.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setAskPermission(false); void startRecording(); }}>Yes, allow</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ToolPage>
   );
 
