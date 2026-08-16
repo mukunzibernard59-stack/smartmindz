@@ -5,6 +5,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import ToolPage from '@/components/tools/ToolPage';
 import SEO from '@/components/SEO';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 
 /* -----------------------------------------------------------
@@ -49,6 +53,8 @@ const Translate: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [recording, setRecording] = useState(false);
   const [askOutput, setAskOutput] = useState(false);
+  const [askPermission, setAskPermission] = useState(false);
+
   const [speaking, setSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const fromVoiceRef = useRef(false);
@@ -58,7 +64,20 @@ const Translate: React.FC = () => {
     window.speechSynthesis?.cancel();
   }, []);
 
+  // Tap handler: if permission is already granted, start immediately.
+  // Otherwise ask the user with a dialog before triggering the browser prompt.
+  const handleSpeakTap = async () => {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    try {
+      const status = await (navigator as any).permissions?.query?.({ name: 'microphone' as PermissionName });
+      if (status?.state === 'granted') { void startRecording(); return; }
+    } catch { /* permissions API unavailable — fall through to dialog */ }
+    setAskPermission(true);
+  };
+
   const startRecording = async () => {
+
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
     // Explicitly ask for microphone permission first so the browser prompt appears.
@@ -269,7 +288,7 @@ const Translate: React.FC = () => {
             </Button>
             <Button
               variant={recording ? 'destructive' : 'outline'}
-              onClick={recording ? stopRecording : startRecording}
+              onClick={recording ? stopRecording : handleSpeakTap}
               disabled={loading}
               title={recording ? 'Stop & translate' : 'Record your voice'}
               className="gap-2"
@@ -323,6 +342,20 @@ const Translate: React.FC = () => {
           </div>
         </div>
       </div>
+      <AlertDialog open={askPermission} onOpenChange={setAskPermission}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Allow microphone access?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We need your microphone to record and translate your voice. Audio is only used for this translation.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setAskPermission(false); void startRecording(); }}>Yes, allow</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ToolPage>
   );
 
