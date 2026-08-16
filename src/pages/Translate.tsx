@@ -284,7 +284,7 @@ const Translate: React.FC = () => {
             </Button>
             <Button
               variant={recording ? 'destructive' : 'outline'}
-              onClick={recording ? stopRecording : startRecording}
+              onClick={recording ? stopRecording : handleSpeakTap}
               disabled={loading}
               title={recording ? 'Stop & translate' : 'Record your voice'}
               className="gap-2"
