@@ -58,9 +58,26 @@ const Translate: React.FC = () => {
     window.speechSynthesis?.cancel();
   }, []);
 
-  const startRecording = () => {
+  const startRecording = async () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    // Explicitly ask for microphone permission first so the browser prompt appears.
+    try {
+      if (navigator.mediaDevices?.getUserMedia) {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(t => t.stop());
+      }
+    } catch (err: any) {
+      if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
+        toast.error('Microphone blocked. Allow microphone access in your browser settings, then try again.');
+      } else if (err?.name === 'NotFoundError') {
+        toast.error('No microphone found on this device.');
+      } else {
+        toast.error('Could not access the microphone.');
+      }
+      return;
+    }
+
     try {
       const rec = new SR();
       recognitionRef.current = rec;
@@ -104,16 +121,56 @@ const Translate: React.FC = () => {
     }, 400);
   };
 
+  // Pick the installed voice that best matches the target language so each
+  // language is pronounced with its own native voice, not the default one.
+  const pickVoice = (locale: string, base: string) => {
+    const voices = window.speechSynthesis.getVoices() || [];
+    const norm = (s: string) => s.toLowerCase().replace('_', '-');
+    return (
+      voices.find(v => norm(v.lang) === norm(locale)) ||
+      voices.find(v => norm(v.lang).startsWith(base.toLowerCase().split('-')[0] + '-')) ||
+      voices.find(v => norm(v.lang).split('-')[0] === base.toLowerCase().split('-')[0]) ||
+      null
+    );
+  };
+
   const speak = (value: string, lang: string) => {
     if (!('speechSynthesis' in window)) { toast.error('Speech is not supported in this browser.'); return; }
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(value);
-    u.lang = LOCALES[lang] || lang;
-    u.onend = () => setSpeaking(false);
-    u.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(u);
+    const locale = LOCALES[lang] || lang;
+
+    const run = () => {
+      const u = new SpeechSynthesisUtterance(value);
+      u.lang = locale;
+      const voice = pickVoice(locale, lang);
+      if (voice) {
+        u.voice = voice;
+        u.lang = voice.lang;
+      } else {
+        // No native voice installed — Kinyarwanda is rarely available, so fall
+        // back to Swahili phonetics which read rw text far more accurately.
+        const fb = lang === 'rw' ? pickVoice('sw-KE', 'sw') : null;
+        if (fb) { u.voice = fb; u.lang = fb.lang; }
+        else toast.info(`No ${LANGUAGES.find(l => l.code === lang)?.name} voice installed on this device — using the default voice.`);
+      }
+      u.rate = 0.95;
+      u.pitch = 1;
+      u.onend = () => setSpeaking(false);
+      u.onerror = () => setSpeaking(false);
+      setSpeaking(true);
+      window.speechSynthesis.speak(u);
+    };
+
+    // Voice list can be empty until the engine loads it.
+    if ((window.speechSynthesis.getVoices() || []).length === 0) {
+      const onVoices = () => { window.speechSynthesis.onvoiceschanged = null; run(); };
+      window.speechSynthesis.onvoiceschanged = onVoices;
+      setTimeout(() => { if (window.speechSynthesis.onvoiceschanged === onVoices) onVoices(); }, 600);
+      return;
+    }
+    run();
   };
+
 
   const stopSpeaking = () => { window.speechSynthesis?.cancel(); setSpeaking(false); };
 
