@@ -54,6 +54,7 @@ const Translate: React.FC = () => {
   const [recording, setRecording] = useState(false);
   const [askOutput, setAskOutput] = useState(false);
   const [askPermission, setAskPermission] = useState(false);
+  const [permissionBlocked, setPermissionBlocked] = useState(false);
 
   const [speaking, setSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -69,9 +70,14 @@ const Translate: React.FC = () => {
   const handleSpeakTap = async () => {
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
+    if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+      toast.error('Microphone access requires the secure published app in a supported browser.');
+      return;
+    }
     try {
       const status = await (navigator as any).permissions?.query?.({ name: 'microphone' as PermissionName });
       if (status?.state === 'granted') { void startRecording(); return; }
+      setPermissionBlocked(status?.state === 'denied');
     } catch { /* permissions API unavailable — fall through to dialog */ }
     setAskPermission(true);
   };
@@ -88,7 +94,9 @@ const Translate: React.FC = () => {
       }
     } catch (err: any) {
       if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
-        toast.error('Microphone blocked. Allow microphone access in your browser settings, then try again.');
+        setPermissionBlocked(true);
+        setAskPermission(true);
+        toast.error('Microphone access is blocked by the browser.');
       } else if (err?.name === 'NotFoundError') {
         toast.error('No microphone found on this device.');
       } else {
@@ -115,7 +123,11 @@ const Translate: React.FC = () => {
         setText((final + interim).trim());
       };
       rec.onerror = (e: any) => {
-        if (e.error === 'not-allowed') toast.error('Microphone permission denied.');
+        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+          setPermissionBlocked(true);
+          setAskPermission(true);
+          toast.error('Microphone access is blocked by the browser.');
+        }
         else if (e.error !== 'no-speech' && e.error !== 'aborted') toast.error('Voice input failed.');
       };
       rec.onend = () => { setRecording(false); recognitionRef.current = null; };
@@ -345,14 +357,18 @@ const Translate: React.FC = () => {
       <AlertDialog open={askPermission} onOpenChange={setAskPermission}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Allow microphone access?</AlertDialogTitle>
+            <AlertDialogTitle>{permissionBlocked ? 'Microphone is blocked' : 'Allow microphone access?'}</AlertDialogTitle>
             <AlertDialogDescription>
-              We need your microphone to record and translate your voice. Audio is only used for this translation.
+              {permissionBlocked
+                ? 'Your browser previously denied access. Tap the lock or site-settings icon beside the address, set Microphone to Allow, then return here and tap Try again.'
+                : 'We need your microphone to record and translate your voice. Audio is only used for this translation.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>No</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setAskPermission(false); void startRecording(); }}>Yes, allow</AlertDialogAction>
+            <AlertDialogCancel>{permissionBlocked ? 'Cancel' : 'No'}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setAskPermission(false); void startRecording(); }}>
+              {permissionBlocked ? 'Try again' : 'Yes, allow'}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
