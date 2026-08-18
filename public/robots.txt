@@ -25,4 +25,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://smartmindz.lovable.app/sitemap.xml
+Sitemap: https://yourdomain.site/sitemap.xml
