@@ -96,8 +96,12 @@ Deno.serve(async (req) => {
       headers: { Authorization: `Bearer ${FIRECRAWL_API_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ url: rootUrl, limit: 500, includeSubdomains: false }),
     });
-    const mapData = await mapRes.json();
-    if (!mapRes.ok) throw new Error(`Firecrawl map failed: ${mapData.error || mapRes.status}`);
+   
+    const mapData = await mapRes.json().catch(() => null);
+if (!mapRes.ok) {
+  throw new Error(`Firecrawl map failed: ${mapData?.error || mapData?.message || mapRes.status}`);
+}
+
 
     const allLinks: string[] = (mapData.links || mapData.data?.links || []).map((l: any) =>
       typeof l === 'string' ? l : l.url
