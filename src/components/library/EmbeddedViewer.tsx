@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import ReactMarkdown from 'react-markdown';
@@ -6,7 +6,16 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const base64ToBytes = (input: string) => {
+  const base64 = input.includes(',') ? input.slice(input.indexOf(',') + 1) : input;
+  const clean = base64.replace(/\s/g, '');
+  const binary = atob(clean);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
 
 interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
@@ -22,21 +31,30 @@ interface Props {
 const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
+  const content = resource?.content || '';
+  const isPdfData = resource?.type === 'pdf' && content.length > 0;
+
+  // Decode once into bytes so pdf.js never re-parses a huge data URL on every render.
+  const pdfFile = useMemo(() => {
+    if (!isPdfData) return null;
+    if (/^https?:\/\//i.test(content.trim())) return content.trim();
+    try {
+      return { data: base64ToBytes(content) };
+    } catch {
+      return null;
+    }
+  }, [content, isPdfData]);
 
   if (!resource) return null;
 
-  const content = resource.content || '';
   const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
-  const isPdfData = resource.type === 'pdf' && content.length > 0;
-  const pdfData = isPdfData
-    ? content.startsWith('data:application/pdf;base64,')
-      ? content
-      : `data:application/pdf;base64,${content}`
-    : null;
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPageNumber(1);
+    setPdfError(null);
   };
 
   return (
@@ -50,7 +68,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
               </DialogTitle>
             </div>
             <div className="px-8 py-6">
-              {isPdfData && pdfData ? (
+              {isPdfData && pdfFile ? (
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <span className="text-sm text-slate-600">PDF preview</span>
@@ -75,9 +93,18 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
                     </div>
                   </div>
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} loading="Loading PDF...">
-                      <Page pageNumber={pageNumber} width={840} />
-                    </Document>
+                    {pdfError ? (
+                      <p className="text-sm text-slate-600">{pdfError}</p>
+                    ) : (
+                      <Document
+                        file={pdfFile}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={(e) => setPdfError(e?.message || 'Could not open this document.')}
+                        loading="Loading PDF..."
+                      >
+                        <Page pageNumber={pageNumber} width={840} renderTextLayer={false} renderAnnotationLayer={false} />
+                      </Document>
+                    )}
                   </div>
                 </div>
               ) : (
