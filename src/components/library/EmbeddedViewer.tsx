@@ -68,7 +68,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
               </DialogTitle>
             </div>
             <div className="px-8 py-6">
-              {isPdfData && pdfData ? (
+              {isPdfData && pdfFile ? (
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <span className="text-sm text-slate-600">PDF preview</span>
@@ -93,9 +93,18 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
                     </div>
                   </div>
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                    <Document file={pdfData} onLoadSuccess={onDocumentLoadSuccess} loading="Loading PDF...">
-                      <Page pageNumber={pageNumber} width={840} />
-                    </Document>
+                    {pdfError ? (
+                      <p className="text-sm text-slate-600">{pdfError}</p>
+                    ) : (
+                      <Document
+                        file={pdfFile}
+                        onLoadSuccess={onDocumentLoadSuccess}
+                        onLoadError={(e) => setPdfError(e?.message || 'Could not open this document.')}
+                        loading="Loading PDF..."
+                      >
+                        <Page pageNumber={pageNumber} width={840} renderTextLayer={false} renderAnnotationLayer={false} />
+                      </Document>
+                    )}
                   </div>
                 </div>
               ) : (
