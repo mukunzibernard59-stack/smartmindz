@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import DOMPurify from 'dompurify';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import ReactMarkdown from 'react-markdown';
@@ -6,7 +6,16 @@ import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Document, Page, pdfjs } from 'react-pdf';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
+const base64ToBytes = (input: string) => {
+  const base64 = input.includes(',') ? input.slice(input.indexOf(',') + 1) : input;
+  const clean = base64.replace(/\s/g, '');
+  const binary = atob(clean);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+};
 
 interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
