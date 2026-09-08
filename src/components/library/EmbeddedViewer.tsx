@@ -31,21 +31,30 @@ interface Props {
 const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+
+  const content = resource?.content || '';
+  const isPdfData = resource?.type === 'pdf' && content.length > 0;
+
+  // Decode once into bytes so pdf.js never re-parses a huge data URL on every render.
+  const pdfFile = useMemo(() => {
+    if (!isPdfData) return null;
+    if (/^https?:\/\//i.test(content.trim())) return content.trim();
+    try {
+      return { data: base64ToBytes(content) };
+    } catch {
+      return null;
+    }
+  }, [content, isPdfData]);
 
   if (!resource) return null;
 
-  const content = resource.content || '';
   const isHtml = /<\/?[a-z][\s\S]*>/i.test(content);
-  const isPdfData = resource.type === 'pdf' && content.length > 0;
-  const pdfData = isPdfData
-    ? content.startsWith('data:application/pdf;base64,')
-      ? content
-      : `data:application/pdf;base64,${content}`
-    : null;
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPageNumber(1);
+    setPdfError(null);
   };
 
   return (
