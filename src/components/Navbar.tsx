@@ -47,8 +47,13 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
+    { to: '/library', label: 'Library' },
     { to: '/learn', label: t('nav.learn') },
     { to: '/dev', label: 'Dev Mode', icon: Code2 },
+    { to: '/blog', label: 'Blog' },
+    { to: '/how-to', label: 'Guides' },
+    { to: '/about', label: 'About' },
+    { to: '/faq', label: 'FAQ' },
   ];
 
   const openLogin = () => { setSignupMode(false); setLoginModalOpen(true); };
