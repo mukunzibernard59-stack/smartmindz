@@ -47,8 +47,13 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { to: '/', label: t('nav.home') },
+    { to: '/library', label: 'Library' },
     { to: '/learn', label: t('nav.learn') },
     { to: '/dev', label: 'Dev Mode', icon: Code2 },
+    { to: '/blog', label: 'Blog' },
+    { to: '/how-to', label: 'Guides' },
+    { to: '/about', label: 'About' },
+    { to: '/faq', label: 'FAQ' },
   ];
 
   const openLogin = () => { setSignupMode(false); setLoginModalOpen(true); };
@@ -101,8 +106,23 @@ const Navbar: React.FC = () => {
               </Link>
             </div>
 
-            {/* Top nav links removed — now in left sidebar */}
-            <div className="hidden md:block" />
+            {/* Main navigation */}
+            <div className="hidden md:flex items-center gap-1 lg:gap-2" aria-label="Main navigation">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  aria-current={location.pathname === link.to ? 'page' : undefined}
+                  className={`px-2.5 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${
+                    location.pathname === link.to
+                      ? 'text-primary bg-primary/10'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
 
             {/* Right Side — balanced spacing across install / language / theme / profile */}
             <div className="hidden md:flex items-center gap-4 lg:gap-5">
