@@ -7,7 +7,7 @@ import SEO from '@/components/SEO';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ChevronRight, Search, BookOpen, FileText, Link2, HelpCircle, ArrowLeft, Sparkles, AlertCircle } from 'lucide-react';
+import { ChevronRight, Search, BookOpen, FileText, Link2, HelpCircle, ArrowLeft, AlertCircle } from 'lucide-react';
 
 const EmbeddedViewer = lazy(() => import('@/components/library/EmbeddedViewer'));
 
@@ -240,9 +240,6 @@ const Library: React.FC = () => {
 
           {view.kind === 'hub' && (
             <div className="text-center py-6 mb-6">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/30 text-primary text-xs mb-3">
-                <Sparkles className="h-3 w-3" /> Rwanda TVET Library
-              </div>
               <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent mb-2">
                 Learn Your Trade. Inside the App.
               </h1>
