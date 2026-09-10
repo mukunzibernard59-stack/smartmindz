@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Download } from 'lucide-react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -16,6 +17,12 @@ const base64ToBytes = (input: string) => {
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return bytes;
 };
+
+const base64ToBlob = (input: string, mime: string) => {
+  const bytes = base64ToBytes(input);
+  return new Blob([bytes], { type: mime });
+};
+
 
 interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
@@ -32,6 +39,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const content = resource?.content || '';
   const isPdfData = resource?.type === 'pdf' && content.length > 0;
@@ -56,6 +64,48 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
     setPageNumber(1);
     setPdfError(null);
   };
+
+  const safeFileName = (title: string, ext: string) => {
+    const sanitized = title.replace(/[^a-z0-9\u00C0-\u024F\u1E00-\u1EFF_\-\s]/gi, '_').trim() || 'document';
+    return `${sanitized}.${ext}`;
+  };
+
+  const triggerDownload = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownload = async () => {
+    if (!resource) return;
+    setDownloading(true);
+    try {
+      if (resource.type === 'pdf' && content) {
+        if (/^https?:\/\//i.test(content.trim())) {
+          const res = await fetch(content.trim());
+          if (!res.ok) throw new Error('Download failed');
+          const blob = await res.blob();
+          triggerDownload(blob, safeFileName(resource.title, 'pdf'));
+        } else {
+          const blob = base64ToBlob(content, 'application/pdf');
+          triggerDownload(blob, safeFileName(resource.title, 'pdf'));
+        }
+      } else {
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        triggerDownload(blob, safeFileName(resource.title, 'txt'));
+      }
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : 'Download failed');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
 
   return (
     <Dialog open={!!resource} onOpenChange={(o) => !o && onClose()}>
@@ -90,8 +140,18 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
                       >
                         Next
                       </button>
+                      <button
+                        type="button"
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="rounded-full border border-primary bg-primary/10 px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/20 disabled:opacity-60 inline-flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        {downloading ? 'Saving…' : 'Download'}
+                      </button>
                     </div>
                   </div>
+
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
                     {pdfError ? (
                       <p className="text-sm text-slate-600">{pdfError}</p>
