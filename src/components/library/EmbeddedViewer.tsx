@@ -140,8 +140,18 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
                       >
                         Next
                       </button>
+                      <button
+                        type="button"
+                        onClick={handleDownload}
+                        disabled={downloading}
+                        className="rounded-full border border-primary bg-primary/10 px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/20 disabled:opacity-60 inline-flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        {downloading ? 'Saving…' : 'Download'}
+                      </button>
                     </div>
                   </div>
+
                   <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
                     {pdfError ? (
                       <p className="text-sm text-slate-600">{pdfError}</p>
