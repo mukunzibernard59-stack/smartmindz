@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkBreaks from 'remark-breaks';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Download } from 'lucide-react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -16,6 +17,12 @@ const base64ToBytes = (input: string) => {
   for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
   return bytes;
 };
+
+const base64ToBlob = (input: string, mime: string) => {
+  const bytes = base64ToBytes(input);
+  return new Blob([bytes], { type: mime });
+};
+
 
 interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
