@@ -39,6 +39,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   const content = resource?.content || '';
   const isPdfData = resource?.type === 'pdf' && content.length > 0;
@@ -63,6 +64,48 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, onClose }) => {
     setPageNumber(1);
     setPdfError(null);
   };
+
+  const safeFileName = (title: string, ext: string) => {
+    const sanitized = title.replace(/[^a-z0-9\u00C0-\u024F\u1E00-\u1EFF_\-\s]/gi, '_').trim() || 'document';
+    return `${sanitized}.${ext}`;
+  };
+
+  const triggerDownload = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleDownload = async () => {
+    if (!resource) return;
+    setDownloading(true);
+    try {
+      if (resource.type === 'pdf' && content) {
+        if (/^https?:\/\//i.test(content.trim())) {
+          const res = await fetch(content.trim());
+          if (!res.ok) throw new Error('Download failed');
+          const blob = await res.blob();
+          triggerDownload(blob, safeFileName(resource.title, 'pdf'));
+        } else {
+          const blob = base64ToBlob(content, 'application/pdf');
+          triggerDownload(blob, safeFileName(resource.title, 'pdf'));
+        }
+      } else {
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        triggerDownload(blob, safeFileName(resource.title, 'txt'));
+      }
+    } catch (err) {
+      setPdfError(err instanceof Error ? err.message : 'Download failed');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
 
   return (
     <Dialog open={!!resource} onOpenChange={(o) => !o && onClose()}>
