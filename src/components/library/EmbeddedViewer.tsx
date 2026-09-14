@@ -33,10 +33,12 @@ interface Resource {
 interface Props {
   resource: Resource | null;
   loading?: boolean;
+  loadError?: string | null;
+  onRetry?: () => void;
   onClose: () => void;
 }
 
-const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, onClose }) => {
+const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError = null, onRetry, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -121,6 +123,23 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, onClose })
             <div className="px-8 py-6">
               {loading ? (
                 <p className="text-sm text-slate-600 py-10 text-center">Loading document…</p>
+              ) : loadError ? (
+                <div className="py-10 text-center space-y-4">
+                  <p className="text-sm text-slate-600">{loadError}</p>
+                  {onRetry && (
+                    <button
+                      type="button"
+                      onClick={onRetry}
+                      className="rounded-full border border-primary bg-primary/10 px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/20"
+                    >
+                      Try again
+                    </button>
+                  )}
+                </div>
+              ) : !content ? (
+                <p className="text-sm text-slate-600 py-10 text-center">
+                  This document is empty or no longer available.
+                </p>
               ) : isPdfData && pdfFile ? (
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

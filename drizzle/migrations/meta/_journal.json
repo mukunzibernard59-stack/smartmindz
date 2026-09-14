@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789367936606,
+      "tag": "0000_share_admin_tvet_resources",
+      "breakpoints": true
+    }
+  ]
+}

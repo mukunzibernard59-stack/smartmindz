@@ -336,7 +336,9 @@ const Library: React.FC = () => {
       <Suspense fallback={<div className="fixed inset-0 z-50 bg-background/40 backdrop-blur-sm" />}>
         <EmbeddedViewer
           resource={resolvedViewerResource}
-          loading={!!viewerResource && resourceContentQuery.isPending}
+          loading={!!viewerResource && resourceContentQuery.isFetching && !resourceContentQuery.data}
+          loadError={resourceContentQuery.isError ? 'This document could not be opened. Please check your connection and try again.' : null}
+          onRetry={() => resourceContentQuery.refetch()}
           onClose={() => setViewerResource(null)}
         />
       </Suspense>
