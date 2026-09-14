@@ -119,7 +119,9 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, onClose })
               </DialogTitle>
             </div>
             <div className="px-8 py-6">
-              {isPdfData && pdfFile ? (
+              {loading ? (
+                <p className="text-sm text-slate-600 py-10 text-center">Loading document…</p>
+              ) : isPdfData && pdfFile ? (
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <span className="text-sm text-slate-600">PDF preview</span>
