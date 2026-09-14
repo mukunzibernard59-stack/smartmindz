@@ -160,13 +160,12 @@ const Library: React.FC = () => {
     queryKey: ['tvet', 'resource-content', viewerResource?.id],
     enabled: !!viewerResource,
     staleTime: 10 * 60 * 1000,
-    queryFn: async ({ signal }) => {
+    queryFn: async () => {
       const { data, error } = await supabase
         .from('tvet_resources')
         .select('id, content')
         .eq('id', viewerResource!.id)
-        .single()
-        .abortSignal(signal);
+        .maybeSingle();
       if (error) throw error;
       return data as { id: string; content: string | null };
     },
