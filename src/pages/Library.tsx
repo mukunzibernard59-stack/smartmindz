@@ -36,7 +36,8 @@ const CATEGORY_COLUMNS = 'id, slug, name, description, sort_order';
 const COURSE_COLUMNS = 'id, category_id, title, description, sort_order';
 const LEVEL_COLUMNS = 'id, course_id, level';
 const MODULE_COLUMNS = 'id, level_id, title, description, sort_order';
-const RESOURCE_COLUMNS = 'id, module_id, type, title, content, user_id, created_at, sort_order';
+// Meta-only columns keep course pages fast; heavy `content` (base64 PDFs) loads on demand.
+const RESOURCE_COLUMNS = 'id, module_id, type, title, user_id, created_at, sort_order';
 
 const useDebouncedValue = (value: string, delay = 250) => {
   const [debounced, setDebounced] = useState(value);
@@ -154,6 +155,26 @@ const Library: React.FC = () => {
       return (data || []) as Resource[];
     },
   });
+
+  const resourceContentQuery = useQuery({
+    queryKey: ['tvet', 'resource-content', viewerResource?.id],
+    enabled: !!viewerResource,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async ({ signal }) => {
+      const { data, error } = await supabase
+        .from('tvet_resources')
+        .select('id, content')
+        .eq('id', viewerResource!.id)
+        .single()
+        .abortSignal(signal);
+      if (error) throw error;
+      return data as { id: string; content: string | null };
+    },
+  });
+
+  const resolvedViewerResource = viewerResource
+    ? { ...viewerResource, content: resourceContentQuery.data?.content ?? null }
+    : null;
 
   const searchQuery = useQuery({
     queryKey: ['tvet', 'search', debouncedSearch],
@@ -314,7 +335,11 @@ const Library: React.FC = () => {
       </main>
 
       <Suspense fallback={<div className="fixed inset-0 z-50 bg-background/40 backdrop-blur-sm" />}>
-        <EmbeddedViewer resource={viewerResource} onClose={() => setViewerResource(null)} />
+        <EmbeddedViewer
+          resource={resolvedViewerResource}
+          loading={!!viewerResource && resourceContentQuery.isPending}
+          onClose={() => setViewerResource(null)}
+        />
       </Suspense>
     </div>
   );
