@@ -33,10 +33,12 @@ interface Resource {
 interface Props {
   resource: Resource | null;
   loading?: boolean;
+  loadError?: string | null;
+  onRetry?: () => void;
   onClose: () => void;
 }
 
-const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, onClose }) => {
+const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError = null, onRetry, onClose }) => {
   const [numPages, setNumPages] = useState(0);
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState<string | null>(null);
