@@ -226,7 +226,6 @@ const AdminLibrary: React.FC = () => {
 
     setUploading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
       const uploadType = selectedFileType === 'pdf' ? 'pdf' : 'note';
 
       const { error: insErr } = await supabase
@@ -235,7 +234,8 @@ const AdminLibrary: React.FC = () => {
           module_id: moduleId,
           title: uploadTitle.trim(),
           content: uploadContent.trim(),
-          user_id: user?.id ?? null,
+          // Shared library material: visible to every user, not just the uploader.
+          user_id: null,
           type: uploadType,
         });
 
