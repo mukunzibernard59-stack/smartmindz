@@ -14,6 +14,65 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_recipients: {
+        Row: {
+          announcement_id: string
+          created_at: string
+          id: string
+          seen_at: string | null
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          created_at?: string
+          id?: string
+          seen_at?: string | null
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          created_at?: string
+          id?: string
+          seen_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_recipients_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          audience: string
+          created_at: string
+          created_by: string | null
+          id: string
+          message: string
+          recipient_count: number
+        }
+        Insert: {
+          audience?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message: string
+          recipient_count?: number
+        }
+        Update: {
+          audience?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          message?: string
+          recipient_count?: number
+        }
+        Relationships: []
+      }
       family_members: {
         Row: {
           added_at: string
@@ -99,6 +158,7 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          last_active_at: string
           updated_at: string
           user_id: string
         }
@@ -107,6 +167,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_active_at?: string
           updated_at?: string
           user_id: string
         }
@@ -115,6 +176,7 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          last_active_at?: string
           updated_at?: string
           user_id?: string
         }
