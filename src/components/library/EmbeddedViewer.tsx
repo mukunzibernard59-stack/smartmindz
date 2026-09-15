@@ -112,11 +112,11 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError 
 
   return (
     <Dialog open={!!resource} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-5xl w-[95vw] h-[90vh] p-0 flex flex-col bg-slate-50/90 border-primary/20">
-        <div className="overflow-auto h-full p-6">
-          <div className="mx-auto w-full max-w-5xl rounded-[2rem] bg-white text-slate-900 shadow-2xl ring-1 ring-slate-200/70">
-            <div className="border-b border-slate-200 px-8 py-6 bg-slate-50 rounded-t-[2rem]">
-              <DialogTitle className="text-5xl font-black tracking-tight text-slate-900">
+      <DialogContent className="max-w-5xl w-[97vw] h-[92vh] sm:h-[90vh] p-0 flex flex-col bg-slate-50/90 border-primary/20">
+        <div className="overflow-auto h-full p-2 sm:p-6">
+          <div className="mx-auto w-full max-w-5xl rounded-2xl sm:rounded-[2rem] bg-white text-slate-900 shadow-2xl ring-1 ring-slate-200/70">
+            <div className="border-b border-slate-200 px-4 py-4 sm:px-8 sm:py-6 bg-slate-50 rounded-t-2xl sm:rounded-t-[2rem]">
+              <DialogTitle className="text-xl sm:text-3xl lg:text-5xl font-black tracking-tight text-slate-900 break-words">
                 {resource.title}
               </DialogTitle>
             </div>
