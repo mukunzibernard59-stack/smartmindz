@@ -13,6 +13,7 @@ import {
 import { Loader2, Upload, RefreshCw, Download, ShieldAlert, FolderTree } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import AnnouncementsAdmin from '@/components/admin/AnnouncementsAdmin';
 
 interface Job {
   id: string;
