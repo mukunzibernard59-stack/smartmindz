@@ -13,6 +13,7 @@ import {
 import { Loader2, Upload, RefreshCw, Download, ShieldAlert, FolderTree } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
+import AnnouncementsAdmin from '@/components/admin/AnnouncementsAdmin';
 
 interface Job {
   id: string;
@@ -288,6 +289,8 @@ const AdminLibrary: React.FC = () => {
         </h1>
         <p className="text-muted-foreground">Import from RTB, upload resources, and manage modules.</p>
       </header>
+
+      <AnnouncementsAdmin />
 
       <Card className="p-6 space-y-4 border-primary/20">
         <h2 className="font-semibold flex items-center gap-2"><Download className="h-4 w-4" /> RTB Auto-Importer</h2>

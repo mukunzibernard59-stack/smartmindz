@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.youtube-search]
 verify_jwt = false
+
+[functions.send-announcement]
+verify_jwt = false
