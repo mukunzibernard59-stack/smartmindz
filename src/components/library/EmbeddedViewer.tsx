@@ -43,6 +43,15 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError 
   const [pageNumber, setPageNumber] = useState(1);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const [pageWidth, setPageWidth] = useState(() =>
+    typeof window === 'undefined' ? 840 : Math.min(840, window.innerWidth - 60),
+  );
+
+  React.useEffect(() => {
+    const onResize = () => setPageWidth(Math.min(840, window.innerWidth - 60));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const content = resource?.content || '';
   const isPdfData = resource?.type === 'pdf' && content.length > 0;
