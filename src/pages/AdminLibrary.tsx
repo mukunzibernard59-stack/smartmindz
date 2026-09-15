@@ -290,6 +290,8 @@ const AdminLibrary: React.FC = () => {
         <p className="text-muted-foreground">Import from RTB, upload resources, and manage modules.</p>
       </header>
 
+      <AnnouncementsAdmin />
+
       <Card className="p-6 space-y-4 border-primary/20">
         <h2 className="font-semibold flex items-center gap-2"><Download className="h-4 w-4" /> RTB Auto-Importer</h2>
         <div className="grid sm:grid-cols-3 gap-3">

@@ -14,6 +14,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import UpdateNotification from "@/components/UpdateNotification";
 import AppRatingBanner from "@/components/AppRatingBanner";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
 import OfflineGate from "@/components/OfflineGate";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient } from "@/lib/queryClient";
