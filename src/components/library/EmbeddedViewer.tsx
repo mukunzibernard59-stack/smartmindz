@@ -120,7 +120,7 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError 
                 {resource.title}
               </DialogTitle>
             </div>
-            <div className="px-8 py-6">
+            <div className="px-3 py-4 sm:px-8 sm:py-6">
               {loading ? (
                 <p className="text-sm text-slate-600 py-10 text-center">Loading document…</p>
               ) : loadError ? (
@@ -184,13 +184,13 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError 
                         onLoadError={(e) => setPdfError(e?.message || 'Could not open this document.')}
                         loading="Loading PDF..."
                       >
-                        <Page pageNumber={pageNumber} width={840} renderTextLayer={false} renderAnnotationLayer={false} />
+                        <Page pageNumber={pageNumber} width={pageWidth} renderTextLayer={false} renderAnnotationLayer={false} />
                       </Document>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="prose prose-slate prose-lg prose-headings:font-semibold prose-headings:text-slate-900 prose-headings:tracking-tight prose-p:text-slate-800 prose-li:text-slate-800 prose-strong:text-slate-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-blockquote:border-l-slate-300 prose-blockquote:text-slate-600 prose-pre:bg-slate-100 prose-code:text-slate-900 prose-code:bg-slate-100 prose-img:rounded-xl max-w-none break-words">
+                <div className="prose prose-slate prose-sm sm:prose-lg prose-headings:font-semibold prose-headings:text-slate-900 prose-headings:tracking-tight prose-p:text-slate-800 prose-li:text-slate-800 prose-strong:text-slate-900 prose-a:text-primary hover:prose-a:text-primary-dark prose-blockquote:border-l-slate-300 prose-blockquote:text-slate-600 prose-pre:bg-slate-100 prose-code:text-slate-900 prose-code:bg-slate-100 prose-img:rounded-xl max-w-none break-words">
                   {isHtml ? (
                     <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }) }} />
                   ) : (
