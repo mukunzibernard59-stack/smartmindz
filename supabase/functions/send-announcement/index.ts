@@ -138,11 +138,60 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Web push via the Firebase Cloud Messaging gateway.
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const FCM_KEY = Deno.env.get("FIREBASE_MESSAGING_API_KEY");
+    let pushSent = 0;
+    if (LOVABLE_API_KEY && FCM_KEY && matching.length > 0) {
+      const ids = matching.map((u) => u.id);
+      const { data: tokens } = await admin
+        .from("push_tokens")
+        .select("token, user_id")
+        .in("user_id", ids);
+
+      for (const t of tokens || []) {
+        const name = (profileMap.get(t.user_id) as any)?.full_name || "there";
+        const text = personalize(message, name);
+        try {
+          const res = await fetch(
+            "https://connector-gateway.lovable.dev/firebase_messaging/v1/projects/_/messages:send",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "X-Connection-Api-Key": FCM_KEY,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                message: {
+                  token: t.token,
+                  notification: { title: "Smartmindz", body: text.slice(0, 240) },
+                  data: { path: "/" },
+                },
+              }),
+            },
+          );
+          if (res.ok) {
+            pushSent += 1;
+          } else {
+            const body = await res.text();
+            console.error(`FCM send failed [${res.status}]: ${body}`);
+            if (res.status === 404 || res.status === 400) {
+              await admin.from("push_tokens").delete().eq("token", t.token);
+            }
+          }
+        } catch (e) {
+          console.error("Push failed:", e);
+        }
+      }
+    }
+
     return json({
       success: true,
       announcementId: announcement.id,
       recipients: matching.length,
       emailsSent,
+      pushSent,
     });
   } catch (err) {
     console.error("send-announcement error:", err);
