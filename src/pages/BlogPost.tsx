@@ -40,7 +40,7 @@ const BlogPost: React.FC = () => {
           datePublished: post.date,
           author: { '@type': 'Organization', name: post.author },
           publisher: { '@type': 'Organization', name: 'SmartMind' },
-          mainEntityOfPage: `https://smartmindz.lovable.app/blog/${post.slug}`,
+          mainEntityOfPage: `https://smartmindz.site/blog/${post.slug}`,
         }}
       />
       <Navbar />

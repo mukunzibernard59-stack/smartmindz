@@ -16,7 +16,7 @@ const HomeworkHelper: React.FC = () => {
     "author": { "@type": "Organization", "name": "SmartMind" },
     "publisher": { "@type": "Organization", "name": "SmartMind" },
     "datePublished": "2026-04-23",
-    "mainEntityOfPage": "https://smartmindz.lovable.app/ai-homework-helper"
+    "mainEntityOfPage": "https://smartmindz.site/ai-homework-helper"
   };
 
   const faqLd = {
@@ -46,11 +46,11 @@ const HomeworkHelper: React.FC = () => {
       <Helmet>
         <title>AI That Explains Homework Step by Step (Free) | SmartMind</title>
         <meta name="description" content="Need an AI that explains homework step by step? SmartMind walks you through every problem in plain English. Free, no signup hassle. Try it now." />
-        <link rel="canonical" href="https://smartmindz.lovable.app/ai-homework-helper" />
+        <link rel="canonical" href="https://smartmindz.site/ai-homework-helper" />
         <meta property="og:title" content="AI That Explains Homework Step by Step — SmartMind" />
         <meta property="og:description" content="Stop copying answers. SmartMind is the AI tutor that explains every homework problem step by step, like a real teacher." />
         <meta property="og:type" content="article" />
-        <meta property="og:url" content="https://smartmindz.lovable.app/ai-homework-helper" />
+        <meta property="og:url" content="https://smartmindz.site/ai-homework-helper" />
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
       </Helmet>

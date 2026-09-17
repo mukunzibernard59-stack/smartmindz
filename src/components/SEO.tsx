@@ -9,7 +9,7 @@ interface SEOProps {
   jsonLd?: object | object[];
 }
 
-const BASE = 'https://smartmindz.lovable.app';
+const BASE = 'https://smartmindz.site';
 
 const SEO: React.FC<SEOProps> = ({ title, description, path, type = 'website', jsonLd }) => {
   const url = `${BASE}${path}`;

@@ -17,14 +17,14 @@ const Blog: React.FC = () => (
         '@context': 'https://schema.org',
         '@type': 'Blog',
         name: 'SmartMind Blog',
-        url: 'https://smartmindz.lovable.app/blog',
+        url: 'https://smartmindz.site/blog',
         blogPost: posts.map((p) => ({
           '@type': 'BlogPosting',
           headline: p.title,
           description: p.description,
           datePublished: p.date,
           author: { '@type': 'Organization', name: p.author },
-          url: `https://smartmindz.lovable.app/blog/${p.slug}`,
+          url: `https://smartmindz.site/blog/${p.slug}`,
         })),
       }}
     />

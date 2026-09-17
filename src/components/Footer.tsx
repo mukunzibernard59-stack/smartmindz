@@ -38,7 +38,7 @@ const Footer: React.FC = () => {
               <li><Link to="/about" className="text-muted-foreground hover:text-primary text-sm transition-colors">About Us</Link></li>
               <li><Link to="/blog" className="text-muted-foreground hover:text-primary text-sm transition-colors">Blog</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-primary text-sm transition-colors">FAQ</Link></li>
-              <li><a href="mailto:mukunzibernard59@gmail.com" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact</a></li>
+              <li><Link to="/contact" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -48,7 +48,7 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">Help Center</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-primary text-sm transition-colors">FAQ</Link></li>
-              <li><a href="mailto:mukunzibernard59@gmail.com" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact Us</a></li>
+              <li><Link to="/contact" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact Us</Link></li>
               <li><Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">Terms of Service</Link></li>
             </ul>
@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">© 2025 Smart Mind. All rights reserved.</p>
+          <p className="text-muted-foreground text-sm">© 2026 SmartMind. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <span className="text-muted-foreground text-sm">Available in:</span>
             <div className="flex gap-2">
