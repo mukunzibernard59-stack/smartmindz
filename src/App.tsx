@@ -69,6 +69,7 @@ const AppContent = () => {
       <UpdateNotification />
       <AppRatingBanner />
       <AnnouncementPopup />
+      <PushPermissionPrompt />
         <BrowserRouter basename="/">
         <RouteRobotsMeta />
         <SidebarProvider defaultOpen={true}>
