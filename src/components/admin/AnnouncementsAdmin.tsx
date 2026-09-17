@@ -55,7 +55,7 @@ const AnnouncementsAdmin: React.FC = () => {
       if (data?.error) throw new Error(data.error);
       toast({
         title: 'Announcement sent',
-        description: `${data.recipients} people will see the popup · ${data.emailsSent} emails sent.`,
+        description: `${data.recipients} people will see the popup · ${data.emailsSent} emails · ${data.pushSent ?? 0} phone notifications.`,
       });
       setMessage('');
       loadHistory();
