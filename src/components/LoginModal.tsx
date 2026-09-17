@@ -175,7 +175,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onOpenChange, defaultTab 
 
             {isLogin && (
               <div className="text-right">
-                <button type="button" className="text-xs text-primary hover:underline" onClick={() => toast.info('Password reset feature coming soon!')}>
+                <button
+                  type="button"
+                  className="text-xs text-primary hover:underline"
+                  onClick={async () => {
+                    if (!email) {
+                      toast.error('Enter your email address first, then tap "Forgot password?"');
+                      return;
+                    }
+                    const { supabase } = await import('@/integrations/supabase/client');
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                      redirectTo: `${window.location.origin}/`,
+                    });
+                    if (error) toast.error(error.message);
+                    else toast.success('Password reset link sent — check your email inbox.');
+                  }}
+                >
                   Forgot password?
                 </button>
               </div>
