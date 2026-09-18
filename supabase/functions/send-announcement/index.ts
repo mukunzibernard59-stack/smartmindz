@@ -53,6 +53,19 @@ Deno.serve(async (req) => {
 
     const admin = createClient(supabaseUrl, serviceKey);
 
+    // Duplicate guard: never save the same announcement twice.
+    const { data: existing } = await admin
+      .from("announcements")
+      .select("id, created_at")
+      .eq("message", message)
+      .limit(1);
+    if (existing && existing.length > 0) {
+      return json(
+        { error: "This announcement was already sent. Edit the message before sending again.", duplicate: true },
+        409,
+      );
+    }
+
     // Collect auth users (emails) — paginate defensively.
     const authUsers: { id: string; email?: string | null }[] = [];
     for (let page = 1; page <= 20; page += 1) {

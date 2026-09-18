@@ -42,14 +42,23 @@ const AnnouncementsAdmin: React.FC = () => {
   const insertPlaceholder = () => setMessage((prev) => `${prev}{username}`);
 
   const handleSend = async () => {
-    if (!message.trim()) {
+    const trimmed = message.trim();
+    if (!trimmed) {
       toast({ title: 'Write a message first', variant: 'destructive' });
+      return;
+    }
+    if (history.some((a) => a.message.trim() === trimmed)) {
+      toast({
+        title: 'Already sent',
+        description: 'This exact announcement is in your history. Edit the message before sending again.',
+        variant: 'destructive',
+      });
       return;
     }
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-announcement', {
-        body: { message: message.trim(), audience },
+        body: { message: trimmed, audience },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -60,7 +69,9 @@ const AnnouncementsAdmin: React.FC = () => {
       setMessage('');
       loadHistory();
     } catch (e: any) {
-      toast({ title: 'Could not send', description: e.message || String(e), variant: 'destructive' });
+      const ctx = await e?.context?.json?.().catch?.(() => null) ?? null;
+      const detail = ctx?.error || e?.message || String(e);
+      toast({ title: 'Could not send', description: detail, variant: 'destructive' });
     } finally {
       setSending(false);
     }
