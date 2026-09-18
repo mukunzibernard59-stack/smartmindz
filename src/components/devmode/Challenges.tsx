@@ -134,18 +134,6 @@ const Challenges: React.FC<ChallengesProps> = ({ completedChallenges, onStartCha
           </ScrollArea>
         </TabsContent>
 
-        <TabsContent value="quests" className="mt-4">
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Swords className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Coding Quests Coming Soon!</h3>
-              <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                Epic multi-day coding adventures with story-driven challenges.
-                Complete quests to unlock exclusive badges and rewards.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="events" className="mt-4">
           <div className="space-y-4">
