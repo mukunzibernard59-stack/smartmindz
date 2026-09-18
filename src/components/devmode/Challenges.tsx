@@ -60,14 +60,10 @@ const Challenges: React.FC<ChallengesProps> = ({ completedChallenges, onStartCha
       </Card>
 
       <Tabs defaultValue="challenges" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="challenges" className="gap-2">
             <Target className="h-4 w-4" />
             Challenges
-          </TabsTrigger>
-          <TabsTrigger value="quests" className="gap-2">
-            <Swords className="h-4 w-4" />
-            Quests
           </TabsTrigger>
           <TabsTrigger value="events" className="gap-2">
             <Rocket className="h-4 w-4" />

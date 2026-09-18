@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -41,6 +41,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const HowTo = lazy(() => import("./pages/HowTo"));
+const Contact = lazy(() => import("./pages/Contact"));
 
 
 const RouteSkeleton = () => (
@@ -89,11 +90,13 @@ const AppContent = () => {
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/how-to" element={<HowTo />} />
+                  <Route path="/contact" element={<Contact />} />
 
                   {/* Internet-required routes (gated when offline) */}
                   <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
-                  <Route path="/quiz" element={<OfflineGate toolName="Quiz"><Learn /></OfflineGate>} />
-                  <Route path="/chat" element={<OfflineGate toolName="Chat"><Learn /></OfflineGate>} />
+                  {/* Duplicate entry points redirect to the single canonical Learn screen */}
+                  <Route path="/quiz" element={<Navigate to="/learn" replace />} />
+                  <Route path="/chat" element={<Navigate to="/learn" replace />} />
                   <Route path="/dev" element={<OfflineGate toolName="Dev Mode"><DevMode /></OfflineGate>} />
                   <Route path="/ai-detector" element={<OfflineGate toolName="AI Detector"><AIDetector /></OfflineGate>} />
                   <Route path="/generate-image" element={<OfflineGate toolName="Design Studio"><GenerateImage /></OfflineGate>} />
