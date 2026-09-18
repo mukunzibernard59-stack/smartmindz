@@ -60,14 +60,10 @@ const Challenges: React.FC<ChallengesProps> = ({ completedChallenges, onStartCha
       </Card>
 
       <Tabs defaultValue="challenges" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="challenges" className="gap-2">
             <Target className="h-4 w-4" />
             Challenges
-          </TabsTrigger>
-          <TabsTrigger value="quests" className="gap-2">
-            <Swords className="h-4 w-4" />
-            Quests
           </TabsTrigger>
           <TabsTrigger value="events" className="gap-2">
             <Rocket className="h-4 w-4" />
@@ -134,18 +130,6 @@ const Challenges: React.FC<ChallengesProps> = ({ completedChallenges, onStartCha
           </ScrollArea>
         </TabsContent>
 
-        <TabsContent value="quests" className="mt-4">
-          <Card>
-            <CardContent className="py-12 text-center">
-              <Swords className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Coding Quests Coming Soon!</h3>
-              <p className="text-muted-foreground text-sm max-w-md mx-auto">
-                Epic multi-day coding adventures with story-driven challenges.
-                Complete quests to unlock exclusive badges and rewards.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="events" className="mt-4">
           <div className="space-y-4">
