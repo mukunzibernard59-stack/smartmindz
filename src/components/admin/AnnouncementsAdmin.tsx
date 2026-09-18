@@ -69,7 +69,9 @@ const AnnouncementsAdmin: React.FC = () => {
       setMessage('');
       loadHistory();
     } catch (e: any) {
-      toast({ title: 'Could not send', description: e.message || String(e), variant: 'destructive' });
+      const ctx = await e?.context?.json?.().catch?.(() => null) ?? null;
+      const detail = ctx?.error || e?.message || String(e);
+      toast({ title: 'Could not send', description: detail, variant: 'destructive' });
     } finally {
       setSending(false);
     }
