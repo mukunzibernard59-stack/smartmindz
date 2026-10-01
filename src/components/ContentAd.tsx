@@ -1,20 +1,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { getAdConsent, onAdConsentChange } from '@/lib/consent';
+import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
 
 /**
- * ContentAd — policy-safe AdSense unit.
+ * ContentAd (AdSlot) — policy-safe AdSense unit.
  *
- * Google's "Google-served ads on screens without publisher-content" policy means an ad
- * must never render on a screen that lacks substantial publisher content (tool screens,
- * loading states, auth, admin, offline, empty results, behind-app shells).
+ * Renders only when ALL hold:
+ *  1. Route is an editorial/content route (allowlist below).
+ *  2. The page contains a meaningful amount of rendered text.
+ *  3. The visitor has accepted advertising cookies (consent banner).
+ *  4. The visitor is not the site admin (no ads while testing).
+ *  5. Viewport is wide enough and the browser is online.
  *
- * This component therefore refuses to render unless ALL of these hold:
- *  1. The current route is an editorial/content route (allowlist below).
- *  2. The page actually contains a meaningful amount of rendered text.
- *  3. The viewport is wide/tall enough for content + ad to coexist.
- *
- * If any check fails the component renders nothing at all — no empty <ins>, no
- * ad request, no reserved space.
+ * One push per slot per route change, reserved min-height to avoid layout
+ * shift, and a visible "Advertisement" label.
  */
 interface ContentAdProps {
   slot?: string;
@@ -26,7 +27,16 @@ declare global {
 }
 
 /** Routes that are genuine publisher content (articles, guides, editorial pages). */
-const CONTENT_ROUTES = [/^\/$/, /^\/about$/, /^\/faq$/, /^\/how-to$/, /^\/blog$/, /^\/blog\/[^/]+$/];
+const CONTENT_ROUTES = [
+  /^\/$/,
+  /^\/about$/,
+  /^\/faq$/,
+  /^\/how-to$/,
+  /^\/blog$/,
+  /^\/blog\/[^/]+$/,
+  /^\/guides$/,
+  /^\/guides\/[^/]+$/,
+];
 
 /** Minimum rendered characters of publisher text required before any ad request. */
 const MIN_TEXT_CHARS = 1200;
@@ -42,8 +52,13 @@ const countPageText = () => {
 
 const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = '' }) => {
   const { pathname } = useLocation();
+  const { user } = useAuth();
+  const { data: isAdmin = false } = useAdminStatus(user);
   const [eligible, setEligible] = useState(false);
+  const [consent, setConsent] = useState(getAdConsent());
   const pushed = useRef(false);
+
+  useEffect(() => onAdConsentChange(setConsent), []);
 
   // Re-evaluate eligibility whenever the route changes; content may still be mounting.
   useEffect(() => {
@@ -51,11 +66,14 @@ const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = 
     pushed.current = false;
 
     if (!isContentRoute(pathname)) return;
+    if (consent !== 'accepted') return;
+    if (isAdmin) return;
     if (typeof window === 'undefined') return;
     if (window.innerWidth < MIN_VIEWPORT_WIDTH) return;
     if (!navigator.onLine) return;
 
     let attempts = 0;
+    let timer: number;
     const check = () => {
       attempts += 1;
       if (countPageText() >= MIN_TEXT_CHARS) {
@@ -64,9 +82,9 @@ const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = 
       }
       if (attempts < 12) timer = window.setTimeout(check, 400);
     };
-    let timer = window.setTimeout(check, 300);
+    timer = window.setTimeout(check, 300);
     return () => window.clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, consent, isAdmin]);
 
   // Only load the AdSense library + request an ad once content is confirmed present.
   // Loading it lazily also prevents Auto ads from injecting units on tool/app screens.
@@ -90,17 +108,19 @@ const ContentAd: React.FC<ContentAdProps> = ({ slot = '8240576962', className = 
     }
   }, [eligible]);
 
-
   if (!eligible) return null;
 
   return (
     <aside
       aria-label="Advertisement"
-      className={`my-8 w-full flex justify-center ${className}`}
+      className={`my-8 w-full flex flex-col items-center ${className}`}
     >
+      <span className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">
+        Advertisement
+      </span>
       <ins
         className="adsbygoogle"
-        style={{ display: 'block', width: '100%', minHeight: 100 }}
+        style={{ display: 'block', width: '100%', minHeight: 250 }}
         data-ad-client="ca-pub-4985844054229933"
         data-ad-slot={slot}
         data-ad-format="auto"
