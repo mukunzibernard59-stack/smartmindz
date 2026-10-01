@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="mt-16 text-center text-sm text-muted-foreground font-medium"
         >
-          The smart learning app trusted by thousands to learn/get help faster
+          A free smart learning app built for Rwandan students
         </motion.p>
 
         <motion.div

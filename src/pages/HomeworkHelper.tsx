@@ -146,7 +146,7 @@ const HomeworkHelper: React.FC = () => {
               <div className="space-y-4">
                 <div className="glass p-6 rounded-2xl border-primary/30">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-semibold">#1 PICK</span>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-semibold">OUR APP</span>
                     <h3 className="text-xl font-bold">SmartMind</h3>
                   </div>
                   <p className="text-muted-foreground">
