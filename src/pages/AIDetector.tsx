@@ -158,6 +158,9 @@ const AIDetector: React.FC = () => {
         description="Instant local text analyzer: grammar hints, readability, repeated words, sentence length, keyword density and spelling — no signup."
         path="/ai-detector"
       />
+      <p className="text-xs text-muted-foreground bg-secondary/60 border border-border rounded-lg px-3 py-2 mb-4">
+        Use this tool to learn and draft — always follow your school's academic integrity rules. Do not submit generated text as your own work.
+      </p>
       <div className="grid lg:grid-cols-2 gap-5">
         <div className="space-y-3 bg-card border border-border rounded-2xl p-4 sm:p-5">
           <label className="text-sm font-medium">Text to analyze</label>

@@ -1,12 +1,18 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import BackButton from '@/components/BackButton';
 import { Shield, Eye, Lock, Users, Mail, Calendar } from 'lucide-react';
 
 const PrivacyPolicy: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Privacy Policy — SmartMind"
+        description="How SmartMind collects, uses, and protects your data, including our use of Google AdSense, cookies, and third-party advertising vendors."
+        path="/privacy"
+      />
       <Navbar />
       <main className="flex-1 pt-24 py-16 px-4">
         <div className="container mx-auto max-w-4xl">

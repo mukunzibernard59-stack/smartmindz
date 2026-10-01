@@ -42,6 +42,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const HowTo = lazy(() => import("./pages/HowTo"));
 const Contact = lazy(() => import("./pages/Contact"));
+const CopyrightPolicy = lazy(() => import("./pages/CopyrightPolicy"));
 
 
 const RouteSkeleton = () => (
@@ -91,6 +92,7 @@ const AppContent = () => {
                   <Route path="/blog/:slug" element={<BlogPost />} />
                   <Route path="/how-to" element={<HowTo />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/copyright" element={<CopyrightPolicy />} />
 
                   {/* Internet-required routes (gated when offline) */}
                   <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />

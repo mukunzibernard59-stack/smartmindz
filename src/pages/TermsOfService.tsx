@@ -1,12 +1,18 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 import BackButton from '@/components/BackButton';
 import { FileText, AlertCircle, CheckCircle, Ban, Calendar } from 'lucide-react';
 
 const TermsOfService: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
+      <SEO
+        title="Terms of Service — SmartMind"
+        description="The terms governing your use of SmartMind, our free AI learning tools, accounts, prohibited uses, and intellectual property rules."
+        path="/terms"
+      />
       <Navbar />
       <main className="flex-1 pt-24 py-16 px-4">
         <div className="container mx-auto max-w-4xl">
