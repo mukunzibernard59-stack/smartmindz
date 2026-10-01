@@ -40,6 +40,7 @@ const routes = [
   ...blogSlugs.map((s) => `blog/${s}`),
   "privacy",
   "terms",
+  "copyright",
   "library",
   "learn",
   "dev",

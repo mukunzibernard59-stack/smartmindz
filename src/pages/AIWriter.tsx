@@ -337,6 +337,9 @@ const AIWriter: React.FC = () => {
         description="Free AI Writer with smart templates for cover letters, emails, blogs, captions and CVs. Export to PDF, DOCX or TXT instantly."
         path="/ai-writer"
       />
+      <p className="text-xs text-muted-foreground bg-secondary/60 border border-border rounded-lg px-3 py-2 mb-4">
+        Use this tool to learn and draft — always follow your school's academic integrity rules. Do not submit generated text as your own work.
+      </p>
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Form */}
         <div className="space-y-3 bg-card border border-border rounded-2xl p-4 sm:p-5">
