@@ -31,7 +31,7 @@ const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 // ---- Load blog posts (source of truth) ----
-const { blogPosts } = await import("../src/data/blogPosts.ts");
+const { posts: blogPosts } = await import("../src/data/blogPosts.ts");
 
 const mdToHtml = (md: string): string =>
   md
