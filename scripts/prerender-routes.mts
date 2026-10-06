@@ -280,4 +280,28 @@ for (const r of routes) {
 copyFileSync(indexPath, resolve(distDir, "404.html"));
 writeFileSync(resolve(distDir, "CNAME"), "smartmindz.site");
 
-console.log(`Prerendered ${count} routes with real content; wrote 404.html and CNAME.`);
+// Generate sitemap.xml from the same route list so it can never drift
+// from the real content (blog posts and guides are read from source).
+const NOINDEX_PATTERNS = [/^admin/, /^quiz$/, /^chat$/];
+const priorityFor = (p: string) =>
+  p === "" ? "1.0" : p === "blog" || p === "guides" ? "0.9" : p.includes("/") ? "0.7" : "0.8";
+const freqFor = (p: string) =>
+  p === "" || p === "blog" || p === "guides" ? "weekly" : ["privacy", "terms", "copyright"].includes(p) ? "yearly" : "monthly";
+
+const sitemapUrls = routes
+  .filter((r) => !r.noindex && !NOINDEX_PATTERNS.some((rx) => rx.test(r.path)))
+  .map(
+    (r) =>
+      `  <url><loc>${BASE}/${r.path}</loc><changefreq>${freqFor(r.path)}</changefreq><priority>${priorityFor(r.path)}</priority></url>`
+  );
+
+const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemapUrls.join("\n")}
+</urlset>
+`;
+writeFileSync(resolve(distDir, "sitemap.xml"), sitemap);
+// Keep the source copy in sync so the dev preview serves the same file.
+writeFileSync(resolve(root, "public", "sitemap.xml"), sitemap);
+
+console.log(`Prerendered ${count} routes with real content; wrote sitemap.xml (${sitemapUrls.length} URLs), 404.html and CNAME.`);
