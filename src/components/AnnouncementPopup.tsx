@@ -3,6 +3,8 @@ import { Megaphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from 'react-router-dom';
+import { isContentRoute } from '@/lib/contentRoutes';
 
 interface Pending {
   rowId: string;
@@ -11,13 +13,17 @@ interface Pending {
 
 const AnnouncementPopup: React.FC = () => {
   const { user, profile } = useAuth();
+  const { pathname } = useLocation();
   const [pending, setPending] = useState<Pending | null>(null);
   const [dismissing, setDismissing] = useState(false);
 
   const name = profile?.full_name?.trim() || user?.email?.split('@')[0] || 'there';
 
+  // Popups must never cover ad-bearing content pages.
+  const onContentPage = isContentRoute(pathname);
+
   useEffect(() => {
-    if (!user?.id) {
+    if (!user?.id || onContentPage) {
       setPending(null);
       return;
     }
@@ -51,9 +57,9 @@ const AnnouncementPopup: React.FC = () => {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [user?.id]);
+  }, [user?.id, onContentPage]);
 
-  if (!pending) return null;
+  if (!pending || onContentPage) return null;
 
   const text = pending.message.replace(/\{username\}/gi, name);
 
