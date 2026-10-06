@@ -4,16 +4,22 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { enablePush, pushAlreadyGranted, pushDecisionMade } from '@/lib/push';
+import { useLocation } from 'react-router-dom';
+import { isContentRoute } from '@/lib/contentRoutes';
 
 const DISMISS_KEY = 'push-prompt-dismissed';
 
 const PushPermissionPrompt: React.FC = () => {
   const { user } = useAuth();
+  const { pathname } = useLocation();
   const [visible, setVisible] = useState(false);
   const [working, setWorking] = useState(false);
 
+  // Permission prompts must never appear on ad-bearing content pages.
+  const onContentPage = isContentRoute(pathname);
+
   useEffect(() => {
-    if (!user) {
+    if (!user || onContentPage) {
       setVisible(false);
       return;
     }
@@ -29,7 +35,7 @@ const PushPermissionPrompt: React.FC = () => {
 
     const timer = setTimeout(() => setVisible(true), 4000);
     return () => clearTimeout(timer);
-  }, [user]);
+  }, [user, onContentPage]);
 
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, '1');

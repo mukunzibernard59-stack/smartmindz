@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { getAdConsent, onAdConsentChange } from '@/lib/consent';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { isContentRoute } from '@/lib/contentRoutes';
 
 /**
  * ContentAd (AdSlot) — policy-safe AdSense unit.
@@ -26,23 +27,9 @@ declare global {
   interface Window { adsbygoogle?: unknown[] }
 }
 
-/** Routes that are genuine publisher content (articles, guides, editorial pages). */
-const CONTENT_ROUTES = [
-  /^\/$/,
-  /^\/about$/,
-  /^\/faq$/,
-  /^\/how-to$/,
-  /^\/blog$/,
-  /^\/blog\/[^/]+$/,
-  /^\/guides$/,
-  /^\/guides\/[^/]+$/,
-];
-
 /** Minimum rendered characters of publisher text required before any ad request. */
 const MIN_TEXT_CHARS = 1200;
 const MIN_VIEWPORT_WIDTH = 360;
-
-const isContentRoute = (path: string) => CONTENT_ROUTES.some((r) => r.test(path));
 
 const countPageText = () => {
   const main = document.querySelector('main') ?? document.body;
