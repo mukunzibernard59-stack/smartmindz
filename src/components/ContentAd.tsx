@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { getAdConsent, onAdConsentChange } from '@/lib/consent';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminStatus } from '@/hooks/useAdminStatus';
+import { isContentRoute } from '@/lib/contentRoutes';
 
 /**
  * ContentAd (AdSlot) — policy-safe AdSense unit.
@@ -25,8 +26,6 @@ interface ContentAdProps {
 declare global {
   interface Window { adsbygoogle?: unknown[] }
 }
-
-import { isContentRoute } from '@/lib/contentRoutes';
 
 /** Minimum rendered characters of publisher text required before any ad request. */
 const MIN_TEXT_CHARS = 1200;
