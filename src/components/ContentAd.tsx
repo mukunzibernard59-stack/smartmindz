@@ -26,23 +26,11 @@ declare global {
   interface Window { adsbygoogle?: unknown[] }
 }
 
-/** Routes that are genuine publisher content (articles, guides, editorial pages). */
-const CONTENT_ROUTES = [
-  /^\/$/,
-  /^\/about$/,
-  /^\/faq$/,
-  /^\/how-to$/,
-  /^\/blog$/,
-  /^\/blog\/[^/]+$/,
-  /^\/guides$/,
-  /^\/guides\/[^/]+$/,
-];
+import { isContentRoute } from '@/lib/contentRoutes';
 
 /** Minimum rendered characters of publisher text required before any ad request. */
 const MIN_TEXT_CHARS = 1200;
 const MIN_VIEWPORT_WIDTH = 360;
-
-const isContentRoute = (path: string) => CONTENT_ROUTES.some((r) => r.test(path));
 
 const countPageText = () => {
   const main = document.querySelector('main') ?? document.body;
