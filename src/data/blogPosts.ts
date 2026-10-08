@@ -34,7 +34,7 @@ Divide your week into 60-minute focused blocks. In each block, pick one red item
 
 ## Practice, Don't Reread
 
-TVET is a doing subject. Reading about how to wire a distribution board does not teach you to wire one. Whenever possible, physically perform the task, even in a simplified form. When physical practice isn't possible, use the Smart Tutor in SmartMind to generate step-by-step problems on the exact topic you're weak on, then work them by hand before checking the answer. Passive reading gives roughly 10% retention after a week; active recall pushes retention above 70%.
+TVET is a doing subject. Reading about how to wire a distribution board does not teach you to wire one. Whenever possible, physically perform the task, even in a simplified form. When physical practice isn't possible, use the Smart Tutor in SmartMind to generate step-by-step problems on the exact topic you're weak on, then work them by hand before checking the answer. Passive rereading is one of the least effective ways to revise; actively recalling and practising a skill sticks far better.
 
 ## Use Past Papers Ruthlessly
 
@@ -50,7 +50,7 @@ Study groups fail when they become social events. A working TVET revision pair h
 
 ## Handle The Practical Assessment Like A Workplace Task
 
-Assessors are trained to watch process, not only the finished product. Marks are attached to preparation, workspace organisation, safety compliance, tool selection, measurement accuracy, and clean-up. Many students lose ten to fifteen percent of their total mark before they touch the task, simply by skipping personal protective equipment or laying out tools carelessly. Build the habit during practice: say the safety step out loud, lay tools in the same order every time, and check your measurement twice. On assessment day the habit runs itself while your mind handles the harder thinking.
+Assessors are trained to watch process, not only the finished product. Marks are attached to preparation, workspace organisation, safety compliance, tool selection, measurement accuracy, and clean-up. Many students lose marks before they even touch the task, simply by skipping personal protective equipment or laying out tools carelessly. Build the habit during practice: say the safety step out loud, lay tools in the same order every time, and check your measurement twice. On assessment day the habit runs itself while your mind handles the harder thinking.
 
 ## The Final Week
 
@@ -168,11 +168,11 @@ Generated answers remain confidently wrong on local curricula, recent events, an
 
 ## Keep It To One Page
 
-If you have less than five years of formal experience, your CV must fit on a single A4 page. Recruiters spend an average of seven seconds per CV on a first review. Two-page CVs from junior candidates are almost always skimmed and often skipped entirely. The SmartMind Writer Studio has a "First Job CV" template that already enforces this length.
+If you have less than five years of formal experience, your CV must fit on a single A4 page. Recruiters often spend only a few seconds on a first look at a CV. Two-page CVs from junior candidates are almost always skimmed and often skipped entirely. The SmartMind Writer Studio has a "First Job CV" template that already enforces this length.
 
 ## Lead With A Two-Sentence Profile
 
-Instead of an "Objective" line ("Seeking a position where I can grow…"), write a two-sentence profile that names what you can do and what you're looking for. Example: "TVET Level 4 graduate in Networking with hands-on experience configuring routers and small business LANs. Looking for a junior IT support role where I can contribute immediately and continue learning enterprise systems." That opening tells a recruiter, in seven seconds, whether you fit.
+Instead of an "Objective" line ("Seeking a position where I can grow…"), write a two-sentence profile that names what you can do and what you're looking for. Example: "TVET Level 4 graduate in Networking with hands-on experience configuring routers and small business LANs. Looking for a junior IT support role where I can contribute immediately and continue learning enterprise systems." That opening tells a recruiter, at a glance, whether you fit.
 
 ## Show Skills With Evidence
 
@@ -188,7 +188,7 @@ List every course, certificate, and workshop, even short online ones, with dates
 
 ## Proofread — Twice
 
-Typos in a first CV are fatal. Read your CV out loud once. Then paste it into the SmartMind Writer Studio and ask it to check grammar and clarity. Finally, ask one person you trust to read it fresh. Three passes catches 99% of mistakes.
+Typos in a first CV are fatal. Read your CV out loud once. Then paste it into the SmartMind Writer Studio and ask it to check grammar and clarity. Finally, ask one person you trust to read it fresh. Three passes, each with fresh eyes, catches almost every mistake.
 
 ## Write For The Person Who Reads For Six Seconds
 
@@ -314,7 +314,7 @@ Practise daily with automated help, then bring your three hardest unresolved gap
 
 ## Start With A Weekly Skeleton, Not A Daily Plan
 
-Daily to-do lists fail because a single interruption breaks the whole day. A weekly skeleton is different: you decide which two-hour blocks in your week are protected study time, and everything else flexes around them. For most students, the best blocks are early morning (5:30–7:00 AM) before the household wakes, and a focused session on Saturday morning. If you protect just three of these blocks per week, you will study more than 90% of your classmates.
+Daily to-do lists fail because a single interruption breaks the whole day. A weekly skeleton is different: you decide which two-hour blocks in your week are protected study time, and everything else flexes around them. For most students, the best blocks are early morning (5:30–7:00 AM) before the household wakes, and a focused session on Saturday morning. If you protect just three of these blocks every week, you will out-study most students who only study 'when they find time'.
 
 ## The 25-5 Rule
 

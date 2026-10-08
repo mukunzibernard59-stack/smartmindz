@@ -230,8 +230,8 @@ ${sections}
       });
     }
   }
-} catch {
-  // studyGuides.ts not present yet — skip guide routes.
+} catch (e) {
+  console.warn("Study guides import failed, skipping guide routes:", (e as Error)?.message);
 }
 
 // ---- Stamp each route's HTML ----
