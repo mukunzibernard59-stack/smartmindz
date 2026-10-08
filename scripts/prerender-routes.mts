@@ -215,23 +215,38 @@ try {
 <ul>${list.map((g) => `<li><a href="/guides/${g.slug}">${esc(g.title || g.subject)}</a></li>`).join("")}</ul>`,
     });
     for (const g of list) {
+      const introText = Array.isArray(g.intro) ? g.intro.join(" ") : String(g.intro || "");
+      const introHtml = (Array.isArray(g.intro) ? g.intro : [g.intro].filter(Boolean))
+        .map((p: string) => `<p>${esc(p)}</p>`)
+        .join("\n");
       const sections = (g.keyTopics || [])
         .map((t: any) => `<h2>${esc(t.title || t.name || "")}</h2><p>${esc(t.explanation || t.summary || "")}</p>`)
+        .join("\n");
+      const modules = (g.moduleSummaries || [])
+        .map((m: any) => `<h3>${esc(m.title || "")}</h3><p>${esc(m.summary || "")}</p>`)
+        .join("\n");
+      const questions = (g.practiceQuestions || [])
+        .map(
+          (q: any, i: number) =>
+            `<h3>Practice question ${i + 1}</h3><p><strong>${esc(q.question || "")}</strong></p><p>${esc(q.answer || "")}</p><p><em>${esc(q.explanation || "")}</em></p>`
+        )
         .join("\n");
       routes.push({
         path: `guides/${g.slug}`,
         title: `${g.title || g.subject} — Study Guide | SmartMind`.slice(0, 60),
-        description: (g.intro || "").replace(/\s+/g, " ").slice(0, 158),
+        description: introText.replace(/\s+/g, " ").slice(0, 158),
         body: `<article>
 <h1>${esc(g.title || g.subject)}</h1>
-<p>${esc(g.intro || "")}</p>
+${introHtml}
 ${sections}
+${modules ? `<h2>Modules</h2>\n${modules}` : ""}
+${questions ? `<h2>Practice questions</h2>\n${questions}` : ""}
 </article>`,
       });
     }
   }
-} catch {
-  // studyGuides.ts not present yet — skip guide routes.
+} catch (e) {
+  console.warn("Study guides import failed, skipping guide routes:", (e as Error)?.message);
 }
 
 // ---- Stamp each route's HTML ----

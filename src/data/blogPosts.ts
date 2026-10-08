@@ -6,19 +6,29 @@ export interface BlogPost {
   title: string;
   description: string;
   author: string;
+  authorBio?: string;
   date: string;      // ISO
+  updated?: string;
+  lastReviewed?: string;
   readMinutes: number;
   tags: string[];
   cover?: string;
+  status: 'draft' | 'published';
+  nextStep?: { label: string; path: string };
   content: string;   // Markdown-ish paragraphs separated by \n\n. Use ## for h2.
 }
 
 export const posts: BlogPost[] = [
+
   {
     slug: 'how-to-study-for-tvet-exams-rwanda',
     title: 'How to Study for Rwanda TVET Exams: A Complete Guide',
     description: 'A practical, step-by-step revision plan for Rwanda TVET students preparing for national assessments — from planning your week to the night before the exam.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Practice with the Smart Tutor', path: '/learn' },
     date: '2026-05-12',
     readMinutes: 4,
     tags: ['TVET', 'Study', 'Rwanda'],
@@ -34,7 +44,7 @@ Divide your week into 60-minute focused blocks. In each block, pick one red item
 
 ## Practice, Don't Reread
 
-TVET is a doing subject. Reading about how to wire a distribution board does not teach you to wire one. Whenever possible, physically perform the task, even in a simplified form. When physical practice isn't possible, use the Smart Tutor in SmartMind to generate step-by-step problems on the exact topic you're weak on, then work them by hand before checking the answer. Passive reading gives roughly 10% retention after a week; active recall pushes retention above 70%.
+TVET is a doing subject. Reading about how to wire a distribution board does not teach you to wire one. Whenever possible, physically perform the task, even in a simplified form. When physical practice isn't possible, use the Smart Tutor in SmartMind to generate step-by-step problems on the exact topic you're weak on, then work them by hand before checking the answer. Passive rereading is one of the least effective ways to revise; actively recalling and practising a skill sticks far better.
 
 ## Use Past Papers Ruthlessly
 
@@ -50,7 +60,7 @@ Study groups fail when they become social events. A working TVET revision pair h
 
 ## Handle The Practical Assessment Like A Workplace Task
 
-Assessors are trained to watch process, not only the finished product. Marks are attached to preparation, workspace organisation, safety compliance, tool selection, measurement accuracy, and clean-up. Many students lose ten to fifteen percent of their total mark before they touch the task, simply by skipping personal protective equipment or laying out tools carelessly. Build the habit during practice: say the safety step out loud, lay tools in the same order every time, and check your measurement twice. On assessment day the habit runs itself while your mind handles the harder thinking.
+Assessors are trained to watch process, not only the finished product. Marks are attached to preparation, workspace organisation, safety compliance, tool selection, measurement accuracy, and clean-up. Many students lose marks before they even touch the task, simply by skipping personal protective equipment or laying out tools carelessly. Build the habit during practice: say the safety step out loud, lay tools in the same order every time, and check your measurement twice. On assessment day the habit runs itself while your mind handles the harder thinking.
 
 ## The Final Week
 
@@ -58,13 +68,41 @@ In the last seven days, stop learning new material. Convert everything to recall
 
 ## A Sample Four-Week Plan
 
-Week one: build the competency map and clear the easiest red items. Week two: attack the hardest three red items with practical repetition. Week three: past papers under timed conditions, marking against the official criteria. Week four: recall drills, safety and process rehearsal, and rest. If you have less time, keep the order and shorten each phase — never skip the competency map, because without it you are guessing at what to revise.`,
+Week one: build the competency map and clear the easiest red items. Week two: attack the hardest three red items with practical repetition. Week three: past papers under timed conditions, marking against the official criteria. Week four: recall drills, safety and process rehearsal, and rest. If you have less time, keep the order and shorten each phase — never skip the competency map, because without it you are guessing at what to revise.
+
+## A Worked Example: Planning One Week For A Wiring Module
+
+Say your module is "Install a domestic distribution board" and your assessment is in four weeks. Monday you print the competency list and mark each line red, yellow, or green — suppose six items come out red, four yellow, three green. Tuesday to Friday you take one red item per day (for example, "select the correct cable size for a circuit") and practice it until you can do it without looking at notes, using the Smart Tutor in SmartMind to generate extra practice questions on cable sizing when you run out of your own examples. Saturday you redo the whole competency list honestly — items that moved to yellow or green get a tick, the rest stay red for next week. This is the whole method; everything else in this guide is detail on how to run each day well.
+
+## Common Mistakes Students Make
+
+- Revising only the topics they already enjoy, which are usually already green.
+- Reading a textbook chapter three times instead of practising the skill once.
+- Leaving past papers until the final week, so there is no time left to fix the gaps they reveal.
+- Studying for long unbroken hours and calling it progress, even though focus collapses after the first hour.
+- Skipping sleep before the exam to "fit in one more read", which usually lowers performance rather than raising it.
+
+## Quick Checklist Before Assessment Day
+
+- Competency map reviewed, with every red item worked at least once.
+- At least two past paper sections completed under timed, notes-closed conditions.
+- Tools, ID, and uniform or PPE packed the night before.
+- A full night's sleep, not a study marathon.
+- A real breakfast and enough travel time to arrive without rushing.
+
+## What To Do Next
+
+Open the Smart Tutor in SmartMind right now and ask it to quiz you on the one topic from your module you are least confident about. Work the first question by hand before checking the answer — that single habit, repeated daily, is the core of everything in this guide.`,
   },
   {
     slug: 'learn-kinyarwanda-english-with-smartmind',
     title: 'Learning Kinyarwanda and English Together: Tips That Actually Work',
     description: 'How bilingual learners in Rwanda can use SmartMind to grow both Kinyarwanda and English at the same time — with concrete daily habits.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Check your writing with Translate', path: '/translate' },
     date: '2026-05-18',
     readMinutes: 3,
     tags: ['Language', 'Kinyarwanda', 'English'],
@@ -104,13 +142,41 @@ Kinyarwanda and English differ sharply in rhythm and stress, and reading silentl
 
 ## Build A Weekly Routine You Can Keep
 
-Fifteen minutes daily beats two hours on Sunday. A workable week looks like this: Monday to Friday, ten new phrases and five minutes reading aloud; Saturday, review the week's phrases from memory and write three sentences of your own; Sunday, one real conversation, however short, in your target language. Track only two numbers — days practised and phrases used in real speech. Perfection is not the goal; consistency is.`,
+Fifteen minutes daily beats two hours on Sunday. A workable week looks like this: Monday to Friday, ten new phrases and five minutes reading aloud; Saturday, review the week's phrases from memory and write three sentences of your own; Sunday, one real conversation, however short, in your target language. Track only two numbers — days practised and phrases used in real speech. Perfection is not the goal; consistency is.
+
+## A Worked Example: One Evening, Two Languages
+
+Suppose your day was ordinary — school, a chore, homework. In Kinyarwanda you might write: "Nagiye kwishuri, nkora imirimo y'urugo, maze nkora imyitozo." In English, write the same ideas without translating word for word: "I went to school, did some housework, then did my homework." Notice English needed "some" and "my" where Kinyarwanda did not — write that difference down. That one noticed difference is worth more than copying ten vocabulary lists.
+
+## Common Mistakes To Avoid
+
+- Translating word-for-word instead of reading or writing for meaning.
+- Memorising long vocabulary lists with no sentence attached to each word.
+- Avoiding speaking because you are afraid of mistakes — mistakes are how the brain files new patterns.
+- Relying on a translator for every sentence instead of attempting it yourself first.
+- Practising only the language you are already comfortable in.
+
+## Quick Checklist For A Balanced Week
+
+- Three sentences written in each language, every evening.
+- One real spoken conversation, however short, in your weaker language.
+- Ten new phrases learned in context, not as isolated words.
+- One passage read aloud for five minutes.
+- A Sunday review of the week's vocabulary notebook.
+
+## What To Do Next
+
+Write three sentences about your day in your weaker language right now, then open the SmartMind Translator to check them — but only after you have tried, not before.`,
   },
   {
     slug: 'best-free-ai-study-tools-2026',
     title: 'The Best Free Study Tools for African Students in 2026',
     description: 'A practical review of the most useful free study tools available to students across Africa this year — what each one is good for and what to skip.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Explore the TVET Library', path: '/library' },
     date: '2026-06-02',
     readMinutes: 3,
     tags: ['Tools', 'Study', 'Africa'],
@@ -154,13 +220,40 @@ You need only four functions, not forty apps. One tool to explain concepts you a
 
 ## Where These Tools Still Fail
 
-Generated answers remain confidently wrong on local curricula, recent events, and anything requiring judgment about your specific assessment criteria. They also flatten your writing voice, which examiners notice. Use generated text as a draft to argue with, keep your own examples and your own conclusion, and always verify facts against your official course material before writing them in an exam.`,
+Generated answers remain confidently wrong on local curricula, recent events, and anything requiring judgment about your specific assessment criteria. They also flatten your writing voice, which examiners notice. Use generated text as a draft to argue with, keep your own examples and your own conclusion, and always verify facts against your official course material before writing them in an exam.
+
+## A Worked Example: Building A Simple Study Stack
+
+Imagine you are preparing for a module with heavy reading, regular written assignments, and a practical test. A workable free stack looks like this: the SmartMind Smart Tutor for explaining concepts you are stuck on and generating practice questions, the SmartMind TVET Library for Rwanda-relevant reading material, a notes app you already have for your own summaries, and past papers from your school or the official TVET portal for timed practice. That is four tools, each doing one job, used every week — not forty apps tried once each.
+
+## Common Mistakes Students Make With Study Tools
+
+- Collecting many apps and using none of them consistently.
+- Treating AI-generated answers as final instead of a draft to check and improve.
+- Choosing a tool because it is popular rather than because it fits a slow connection and a mid-range phone.
+- Paying for a subscription before confirming the free tier cannot already do the job.
+- Using a tool to skip practice entirely instead of to practice more efficiently.
+
+## Quick Checklist Before Adopting A New Tool
+
+- Works on a mid-range phone over a slow connection.
+- Has a genuinely usable free tier, not a three-question trial.
+- Lets you check or see its reasoning rather than giving unverifiable answers.
+- Still requires you to do the thinking, not just receive a finished product.
+
+## What To Do Next
+
+Pick one weak topic from your current module and open the SmartMind TVET Library to find reading material on it today, rather than searching the open internet for an hour.`,
   },
   {
     slug: 'writing-a-strong-cv-first-job',
     title: 'How to Write a Strong CV for Your First Job in Rwanda',
     description: 'A step-by-step guide for TVET graduates and young Rwandans building their first professional CV — with examples of what employers actually look for.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Build your CV with AI Writer', path: '/ai-writer' },
     date: '2026-06-14',
     readMinutes: 4,
     tags: ['Career', 'CV', 'Jobs'],
@@ -168,11 +261,11 @@ Generated answers remain confidently wrong on local curricula, recent events, an
 
 ## Keep It To One Page
 
-If you have less than five years of formal experience, your CV must fit on a single A4 page. Recruiters spend an average of seven seconds per CV on a first review. Two-page CVs from junior candidates are almost always skimmed and often skipped entirely. The SmartMind Writer Studio has a "First Job CV" template that already enforces this length.
+If you have less than five years of formal experience, your CV must fit on a single A4 page. Recruiters often spend only a few seconds on a first look at a CV. Two-page CVs from junior candidates are almost always skimmed and often skipped entirely. The SmartMind Writer Studio has a "First Job CV" template that already enforces this length.
 
 ## Lead With A Two-Sentence Profile
 
-Instead of an "Objective" line ("Seeking a position where I can grow…"), write a two-sentence profile that names what you can do and what you're looking for. Example: "TVET Level 4 graduate in Networking with hands-on experience configuring routers and small business LANs. Looking for a junior IT support role where I can contribute immediately and continue learning enterprise systems." That opening tells a recruiter, in seven seconds, whether you fit.
+Instead of an "Objective" line ("Seeking a position where I can grow…"), write a two-sentence profile that names what you can do and what you're looking for. Example: "TVET Level 4 graduate in Networking with hands-on experience configuring routers and small business LANs. Looking for a junior IT support role where I can contribute immediately and continue learning enterprise systems." That opening tells a recruiter, at a glance, whether you fit.
 
 ## Show Skills With Evidence
 
@@ -188,7 +281,7 @@ List every course, certificate, and workshop, even short online ones, with dates
 
 ## Proofread — Twice
 
-Typos in a first CV are fatal. Read your CV out loud once. Then paste it into the SmartMind Writer Studio and ask it to check grammar and clarity. Finally, ask one person you trust to read it fresh. Three passes catches 99% of mistakes.
+Typos in a first CV are fatal. Read your CV out loud once. Then paste it into the SmartMind Writer Studio and ask it to check grammar and clarity. Finally, ask one person you trust to read it fresh. Three passes, each with fresh eyes, catches almost every mistake.
 
 ## Write For The Person Who Reads For Six Seconds
 
@@ -204,13 +297,41 @@ Keep one master CV, then adjust the top third for each application: the headline
 
 ## Common Fixes That Take Five Minutes
 
-Use a professional email address. Name the file "Firstname-Lastname-CV.pdf". Export to PDF so layout survives. Remove photos, marital status, and age unless the employer requires them. Cut every skill you could not demonstrate in an interview. Ask one person to read it cold and tell you what job they think you want — if they get it wrong, the top third needs work.`,
+Use a professional email address. Name the file "Firstname-Lastname-CV.pdf". Export to PDF so layout survives. Remove photos, marital status, and age unless the employer requires them. Cut every skill you could not demonstrate in an interview. Ask one person to read it cold and tell you what job they think you want — if they get it wrong, the top third needs work.
+
+## A Worked Example: Turning A School Project Into An Experience Line
+
+Imagine you built a small irrigation timer for a school agriculture project. A weak CV line says "Did an agriculture project." A strong line says: "Agriculture Club Irrigation Project (2025) — designed and built a low-cost timer to water a 10-bed vegetable plot; reduced manual watering trips from twice daily to once; presented results to classmates and the school farm supervisor." Same project, far more evidence of initiative, impact, and communication.
+
+## Common Mistakes First-Time CV Writers Make
+
+- Writing a vague objective instead of a specific two-sentence profile.
+- Listing soft skills with no evidence behind them.
+- Letting the CV run to two pages out of fear of looking inexperienced.
+- Using an unprofessional email address or an unreachable phone number.
+- Submitting the same unchanged CV to every job regardless of the role.
+
+## Quick Checklist Before You Submit
+
+- One page, exported as PDF.
+- A two-sentence profile naming what you can do and what you want.
+- Every skill backed by one concrete example or project.
+- No photo, no typos, checked by at least one other person.
+- Top third adjusted to match the specific role you are applying for.
+
+## What To Do Next
+
+Open the SmartMind Writer Studio, start the "First Job CV" template, and turn one real school project or piece of volunteer work into a proper experience entry today.`,
   },
   {
     slug: 'staying-focused-while-studying-with-a-phone',
     title: 'How to Actually Study on a Phone Without Getting Distracted',
     description: 'Practical, tested strategies for studying effectively when a smartphone is your only device — and how to keep social media from stealing your revision hours.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Start a focused session', path: '/learn' },
     date: '2026-06-21',
     readMinutes: 3,
     tags: ['Study', 'Focus', 'Habits'],
@@ -254,13 +375,41 @@ Many students study entirely on a phone, so "put it away" is useless advice. Ins
 
 ## Work In Honest Blocks
 
-Try twenty-five minutes of work and five of rest, and treat the rest as mandatory rather than optional. During rest, stand and look away from screens rather than scrolling, because scrolling refills your attention with new open loops. After four blocks take a longer break. Track only the number of completed blocks each day; that single number tells you more about your week than hours claimed at a desk.`,
+Try twenty-five minutes of work and five of rest, and treat the rest as mandatory rather than optional. During rest, stand and look away from screens rather than scrolling, because scrolling refills your attention with new open loops. After four blocks take a longer break. Track only the number of completed blocks each day; that single number tells you more about your week than hours claimed at a desk.
+
+## A Worked Example: A Distraction-Proof 90 Minutes
+
+Set your phone to Focus mode, put it face-down across the room, and open only the SmartMind app in full screen. Run three 25-minute blocks with 5-minute breaks between them, where your break means standing up and looking outside — not scrolling. After the third block, take a full 15-minute rest before deciding whether to continue. Most students who try this once are surprised how much more they absorb in 90 honest minutes than in three distracted hours.
+
+## Common Mistakes That Sabotage Phone-Based Study
+
+- Keeping WhatsApp or social apps open "just to check quickly" between questions.
+- Studying with the phone within arm's reach instead of out of sight.
+- Treating a short break as free scrolling time, which refills your mind with new distractions.
+- Charging the phone beside the bed, which turns bedtime into another study-interrupting session.
+- Trying to multitask between an assignment and entertainment "in the background."
+
+## Quick Checklist For A Focused Session
+
+- Focus mode or do-not-disturb turned on before you start.
+- Phone face-down and out of reach, or in another room.
+- Study material downloaded in advance if your connection is unreliable.
+- A timer running for 25-minute blocks with real 5-minute breaks.
+- Social apps moved off your main home screen.
+
+## What To Do Next
+
+Before your next study session, move your three most-used social apps off your home screen and start your work inside SmartMind's Smart Tutor, where notes, practice, and explanations live in one tab.`,
   },
   {
     slug: 'ai-tutor-vs-human-teacher',
     title: 'AI Tutor vs Human Teacher: What Each Is Actually Good At',
     description: 'An honest comparison of what a smart AI tutor does well, what only a real teacher can give you, and how to combine both for the fastest learning.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Get help from the Homework Helper', path: '/ai-homework-helper' },
     date: '2026-06-28',
     readMinutes: 3,
     tags: ['Learning', 'AI', 'Teaching'],
@@ -300,13 +449,41 @@ Choosing what to study before an assessment, interpreting marking criteria, judg
 
 ## A Workable Weekly Split
 
-Practise daily with automated help, then bring your three hardest unresolved gaps to a teacher or classmate each week. Verify anything factual against official course material before you rely on it. Students who work this way report the same pattern: fewer hours studying, more topics moved from shaky to solid, and far fewer surprises on assessment day.`,
+Practise daily with automated help, then bring your three hardest unresolved gaps to a teacher or classmate each week. Verify anything factual against official course material before you rely on it. Students who work this way report the same pattern: fewer hours studying, more topics moved from shaky to solid, and far fewer surprises on assessment day.
+
+## A Worked Example: Using Both In The Same Week
+
+Suppose you are struggling with a calculation method your teacher demonstrated once in class. That evening, ask the Homework Helper in SmartMind to explain the same method a different way and generate three extra practice problems. Work them by hand. The next day, bring your one remaining doubt to your teacher instead of every question you had — their time is limited, so arrive with the gap already narrowed. This is the combination that works: volume and patience from the tool, judgment and context from the person.
+
+## Common Mistakes Students Make
+
+- Copying an AI explanation into homework without working through it themselves.
+- Assuming an AI tutor knows the exact local assessment format or marking criteria.
+- Avoiding the teacher out of embarrassment, even when only a teacher can confirm readiness.
+- Using AI for everything, including decisions that need human judgment about safety or context.
+- Treating a wrong AI answer as authoritative instead of double-checking it.
+
+## Quick Checklist For Using Both Well
+
+- Use the AI tutor for repeated drills, step-by-step explanations, and late-night questions.
+- Use your teacher for feedback on practical work, motivation, and judgment calls.
+- Always attempt the problem yourself before checking an AI-generated answer.
+- Verify anything factual against your official course material.
+- Bring your teacher your three hardest unresolved questions each week, not every question.
+
+## What To Do Next
+
+Open the SmartMind Homework Helper, paste in one problem you got wrong recently, and ask it to explain the method a different way — then bring whatever still confuses you to your teacher this week.`,
   },
   {
     slug: 'time-management-for-students-rwanda',
     title: 'Time Management for Rwandan Students: A Realistic System',
     description: 'Practical time-management strategies for Rwandan secondary and TVET students juggling long school days, chores, and self-study.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Plan your study with Learn', path: '/learn' },
     date: '2026-05-28',
     readMinutes: 3,
     tags: ['Study', 'Productivity', 'Rwanda'],
@@ -314,7 +491,7 @@ Practise daily with automated help, then bring your three hardest unresolved gap
 
 ## Start With A Weekly Skeleton, Not A Daily Plan
 
-Daily to-do lists fail because a single interruption breaks the whole day. A weekly skeleton is different: you decide which two-hour blocks in your week are protected study time, and everything else flexes around them. For most students, the best blocks are early morning (5:30–7:00 AM) before the household wakes, and a focused session on Saturday morning. If you protect just three of these blocks per week, you will study more than 90% of your classmates.
+Daily to-do lists fail because a single interruption breaks the whole day. A weekly skeleton is different: you decide which two-hour blocks in your week are protected study time, and everything else flexes around them. For most students, the best blocks are early morning (5:30–7:00 AM) before the household wakes, and a focused session on Saturday morning. If you protect just three of these blocks every week, you will out-study most students who only study 'when they find time'.
 
 ## The 25-5 Rule
 
@@ -346,13 +523,41 @@ Download notes, articles, and practice sets while you have data, so a power cut 
 
 ## Review Weekly, Adjust Honestly
 
-Every Sunday, count completed blocks and compare with planned blocks. If you complete less than two thirds, the plan is too ambitious — cut it rather than blaming yourself. Sustainable plans grow slowly. Two reliable blocks a day, held for a whole term, beat an ambitious schedule abandoned in week two.`,
+Every Sunday, count completed blocks and compare with planned blocks. If you complete less than two thirds, the plan is too ambitious — cut it rather than blaming yourself. Sustainable plans grow slowly. Two reliable blocks a day, held for a whole term, beat an ambitious schedule abandoned in week two.
+
+## A Worked Example: A Realistic Weekly Skeleton
+
+Suppose you wake at 5:00 AM, help at home until 6:30, attend school 7:00 AM to 3:00 PM, and have evening chores. A realistic skeleton protects three blocks: 5:30–6:30 AM on weekdays (before chores), a two-hour block Saturday morning, and one hour Sunday evening for the following week's planning and offline downloads. That is roughly eight protected hours a week — modest, but consistent, and far more than the "study every evening" plan that collapses the first time a chore runs late.
+
+## Common Mistakes In Student Time Planning
+
+- Writing a daily to-do list that one interruption destroys entirely.
+- Ignoring fixed constraints like commuting and chores when planning study blocks.
+- Studying seven days a week with no rest day, which lowers performance over time.
+- Switching subjects every few minutes instead of batching similar work together.
+- Planning for an "ideal evening" that rarely actually happens.
+
+## Quick Checklist For A Workable Week
+
+- Three protected study blocks written down, tied to fixed times.
+- Difficult, analytical work placed in your sharpest hour of the day.
+- One full rest day kept genuinely free of study.
+- Material downloaded in advance for offline study during power or network cuts.
+- A short Sunday review comparing blocks planned with blocks completed.
+
+## What To Do Next
+
+Write down your fixed weekly constraints tonight, then open SmartMind's Smart Tutor and download one topic's material so your next power cut becomes a study block instead of lost time.`,
   },
   {
     slug: 'digital-skills-every-tvet-student-needs',
     title: 'Digital Skills Every Rwandan TVET Student Needs in 2026',
     description: 'The core digital skills — beyond typing — that employers in Rwanda now expect from every TVET graduate, and how to learn them for free.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Practice with the Writer Studio', path: '/ai-writer' },
     date: '2026-06-05',
     readMinutes: 3,
     tags: ['TVET', 'Digital Skills', 'Career'],
@@ -396,13 +601,41 @@ Use a password manager or at minimum unique passwords for email and banking, ena
 
 ## Add One Tool-Specific Skill Per Term
 
-Choose a single practical capability each term and take it to a demonstrable level: spreadsheet formulas and charts, basic image editing, a professional document template, or simple data entry with validation. Four terms produce four employable skills. Trying to learn all four at once usually produces none.`,
+Choose a single practical capability each term and take it to a demonstrable level: spreadsheet formulas and charts, basic image editing, a professional document template, or simple data entry with validation. Four terms produce four employable skills. Trying to learn all four at once usually produces none.
+
+## A Worked Example: Preparing One Document Properly
+
+Imagine your assessor asks for a short practical report. A student with weak digital habits spends twenty minutes hunting for the right file, submits a Word document that opens oddly on another computer, and forgets to rename it from "Document1." A student with the habits in this article names the file "YourName-ReportTitle.pdf", keeps it in a folder named after the module, exports to PDF so formatting never breaks, and backs it up to cloud storage before submitting. Same report, far more professional impression, in the same twenty minutes.
+
+## Common Mistakes To Avoid
+
+- Saving every file with a generic name like "New Document" or "Untitled."
+- Sending a Word file that looks different on the receiver's computer instead of a PDF.
+- Reusing the same password across email, Mobile Money, and social media.
+- Pasting AI-generated text into an assignment without checking or understanding it.
+- Never backing up work, then losing it to a lost phone or formatted laptop.
+
+## Quick Checklist For Basic Digital Competence
+
+- Files named consistently and organised by course and module.
+- Important documents exported to PDF before sharing.
+- Unique passwords for email and financial accounts, with two-step verification where possible.
+- A professional email address and a message style with no slang or emojis.
+- One cloud or offline backup of your most important files.
+
+## What To Do Next
+
+Rename and organise your current module's files properly today, then draft a short professional email using the SmartMind Writer Studio to practice the tone employers expect.`,
   },
   {
     slug: 'preparing-for-a-job-interview-in-rwanda',
     title: 'How to Prepare for Your First Job Interview in Rwanda',
     description: 'A step-by-step guide to preparing for entry-level job interviews in Rwanda — what to research, what to wear, what to say, and what to avoid.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Draft your interview stories', path: '/ai-writer' },
     date: '2026-06-12',
     readMinutes: 3,
     tags: ['Career', 'Interview', 'Rwanda'],
@@ -446,13 +679,41 @@ When asked about a skill you lack, say what you do know, then how you would clos
 
 ## The Logistics That Decide Outcomes
 
-Confirm the location and time the day before, plan to arrive twenty minutes early, bring printed copies of your CV and certificates, silence your phone before entering the building, and prepare two questions to ask at the end about the role or the team. Send a short thank-you message the same day. These details cost nothing and separate you from candidates with identical qualifications.`,
+Confirm the location and time the day before, plan to arrive twenty minutes early, bring printed copies of your CV and certificates, silence your phone before entering the building, and prepare two questions to ask at the end about the role or the team. Send a short thank-you message the same day. These details cost nothing and separate you from candidates with identical qualifications.
+
+## A Worked Example: Answering "Tell Me About A Time You Failed"
+
+Instead of memorising a generic answer, adapt your prepared failure story: situation (a group project where you underestimated the time needed), action (you reorganised the team's tasks and asked for one extra day), result (the project was delivered, a day late but complete, and you now build in buffer time). This structure — situation, action, result, kept under ninety seconds — turns almost any question into a confident, specific answer.
+
+## Common Mistakes Candidates Make
+
+- Arriving with no knowledge of what the organisation actually does.
+- Giving vague, rehearsed answers instead of specific short stories.
+- Dressing far below or above the workplace norm because nobody checked.
+- Saying "I don't have any questions" when asked, which signals low interest.
+- Forgetting to follow up, even though almost nobody else does either.
+
+## Quick Checklist Before Interview Day
+
+- One hour spent researching the organisation and one recent development.
+- Three short stories prepared: a problem solved, a conflict handled, a mistake and lesson.
+- Outfit ironed and shoes cleaned the night before.
+- Printed CV and certificates, phone silenced, arrival twenty minutes early.
+- Two questions ready to ask at the end.
+
+## What To Do Next
+
+Use the SmartMind Writer Studio to draft your three short interview stories tonight, then read them aloud until they sound natural rather than memorised.`,
   },
   {
     slug: 'reading-more-books-as-a-busy-student',
     title: 'How to Actually Read More Books as a Busy Rwandan Student',
     description: 'A realistic reading system for busy students — how to pick books, find them cheaply in Rwanda, and finish more of what you start.',
-    author: 'SmartMind Team',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    nextStep: { label: 'Find something to read', path: '/library' },
     date: '2026-06-20',
     readMinutes: 3,
     tags: ['Study', 'Reading', 'Habits'],
@@ -492,7 +753,375 @@ Finishing a book you dislike teaches you to associate reading with obligation. G
 
 ## Keep A One-Line Record
 
-After each book, write a single sentence about what you will actually use or remember. This takes thirty seconds, dramatically improves retention, and after a year gives you a list that is genuinely useful when writing, arguing, or preparing for interviews. Mix genres deliberately — one technical book, then one story — so reading never becomes a second syllabus.`,
+After each book, write a single sentence about what you will actually use or remember. This takes thirty seconds, dramatically improves retention, and after a year gives you a list that is genuinely useful when writing, arguing, or preparing for interviews. Mix genres deliberately — one technical book, then one story — so reading never becomes a second syllabus.
+
+## A Worked Example: Twenty Pages A Day For A Month
+
+Start with a book you are genuinely curious about — even a sports biography or a practical business story. Read twenty pages each morning before touching your phone. After thirty days, you will have finished roughly two average books and built a habit that no longer depends on motivation. Write one sentence after each finished book: what it was about, and the single idea you want to keep.
+
+## Common Mistakes That Kill A Reading Habit
+
+- Starting with a heavy classic chosen out of obligation rather than interest.
+- Setting an ambitious goal like "a book a week" that collapses after one busy week.
+- Forcing yourself to finish a book you are not enjoying.
+- Reading only when you "have time," which in practice means rarely.
+- Never recording what you read, so the ideas fade within days.
+
+## Quick Checklist For Building The Habit
+
+- Twenty pages, or thirty minutes, read at a fixed time each day.
+- A book chosen because it interests you, not because it impresses others.
+- A cheap or free source lined up: library, second-hand shop, or public-domain ebook.
+- Permission to abandon any book that has not earned your attention by page fifty.
+- One sentence recorded in a notebook after each finished book.
+
+## What To Do Next
+
+Visit the SmartMind TVET Library today, find one short reading related to your course, and read the first twenty pages before you check any other app.`,
+  },
+  {
+    slug: 'reading-an-rtb-competency-based-curriculum',
+    title: 'How to Read an RTB Competency-Based Curriculum (Without Getting Lost)',
+    description: 'A practical guide to understanding a Rwanda TVET Board competency-based curriculum document — what the sections mean and how to turn them into a study plan.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    status: 'draft',
+    date: '2026-09-02',
+    readMinutes: 6,
+    tags: ['TVET', 'Curriculum', 'RTB'],
+    nextStep: { label: 'Organise your notes in the Library', path: '/library' },
+    content: `Every Rwanda TVET Board (RTB) programme is built around a competency-based curriculum document. If you have never opened one, it can look intimidating — modules, learning units, performance criteria, hours, credits — but once you understand the structure, it becomes the single most useful document you own as a student. This guide explains how to read one and turn it into a working study plan.
+
+## Why This Document Matters More Than Your Notes
+
+A competency-based curriculum lists exactly what you must be able to do by the end of a module, not just what you must know. Assessors mark against these stated competencies, so a curriculum document is effectively the answer key to "what will I be tested on." Most students never read it directly and instead rely entirely on whatever a teacher covers in class, which means they miss competencies that are listed but were only briefly mentioned in a lesson.
+
+## The Typical Structure Of A Module
+
+While the exact format and section names can vary by programme and by version of the curriculum, most RTB competency-based documents are organised around a similar logic: a module title and purpose, a list of learning units within the module, and for each unit a set of learning outcomes with performance criteria describing what "doing it correctly" looks like. [ADD/VERIFY: exact section names and numbering used in the current official RTB curriculum template for your specific programme, since formats are updated periodically.]
+
+## Step 1: Get The Official Document
+
+Ask your trainer or your school's academic office for the current competency-based curriculum for your specific trade and level — not a summarised version. [ADD/VERIFY: the official current source or portal where Rwandan TVET students should obtain the curriculum document for their specific programme.] If a printed copy is not available, a scanned copy is enough; what matters is that it is the current, official version for your intake.
+
+## Step 2: List Every Learning Outcome As One Line
+
+Go through the document and write every learning outcome as a single short line in your own notebook or in a spreadsheet. Do not summarise yet — just extract. For a typical module this might be ten to twenty lines. This list becomes your master competency map, the same tool described in our exam preparation guide.
+
+## Step 3: Mark What You Have Actually Practised
+
+For each line, mark whether you have performed the task yourself, watched it demonstrated, or only read about it. Be honest — "the teacher mentioned it" is not the same as "I have done it." This step usually reveals that students have solid coverage of three or four outcomes per module and weak or no practice on several others.
+
+## Step 4: Turn Gaps Into A Weekly Plan
+
+Take every outcome marked "only read about it" and schedule one practice session per week dedicated to it, using the same practice-over-reading approach described in our exam preparation guide. Where practical equipment is not available, ask your trainer directly how that outcome will be assessed and what simplified practice is possible.
+
+## Common Mistakes Students Make
+
+- Relying only on classroom notes and never opening the official curriculum document.
+- Treating the curriculum as something to glance at once, rather than a living checklist.
+- Assuming every learning outcome receives equal classroom time — some get mentioned once and are still assessable.
+- Confusing "I understand the idea" with "I can perform the task," which a competency-based assessment specifically tests.
+
+## A Quick Checklist
+
+- You have the current, official curriculum document for your exact programme and level.
+- Every learning outcome is written as a single line in your own notes.
+- Each line is honestly marked as practised, demonstrated-only, or unseen.
+- A weekly plan exists to turn "unseen" and "demonstrated-only" items into practised ones.
+
+## What To Do Next
+
+Ask your trainer this week for the official current curriculum document for your programme, and start building your own one-line-per-outcome competency map in the SmartMind Library notes area so you can track it over the term.`,
+  },
+  {
+    slug: 'choosing-the-right-tvet-level-rwanda',
+    title: 'Choosing the Right TVET Level in Rwanda: A Practical Decision Guide',
+    description: 'How to think through choosing a TVET level and programme in Rwanda — matching your background, goals, and circumstances to the right starting point.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    status: 'draft',
+    date: '2026-09-09',
+    readMinutes: 5,
+    tags: ['TVET', 'Rwanda', 'Career'],
+    nextStep: { label: 'Prepare your questions with Learn', path: '/learn' },
+    content: `Choosing a TVET level and trade is one of the biggest decisions a young Rwandan makes, and it is often made quickly, under pressure, based on what a friend is doing rather than a clear-eyed look at your own situation. This guide gives you a structured way to think it through.
+
+## Start With What You Already Have
+
+Before looking at any programme, write down three things honestly: your current education level and results, the subjects or practical work you have genuinely enjoyed, and your realistic financial and family situation for the next one to three years. [ADD/VERIFY: the current official entry requirements for each TVET level in Rwanda, since these are set and occasionally updated by the Rwanda TVET Board and may differ by trade.] Your starting level is determined partly by these entry requirements, so confirming them with your school or RTB directly is an essential first step, not an afterthought.
+
+## Understand What A Level Actually Commits You To
+
+A TVET level is not just a label — it determines how long you study, how much practical placement is required, and what kind of role you are trained to enter directly afterward. Rushing into a higher level than your preparation supports can mean struggling through theory you are not ready for; starting lower than necessary can mean repeating content you already know. [ADD/VERIFY: the specific duration, structure, and progression pathway between levels for your trade of interest, as these details should come from your school or the official RTB programme guide.]
+
+## Match The Trade To Local Opportunity, Not Just Interest
+
+Interest matters, but so does realism. Before committing, spend time near people actually working in the trade — a garage, a salon, a construction site, an IT shop — and ask what their typical week and income look like. Look at what kinds of small businesses and employers exist in your own district, since a skill with no local demand forces you to relocate or struggle to find work after graduating.
+
+## Talk To Someone Already Two Steps Ahead
+
+The most useful single conversation you can have is with someone who finished the exact level and trade you are considering one or two years ago. Ask what surprised them, what they wish they had known before starting, and whether they would choose the same path again. Their answer will tell you more than any prospectus.
+
+## Consider The Progression Path, Not Just The First Step
+
+Ask whether your chosen level allows you to progress to a higher level later if you want to, and what that progression requires. Many students choose a starting level assuming they can "upgrade later" without checking what that actually involves. [ADD/VERIFY: the specific progression and credit-transfer rules between TVET levels in Rwanda, which should be confirmed with your school or RTB.]
+
+## Common Mistakes Students Make
+
+- Choosing a trade because a friend chose it, without checking personal interest or local demand.
+- Assuming higher always means better, without checking whether preparation and entry requirements are met.
+- Ignoring the cost of training materials, tools, or transport when comparing options.
+- Never speaking to someone who has actually completed the programme.
+
+## A Quick Checklist Before You Decide
+
+- You have confirmed the current official entry requirements for your target level and trade.
+- You have spoken to at least one person currently working in the trade locally.
+- You have spoken to at least one recent graduate of the exact programme.
+- You understand the realistic cost and duration, not an estimate from memory.
+- You know, in writing, what progression to a higher level would require later.
+
+## What To Do Next
+
+Write down two trades you are seriously considering, then use SmartMind's Smart Tutor to help you prepare a short list of specific questions to ask a trainer or a working tradesperson this week.`,
+  },
+  {
+    slug: 'preparing-for-your-tvet-internship',
+    title: 'Preparing for Your TVET Internship: A Step-by-Step Guide',
+    description: 'How to prepare for an industrial attachment or internship as a Rwandan TVET student — before you arrive, during your first week, and how to make it count for your career.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    date: '2026-09-16',
+    readMinutes: 5,
+    tags: ['TVET', 'Internship', 'Career'],
+    nextStep: { label: 'Draft your introduction with AI Writer', path: '/ai-writer' },
+    content: `An internship, often called industrial attachment, is where a TVET education either becomes real or stays theoretical. Many students treat it as something to simply survive. The students who benefit most treat it as a job interview that lasts several weeks. Here is how to prepare properly.
+
+## Before You Arrive: Research The Workplace
+
+Find out what the company or organisation actually does, roughly how many people work there, and what your specific department handles. If a former student from your school interned there before you, ask them what the first week was like. Arriving with even basic context makes your first conversations far smoother than arriving blind.
+
+## Prepare Your Documents In Advance
+
+Confirm with your school exactly which documents you need to bring — typically an introduction letter, your student ID, and any attachment logbook your programme uses. [ADD/VERIFY: the exact current list of documents and procedures your specific school and the Rwanda TVET Board require for an industrial attachment placement, since this can vary.] Prepare these at least a week before you start, not the night before.
+
+## Set Three Personal Goals Before You Start
+
+Beyond simply completing the hours, write down three specific skills or experiences you want from this internship — for example, operating a specific machine, understanding how a workshop schedules jobs, or seeing how a real client interaction is handled. Review these goals weekly; an internship with no personal goals tends to become routine errands only.
+
+## The First Week: Observe Before You Suggest
+
+In your first few days, your job is to learn how things actually work, not to point out what could be improved. Ask questions, take notes, and watch how experienced workers handle both routine tasks and problems. Arriving on time, dressing appropriately, and showing genuine interest in the smallest tasks builds more trust in the first week than any amount of talking about your qualifications.
+
+## Keep A Daily Log
+
+Most attachment programmes require a logbook, but even if yours does not, keep one. Each day write what you did, what you learned, and one question you still have. This record becomes useful for your final report, for future interviews, and for remembering details that otherwise fade within weeks.
+
+## Build One Real Relationship
+
+Identify one supervisor or experienced worker who seems willing to explain things, and build a genuine working relationship with them — arrive early for their shift, ask thoughtful questions at appropriate moments, and thank them specifically for what they teach you. A strong reference from a real supervisor is often more valuable to your first job search than the certificate itself.
+
+## Turn The Experience Into Future Material
+
+Before your last day, ask if you can request a reference or a short letter confirming your attachment and the skills you practised. Note two or three specific achievements from your time there in concrete terms — a task you completed, a problem you helped solve, a skill you can now perform independently. These become the exact kind of evidence your CV needs, as described in our CV-writing guide.
+
+## Common Mistakes Students Make
+
+- Arriving without having confirmed the required documents, causing a delayed or awkward start.
+- Treating the internship as unpaid labour to tolerate rather than a chance to build real skill and relationships.
+- Never asking questions, out of fear of looking inexperienced — supervisors generally respect curiosity more than silence.
+- Leaving without requesting any reference or written confirmation of what was learned.
+
+## A Quick Checklist
+
+- Documents confirmed and prepared at least a week in advance.
+- Three personal learning goals written down before day one.
+- A daily log kept, even briefly, from the first day.
+- One genuine working relationship built with an experienced supervisor.
+- A reference or confirmation letter requested before the last day.
+
+## What To Do Next
+
+Use the SmartMind Writer Studio to draft a short, polite introduction message you can give your supervisor on day one, explaining who you are and what you hope to learn.`,
+  },
+  {
+    slug: 'building-a-software-portfolio-tvet-student',
+    title: 'Building a Simple Software or IT Portfolio as a TVET Student',
+    description: 'A practical guide for Rwandan TVET students in IT, networking, or software tracks on building a small portfolio that proves your skills to employers.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    date: '2026-09-23',
+    readMinutes: 5,
+    tags: ['TVET', 'IT', 'Career'],
+    nextStep: { label: 'Write your project description', path: '/ai-writer' },
+    content: `If you are studying an IT-related TVET trade — software development, networking, multimedia, or a similar track — a portfolio is the single most convincing thing you can show an employer, far more convincing than a certificate alone. This guide shows how to build one with no budget, starting from where you are now.
+
+## What A Portfolio Actually Needs To Show
+
+A portfolio does not need ten polished projects. It needs three to five pieces of work that each clearly show a skill, a problem you solved, and your own explanation of how you did it. Quality and clarity beat quantity every time; one well-documented class project is worth more than five unfinished ones.
+
+## Start With What You Already Built
+
+Look back at your school assignments and projects. A simple website built for a class exercise, a small database designed for a mock business, a configured network for a lab exercise — these all count. Choose the two or three you are proudest of and rebuild or clean them up so they represent your current skill level, not your skill level from a year ago.
+
+## Document Each Project Properly
+
+For every project, write a short description covering: what problem it solved, what tools or technologies you used, what your specific contribution was if it was a group project, and one challenge you overcame. This written explanation often matters more to an interviewer than the project itself, because it proves you understand what you built rather than having copied it.
+
+## Choose A Simple Place To Host It
+
+You do not need a paid website. A free GitHub account can host code projects with a short README file explaining each one. A simple Google Site or a single PDF document can hold screenshots and descriptions for non-code work like network diagrams or multimedia projects. What matters is that the link or file is easy to share and opens correctly on any device.
+
+## Keep Building, One Project At A Term
+
+Rather than trying to build five projects at once, aim for one solid, well-documented project per term. By graduation, you will have three to six genuinely good pieces of work instead of a rushed pile built in the final month. Treat each new module as a chance to add a portfolio piece, not just an assignment to submit and forget.
+
+## Show It, Don't Just Mention It
+
+When applying for jobs or internships, include a direct link to your portfolio in your CV and mention one specific project during interviews, explaining your role and what you learned. Employers remember candidates who can speak specifically about something they built far more than those who list "proficient in Excel" with nothing to back it up.
+
+## Common Mistakes Students Make
+
+- Waiting until final year to start a portfolio, leaving no time to build it properly.
+- Including unfinished or undocumented projects with no explanation of what they do.
+- Copying code or designs without understanding them, which falls apart under basic interview questions.
+- Hosting work somewhere that is hard to access, such as a locked file on a personal phone.
+
+## A Quick Checklist
+
+- Two to three of your best existing school projects selected and cleaned up.
+- Each project documented with purpose, tools used, your contribution, and one challenge overcome.
+- Work hosted somewhere easy to share: a free GitHub account, a simple site, or a clear PDF.
+- A direct portfolio link included on your CV.
+- A plan to add one new project per term going forward.
+
+## What To Do Next
+
+Pick your strongest existing school project today and use the SmartMind Writer Studio to help you write a clear, honest project description for it.`,
+  },
+  {
+    slug: 'writing-a-small-trade-business-plan',
+    title: 'Writing a Small Trade Business Plan as a TVET Graduate',
+    description: 'A practical, step-by-step guide for Rwandan TVET graduates on writing a simple, honest business plan for a small trade business — welding, tailoring, hairdressing, electrical work, and similar trades.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    date: '2026-09-30',
+    readMinutes: 6,
+    tags: ['TVET', 'Business', 'Entrepreneurship'],
+    nextStep: { label: 'Draft your business plan', path: '/ai-writer' },
+    content: `Many TVET graduates eventually run their own small business — a welding workshop, a tailoring shop, a salon, an electrical installation service. A business plan for this kind of venture does not need to look like a bank's fifty-page template. It needs to be honest, specific, and useful to you. This guide shows how to write one that you will actually use.
+
+## Start With The Problem You Solve, Not The Trade Name
+
+Instead of starting with "I want to open a welding workshop," start with the specific problem you solve for specific customers: "Small shops and households in my area need gates, window grilles, and simple repairs done reliably and without long delays." This framing forces you to think about customers first, which is what actually determines whether a business survives.
+
+## Describe Your Customer Specifically
+
+Write down exactly who you expect to pay you: households within walking distance, nearby shops, a cooperative, construction sites in your sector. Avoid vague answers like "everyone needs this service." A plan that names real, nearby customers is far more useful than one that describes a generic market.
+
+## List What You Already Have And What You Need
+
+Make two honest lists: tools, skills, and connections you already have, and the specific things you still need — a particular machine, a small amount of starting capital, a work space, a business registration. [ADD/VERIFY: the current official process and requirements for registering a small trade business in Rwanda, since procedures and fees can change and should be confirmed with RDB or your local sector office.] Being specific here turns "I need money" into "I need exactly this amount for exactly this tool," which is far easier to plan around.
+
+## Estimate Your Costs And Prices Honestly
+
+List your expected costs: materials for a typical job, tool maintenance, transport, rent if applicable, and your own time. Then look at what similar tradespeople in your area actually charge for comparable work, and set a price that covers your real costs with a reasonable margin — not a price copied from a bigger city or a guess with no basis. Write out two or three example jobs with their expected cost and price, so the numbers are concrete rather than abstract.
+
+## Plan Your First Ten Customers
+
+Rather than a vague marketing section, write down exactly how you will find your first ten paying customers: word of mouth through family and former classmates, a sign at your work space, an offer of a discounted first job in exchange for a referral, or a relationship with a hardware shop that can recommend you. Specific, small, realistic plans beat big vague marketing promises.
+
+## Keep Simple Records From Day One
+
+Decide now how you will track money in and money out, even if it is a simple notebook with a date, a description, and an amount. Businesses that start without records almost always lose track of whether they are actually profitable until it is too late to fix.
+
+## Review And Adjust Every Month
+
+A business plan is not a document you write once and file away. Set a reminder to review it every month: which customers came back, which prices needed adjusting, what tool or skill gap slowed you down. Treat the plan as a living checklist, not a one-time exercise.
+
+## Common Mistakes First-Time Business Owners Make
+
+- Writing a plan full of generic statements with no specific numbers or customers.
+- Underpricing work out of fear of losing customers, then struggling to cover real costs.
+- Starting without any record-keeping and losing track of profit and loss.
+- Never confirming the current legal and registration requirements before starting to trade.
+- Treating the plan as finished rather than revisiting it monthly.
+
+## A Quick Checklist
+
+- The specific problem and specific nearby customers are named, not generic.
+- Tools, skills, and gaps are listed honestly, with a plan to close each gap.
+- At least two or three real cost-and-price examples are worked out.
+- A specific plan exists for finding the first ten paying customers.
+- A simple record-keeping method is chosen and started from day one.
+- Current registration requirements have been confirmed with the relevant local office.
+
+## What To Do Next
+
+Use the SmartMind Writer Studio to turn your notes into a clean one-page business plan you can show to a family member, a potential partner, or a microfinance officer.`,
+  },
+  {
+    slug: 'english-for-the-workshop-trade-vocabulary',
+    title: 'English for the Workshop: Trade Vocabulary Every TVET Student Should Know',
+    description: 'Practical English vocabulary and communication habits for Rwandan TVET students working in workshops, garages, and technical environments.',
+    author: 'Bernard Mukunzi',
+    authorBio: 'Founder of SmartMind, a free learning app for Rwandan TVET students.',
+    lastReviewed: '2026-10-01',
+    status: 'published',
+    date: '2026-10-07',
+    readMinutes: 5,
+    tags: ['English', 'TVET', 'Language'],
+    nextStep: { label: 'Practice with Translate', path: '/translate' },
+    content: `A huge amount of technical documentation, tool labelling, and equipment manuals in Rwanda's workshops, garages, and technical environments is written in English. A student who is confident in their trade but weak in technical English will still struggle to read a manual, follow safety instructions, or communicate with an international client or supplier. This guide focuses on practical, usable workshop English.
+
+## Learn Instructions Before Vocabulary Lists
+
+Technical English in a workshop is mostly instructions and warnings: "disconnect power before servicing," "tighten to the specified torque," "wear eye protection in this area." Instead of memorising random word lists, collect and learn real instruction sentences from manuals, equipment labels, and safety signs you actually encounter. These are the sentences you will need to read quickly and correctly, often under time pressure.
+
+## Build A Trade-Specific Glossary
+
+Keep a small notebook split by category: tools, actions, safety, and measurements. For each new English word you meet in your specific trade, write it with a short definition in your own words and, if useful, the Kinyarwanda equivalent. A student in electrical installation needs different words from a student in tailoring or catering — build your glossary around your own trade, not a generic list.
+
+## Practice Reading Manuals And Labels Deliberately
+
+Once a week, pick a manual, datasheet, or equipment label relevant to your trade and read it slowly, looking up only the words that block understanding of the sentence. Do not stop at every unfamiliar word; many are not essential to the meaning. This mirrors how you will actually use English on the job — scanning for the instructions that matter.
+
+## Practice Describing Your Work Out Loud
+
+Once you can read workshop English, practice producing it. Describe a task you just completed, in English, as if explaining it to a supervisor or client: what the problem was, what you did, and what the result was. Recording yourself and listening back is uncomfortable at first but shows you exactly where your sentences break down.
+
+## Learn Numbers And Measurements Precisely
+
+Mistakes in a workshop are often mistakes in hearing or reading numbers and units correctly — a misread measurement, a mixed-up decimal point, a misunderstood unit. Practice saying and writing measurements clearly in English: dimensions, voltages, weights, temperatures, depending on your trade. Precision here is a safety issue as much as a language one.
+
+## Prepare For Client Or Customer Interactions
+
+If your trade involves any direct customer contact — explaining a repair, giving a quote, describing a service — prepare and practice a short, clear English script for the most common interactions you will have. Keep it simple and professional rather than translating a long Kinyarwanda explanation word for word, which often sounds awkward in English.
+
+## Common Mistakes Students Make
+
+- Memorising long general vocabulary lists instead of trade-specific, instruction-focused language.
+- Skipping manuals and labels because they look difficult, rather than reading them slowly with purpose.
+- Avoiding speaking English at work out of fear of mistakes, which slows improvement.
+- Rushing through numbers and units, which can lead to real safety or quality errors.
+
+## A Quick Checklist
+
+- A trade-specific glossary started, organised by tools, actions, safety, and measurements.
+- At least one real manual, label, or safety sign read and understood each week.
+- Measurements and units practised until they can be said and written without hesitation.
+- A short, practiced script ready for the most common client or supervisor interaction in your trade.
+
+## What To Do Next
+
+Pick one manual or safety label from your workshop this week and use SmartMind's Translator and Smart Tutor together — translate what you are unsure of, then ask the tutor to explain it in simple English.`,
   },
 ];
 

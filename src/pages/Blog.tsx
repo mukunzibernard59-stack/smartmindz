@@ -7,7 +7,9 @@ import ContentAd from '@/components/ContentAd';
 import { posts } from '@/data/blogPosts';
 import { Calendar, Clock } from 'lucide-react';
 
-const Blog: React.FC = () => (
+const Blog: React.FC = () => {
+  const published = posts.filter((p) => p.status === 'published');
+  return (
   <div className="min-h-screen bg-background">
     <SEO
       title="SmartMind Blog — Study Tips, Career, and Learning Guides"
@@ -18,12 +20,13 @@ const Blog: React.FC = () => (
         '@type': 'Blog',
         name: 'SmartMind Blog',
         url: 'https://smartmindz.site/blog',
-        blogPost: posts.map((p) => ({
+        blogPost: published.map((p) => ({
           '@type': 'BlogPosting',
           headline: p.title,
           description: p.description,
           datePublished: p.date,
-          author: { '@type': 'Organization', name: p.author },
+          dateModified: p.updated || p.date,
+          author: { '@type': 'Person', name: p.author },
           url: `https://smartmindz.site/blog/${p.slug}`,
         })),
       }}
@@ -38,7 +41,7 @@ const Blog: React.FC = () => (
       </header>
 
       <div className="grid gap-6">
-        {posts.map((p, idx) => (
+        {published.map((p, idx) => (
           <React.Fragment key={p.slug}>
             <article className="rounded-2xl border border-border bg-card p-6 hover:border-primary/50 transition-colors">
               <div className="flex flex-wrap gap-2 mb-3">
@@ -51,6 +54,7 @@ const Blog: React.FC = () => (
               </h2>
               <p className="text-muted-foreground mb-4">{p.description}</p>
               <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                <span>By {p.author}</span>
                 <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(p.date).toLocaleDateString()}</span>
                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {p.readMinutes} min read</span>
                 <Link to={`/blog/${p.slug}`} className="text-primary hover:underline ml-auto">Read →</Link>
@@ -63,6 +67,7 @@ const Blog: React.FC = () => (
     </main>
     <Footer />
   </div>
-);
+  );
+};
 
 export default Blog;
