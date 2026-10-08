@@ -29,6 +29,7 @@ const Footer: React.FC = () => {
               <li><Link to="/ai-writer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Writer Studio</Link></li>
               <li><Link to="/translate" className="text-muted-foreground hover:text-primary text-sm transition-colors">Translator</Link></li>
               <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">How-To Guides</Link></li>
+              <li><Link to="/guides" className="text-muted-foreground hover:text-primary text-sm transition-colors">Study Guides</Link></li>
             </ul>
           </div>
 
