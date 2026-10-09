@@ -59,9 +59,14 @@ const Translate: React.FC = () => {
   const [speaking, setSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const fromVoiceRef = useRef(false);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const finalTranscriptRef = useRef('');
+  const wantRecordingRef = useRef(false);
 
   useEffect(() => () => {
+    wantRecordingRef.current = false;
     recognitionRef.current?.abort?.();
+    micStreamRef.current?.getTracks().forEach(t => t.stop());
     window.speechSynthesis?.cancel();
   }, []);
 
@@ -82,15 +87,22 @@ const Translate: React.FC = () => {
     setAskPermission(true);
   };
 
+  const releaseMic = () => {
+    micStreamRef.current?.getTracks().forEach(t => t.stop());
+    micStreamRef.current = null;
+  };
+
   const startRecording = async () => {
 
     const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SR) { toast.error('Voice input is not supported in this browser.'); return; }
-    // Explicitly ask for microphone permission first so the browser prompt appears.
+    // Ask for the microphone with noise/echo processing and KEEP the stream open
+    // while listening — a clean signal is the biggest accuracy win.
     try {
       if (navigator.mediaDevices?.getUserMedia) {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(t => t.stop());
+        micStreamRef.current = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true, channelCount: 1 },
+        });
       }
     } catch (err: any) {
       if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') {
@@ -105,45 +117,72 @@ const Translate: React.FC = () => {
       return;
     }
 
-    try {
-      const rec = new SR();
-      recognitionRef.current = rec;
-      rec.lang = LOCALES[source] || 'en-US';
-      rec.continuous = true;
-      rec.interimResults = true;
-      let final = '';
-      rec.onresult = (e: any) => {
-        let interim = '';
-        final = '';
-        for (let i = 0; i < e.results.length; i++) {
-          const r = e.results[i];
-          if (r.isFinal) final += r[0].transcript + ' ';
-          else interim += r[0].transcript;
-        }
-        setText((final + interim).trim());
-      };
-      rec.onerror = (e: any) => {
-        if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-          setPermissionBlocked(true);
-          setAskPermission(true);
-          toast.error('Microphone access is blocked by the browser.');
-        }
-        else if (e.error !== 'no-speech' && e.error !== 'aborted') toast.error('Voice input failed.');
-      };
-      rec.onend = () => { setRecording(false); recognitionRef.current = null; };
-      rec.start();
-      setRecording(true);
-      toast.info('Listening… speak now, then tap stop.');
-    } catch {
-      toast.error('Could not start voice input.');
-    }
+    const launchRecognizer = () => {
+      try {
+        const rec = new SR();
+        recognitionRef.current = rec;
+        rec.lang = LOCALES[source] || 'en-US';
+        rec.continuous = true;
+        rec.interimResults = true;
+        // Ask the engine for several guesses so we can keep the most confident one.
+        try { rec.maxAlternatives = 3; } catch { /* noop */ }
+        rec.onresult = (e: any) => {
+          let interim = '';
+          for (let i = e.resultIndex; i < e.results.length; i++) {
+            const r = e.results[i];
+            // Pick the highest-confidence alternative, not just the first one.
+            let best = r[0];
+            for (let j = 1; j < r.length; j++) {
+              if ((r[j].confidence || 0) > (best.confidence || 0)) best = r[j];
+            }
+            if (r.isFinal) finalTranscriptRef.current += best.transcript + ' ';
+            else interim += best.transcript;
+          }
+          setText((finalTranscriptRef.current + interim).trim());
+        };
+        rec.onerror = (e: any) => {
+          if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+            wantRecordingRef.current = false;
+            setPermissionBlocked(true);
+            setAskPermission(true);
+            toast.error('Microphone access is blocked by the browser.');
+          }
+          else if (e.error !== 'no-speech' && e.error !== 'aborted') toast.error('Voice input failed.');
+        };
+        rec.onend = () => {
+          recognitionRef.current = null;
+          // The engine stops on its own after a pause — restart it so longer
+          // speech is not cut off, until the user taps Stop.
+          if (wantRecordingRef.current) {
+            launchRecognizer();
+          } else {
+            setRecording(false);
+            releaseMic();
+          }
+        };
+        rec.start();
+      } catch {
+        wantRecordingRef.current = false;
+        setRecording(false);
+        releaseMic();
+        toast.error('Could not start voice input.');
+      }
+    };
+
+    finalTranscriptRef.current = '';
+    wantRecordingRef.current = true;
+    setRecording(true);
+    launchRecognizer();
+    toast.info('Listening… speak clearly, then tap Stop.');
   };
 
   const stopRecording = () => {
+    wantRecordingRef.current = false;
     const rec = recognitionRef.current;
     recognitionRef.current = null;
     setRecording(false);
     try { rec?.stop?.(); } catch { /* noop */ }
+    releaseMic();
     setTimeout(() => {
       setText(prev => {
         if (prev.trim()) { fromVoiceRef.current = true; void translate(prev); }
