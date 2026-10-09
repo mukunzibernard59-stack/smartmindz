@@ -64,7 +64,9 @@ const Translate: React.FC = () => {
   const wantRecordingRef = useRef(false);
 
   useEffect(() => () => {
+    wantRecordingRef.current = false;
     recognitionRef.current?.abort?.();
+    micStreamRef.current?.getTracks().forEach(t => t.stop());
     window.speechSynthesis?.cancel();
   }, []);
 
