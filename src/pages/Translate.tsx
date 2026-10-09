@@ -59,6 +59,9 @@ const Translate: React.FC = () => {
   const [speaking, setSpeaking] = useState(false);
   const recognitionRef = useRef<any>(null);
   const fromVoiceRef = useRef(false);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const finalTranscriptRef = useRef('');
+  const wantRecordingRef = useRef(false);
 
   useEffect(() => () => {
     recognitionRef.current?.abort?.();
