@@ -16,7 +16,6 @@ import UpdateNotification from "@/components/UpdateNotification";
 import AppRatingBanner from "@/components/AppRatingBanner";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import PushPermissionPrompt from "@/components/PushPermissionPrompt";
-import ConsentBanner from "@/components/ConsentBanner";
 import OfflineGate from "@/components/OfflineGate";
 import { Skeleton } from "@/components/ui/skeleton";
 import { queryClient } from "@/lib/queryClient";
@@ -76,7 +75,6 @@ const AppContent = () => {
         <BrowserRouter basename="/">
         <AnnouncementPopup />
         <PushPermissionPrompt />
-        <ConsentBanner />
         <RouteRobotsMeta />
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
