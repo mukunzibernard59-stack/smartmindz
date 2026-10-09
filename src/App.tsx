@@ -73,10 +73,10 @@ const AppContent = () => {
       <FloatingInstallButton />
       <UpdateNotification />
       <AppRatingBanner />
-      <AnnouncementPopup />
-      <PushPermissionPrompt />
-      <ConsentBanner />
         <BrowserRouter basename="/">
+        <AnnouncementPopup />
+        <PushPermissionPrompt />
+        <ConsentBanner />
         <RouteRobotsMeta />
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
