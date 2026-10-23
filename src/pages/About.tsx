@@ -45,6 +45,22 @@ const About: React.FC = () => (
           </ul>
         </section>
 
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold mb-3">How we create and source content</h2>
+          <p className="text-muted-foreground leading-relaxed mb-3">
+            Blog articles and study guides are written and edited by the SmartMind team under the name of the founder,
+            Bernard Mukunzi, and each article shows its publication and review dates. They are meant to support your studies,
+            not replace official materials.
+          </p>
+          <p className="text-muted-foreground leading-relaxed">
+            The TVET Library organises course material that the Rwanda TVET Board publishes for use by schools, trainers and
+            students. We do not claim authorship of that material and we credit the original source where we can.
+            Owners who want something corrected or removed can write to us through the{' '}
+            <a href="/contact" className="text-primary hover:underline">contact page</a>; see also our{' '}
+            <a href="/copyright" className="text-primary hover:underline">copyright policy</a>.
+          </p>
+        </section>
+
         <ContentAd />
 
         <section className="mb-10">

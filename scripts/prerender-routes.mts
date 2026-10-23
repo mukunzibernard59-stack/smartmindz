@@ -176,6 +176,43 @@ const routes: RouteMeta[] = [
 <p>Draft letters, CVs, and documents, then export them as PDF, DOCX, or TXT. Includes templates like the friendly letter format taught in school.</p>`,
   },
   {
+<<<<<<< HEAD
+=======
+    path: "dev",
+    title: "Dev Mode — Learn to Code in the Browser | SmartMind",
+    description:
+      "Practise programming with step-by-step lessons, challenges and an in-browser code editor. Free for students.",
+    body: `<h1>Dev Mode</h1>
+<p>Dev Mode is a coding workspace inside SmartMind. Follow lessons, write code in the browser editor, run challenges and track your progress as you learn the basics of programming.</p>
+<p>It is designed for TVET ICT learners and beginners who want to practise without installing anything on their phone or computer.</p>`,
+  },
+  {
+    path: "ai-detector",
+    title: "Text Analyzer — Grammar and Readability | SmartMind",
+    description:
+      "Check grammar, readability and keyword use in your writing. The analysis runs locally in your browser.",
+    body: `<h1>Text Analyzer</h1>
+<p>Paste your writing to check readability, sentence length, repeated words and common grammar issues. The analysis runs in your browser, so your text is not sent anywhere.</p>
+<p>Use it to improve essays, reports, letters and CVs before you submit them.</p>`,
+  },
+  {
+    path: "generate-image",
+    title: "Design Studio — Simple Image Editor | SmartMind",
+    description:
+      "Edit images in your browser: crop, apply filters and add text for school projects and presentations.",
+    body: `<h1>Design Studio</h1>
+<p>Design Studio is a simple in-browser image editor. Crop pictures, apply filters and add text overlays for school projects, posters and presentations.</p>`,
+  },
+  {
+    path: "build-app-prompt",
+    title: "App Planner — Turn an Idea into a Plan | SmartMind",
+    description:
+      "Describe an app idea and get a structured plan with features, pages, data and a simple roadmap.",
+    body: `<h1>App Planner</h1>
+<p>Describe the app you want to build and get a structured plan: the main features, the pages you need, the data to store and a step-by-step roadmap. It is useful for ICT students planning a final project.</p>`,
+  },
+  {
+>>>>>>> 05b305b (smartmindz v2)
     path: "ai-homework-helper",
     title: "Homework Helper — SmartMind",
     description:

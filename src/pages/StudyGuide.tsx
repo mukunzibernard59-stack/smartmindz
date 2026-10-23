@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
+import ContentAd from '@/components/ContentAd';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { getGuideBySlug, studyGuides } from '@/data/studyGuides';
@@ -121,6 +122,7 @@ const StudyGuide: React.FC = () => {
             </div>
           </div>
         )}
+        <ContentAd />
       </main>
       <Footer />
     </div>

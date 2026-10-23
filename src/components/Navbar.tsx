@@ -9,6 +9,7 @@ import { Menu, X, BookOpen, LogOut, MonitorDown, Code2, MessageSquare, Camera, L
 
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuth } from '@/hooks/useAuth';
+import { isContentRoute } from '@/lib/contentRoutes';
 import { useRef, useCallback } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -48,12 +49,12 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { to: '/', label: t('nav.home') },
     { to: '/library', label: 'Library' },
+    { to: '/guides', label: 'Study Guides' },
     { to: '/learn', label: t('nav.learn') },
-    { to: '/dev', label: 'Dev Mode', icon: Code2 },
+    { to: '/translate', label: 'Translate' },
     { to: '/blog', label: 'Blog' },
-    { to: '/how-to', label: 'Guides' },
+    { to: '/how-to', label: 'How-To' },
     { to: '/about', label: 'About' },
-    { to: '/faq', label: 'FAQ' },
   ];
 
   const openLogin = () => { setSignupMode(false); setLoginModalOpen(true); };
@@ -95,7 +96,7 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo + sidebar trigger */}
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="text-muted-foreground hover:text-primary" />
+              {!isContentRoute(location.pathname) && <SidebarTrigger className="text-muted-foreground hover:text-primary" />}
               <Link to="/" className="flex items-center gap-2 group">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[0_0_20px_-3px_hsl(187_85%_53%/0.5)] animate-glow-pulse">
                   <BookOpen className="h-5 w-5 text-primary-foreground" />

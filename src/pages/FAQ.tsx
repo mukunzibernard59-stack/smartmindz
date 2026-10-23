@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: 'Can teachers use SmartMind?',
-    a: 'Yes. Many teachers use the Smart Tutor to generate practice quizzes, the Writer Studio to prepare lesson notes, and the TVET Library to give students structured revision material.',
+    a: 'Yes. Trainers are welcome to use the Smart Tutor to generate practice quizzes, the Writer Studio to prepare lesson notes, and the TVET Library to point students to structured revision material.',
   },
   {
     q: 'How is my data protected?',

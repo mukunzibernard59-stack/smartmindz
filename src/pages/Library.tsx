@@ -266,6 +266,9 @@ const Library: React.FC = () => {
               <p className="text-sm text-muted-foreground max-w-xl mx-auto">
                 Official TVET sectors, courses, L3/L4/L5 levels, modules and resources rendered with cached navigation.
               </p>
+              <p className="text-xs text-muted-foreground max-w-xl mx-auto mt-2">
+                Materials are based on curriculum published by the Rwanda TVET Board (RTB) and remain the property of their original authors. See our copyright policy for sources and takedown requests.
+              </p>
             </div>
           )}
 

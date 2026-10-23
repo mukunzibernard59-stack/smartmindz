@@ -26,8 +26,13 @@ const Hero: React.FC = () => {
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.1] mb-6"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
+<<<<<<< HEAD
             Learn Smarter.{' '}
             <span className="text-gradient-primary text-glow">Get Help Faster.</span>
+=======
+            Study Smarter.{' '}
+            <span className="text-gradient-primary text-glow">Free for Rwandan Students.</span>
+>>>>>>> 05b305b (smartmindz v2)
           </motion.h1>
 
           {/* Subtitle */}
@@ -37,8 +42,12 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl text-foreground/85 max-w-xl mx-auto mb-10 leading-relaxed"
           >
+<<<<<<< HEAD
             Get instant answers/help for <strong className="text-foreground">Tvet notes,letter writing,language translation</strong>, and more
             with the power of smart technology. Your personal tutor that never sleeps.
+=======
+            Find <strong className="text-foreground">TVET course notes, study guides, letter-writing help and translation</strong> in one free app made for Rwandan students.
+>>>>>>> 05b305b (smartmindz v2)
           </motion.p>
         </div>
 

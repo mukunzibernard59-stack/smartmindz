@@ -18,7 +18,11 @@ const Footer: React.FC = () => {
                 Smart<span className="text-primary">Mind</span>
               </span>
             </Link>
+<<<<<<< HEAD
             <p className="text-muted-foreground text-sm">Fast AI learning - direct answers for all subjects.</p>
+=======
+            <p className="text-muted-foreground text-sm">Free study tools and TVET resources for Rwandan students.</p>
+>>>>>>> 05b305b (smartmindz v2)
           </div>
 
           <div>
@@ -28,7 +32,11 @@ const Footer: React.FC = () => {
               <li><Link to="/learn" className="text-muted-foreground hover:text-primary text-sm transition-colors">Smart Tutor</Link></li>
               <li><Link to="/ai-writer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Writer Studio</Link></li>
               <li><Link to="/translate" className="text-muted-foreground hover:text-primary text-sm transition-colors">Translator</Link></li>
+<<<<<<< HEAD
               <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">How-To Guides</Link></li>
+=======
+              <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">How-To</Link></li>
+>>>>>>> 05b305b (smartmindz v2)
               <li><Link to="/guides" className="text-muted-foreground hover:text-primary text-sm transition-colors">Study Guides</Link></li>
             </ul>
           </div>
@@ -46,11 +54,16 @@ const Footer: React.FC = () => {
 
 
           <div>
+<<<<<<< HEAD
             <h4 className="font-semibold mb-4 text-foreground">Support</h4>
             <ul className="space-y-2">
               <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">Help Center</Link></li>
               <li><Link to="/faq" className="text-muted-foreground hover:text-primary text-sm transition-colors">FAQ</Link></li>
               <li><Link to="/contact" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact Us</Link></li>
+=======
+            <h4 className="font-semibold mb-4 text-foreground">Legal</h4>
+            <ul className="space-y-2">
+>>>>>>> 05b305b (smartmindz v2)
               <li><Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">Terms of Service</Link></li>
             </ul>

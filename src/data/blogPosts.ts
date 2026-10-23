@@ -32,11 +32,11 @@ export const posts: BlogPost[] = [
     date: '2026-05-12',
     readMinutes: 4,
     tags: ['TVET', 'Study', 'Rwanda'],
-    content: `Rwanda TVET national assessments are unlike most school exams. They are designed around practical competencies, not memorized theory, which means your revision needs to look very different from the "read the textbook three times" habit most of us grew up with. This guide walks you through a revision system that consistently helps our TVET students score in the top band — and it costs nothing but your time.
+    content: `Rwanda TVET national assessments are unlike most school exams. They are designed around practical competencies, not memorized theory, which means your revision needs to look very different from the "read the textbook three times" habit most of us grew up with. This guide walks you through a simple revision system built around those competencies, and it costs nothing but your time.
 
 ## Start With The Competency Map
 
-Every TVET module is anchored to a set of learning outcomes and performance criteria published by the Rwanda TVET Board. Before you open any note, print the competency list for your module and treat it as your checklist. For each line, write one of three marks next to it: green if you can perform it under exam conditions, yellow if you understand it in theory but haven't practiced enough, and red if you don't know it at all. Ninety percent of failed TVET exams come from students who never made this map — they revise what they already know instead of what they don't.
+Every TVET module is anchored to a set of learning outcomes and performance criteria published by the Rwanda TVET Board. Before you open any note, print the competency list for your module and treat it as your checklist. For each line, write one of three marks next to it: green if you can perform it under exam conditions, yellow if you understand it in theory but haven't practiced enough, and red if you don't know it at all. Many students who struggle in assessments never made this map — they revise what they already know instead of what they don't.
 
 ## Build A Weekly Revision Rhythm
 

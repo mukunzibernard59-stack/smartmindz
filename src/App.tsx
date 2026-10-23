@@ -3,7 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+=======
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { isContentRoute } from "@/lib/contentRoutes";
+>>>>>>> 05b305b (smartmindz v2)
 import { HelmetProvider } from "react-helmet-async";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
@@ -64,21 +69,41 @@ const RouteSkeleton = () => (
   </div>
 );
 
+<<<<<<< HEAD
+=======
+/** Renders children only on tool/app screens, keeping editorial pages free of banners and the tool sidebar. */
+const HideOnContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { pathname } = useLocation();
+  return isContentRoute(pathname) ? null : <>{children}</>;
+};
+
+>>>>>>> 05b305b (smartmindz v2)
 const AppContent = () => {
   return (
     <>
       <Toaster />
       <Sonner />
+<<<<<<< HEAD
       <FloatingInstallButton />
       <UpdateNotification />
       <AppRatingBanner />
         <BrowserRouter basename="/">
+=======
+      <UpdateNotification />
+        <BrowserRouter basename="/">
+        <HideOnContent><FloatingInstallButton /></HideOnContent>
+        <HideOnContent><AppRatingBanner /></HideOnContent>
+>>>>>>> 05b305b (smartmindz v2)
         <AnnouncementPopup />
         <PushPermissionPrompt />
         <RouteRobotsMeta />
         <SidebarProvider defaultOpen={true}>
           <div className="min-h-screen flex w-full">
+<<<<<<< HEAD
             <AppSidebar />
+=======
+            <HideOnContent><AppSidebar /></HideOnContent>
+>>>>>>> 05b305b (smartmindz v2)
             <div className="flex-1 flex flex-col min-w-0">
               <Suspense fallback={<RouteSkeleton />}>
                 <Routes>
