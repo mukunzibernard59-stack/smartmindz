@@ -1,6 +1,6 @@
 # SmartMind
 
-> SmartMind is a free AI learning app: AI tutor, smart quizzes, image editor, translator, writer and more. Designed to help students and lifelong learners learn faster online.
+> SmartMind is a free  learning app: AIl tutor, smart quizzes, image editor, translator, writer and more. Designed to help students and lifelong learners learn faster online.
 
 ## Pages
 
