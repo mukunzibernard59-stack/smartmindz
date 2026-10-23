@@ -1,0 +1,130 @@
+import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {
+  Home, Sparkles, Brain, Youtube, Code2,
+  ImagePlus, Wand2, Languages, Library as LibraryIcon, ShieldCheck,
+} from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useAdminStatus } from '@/hooks/useAdminStatus';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
+
+const mainItems = [
+  { title: 'Home', url: '/', icon: Home },
+  { title: 'TVET Library', url: '/library', icon: LibraryIcon },
+  { title: 'Dev Mode', url: '/dev', icon: Code2 },
+];
+
+const aiTools = [
+  { title: 'Writer', url: '/ai-writer', icon: Sparkles },
+  { title: 'Detector', url: '/ai-detector', icon: Brain },
+  { title: 'YouTube Tutor', url: '/youtube-tutor', icon: Youtube },
+  { title: 'Design Studio', url: '/generate-image', icon: ImagePlus },
+  { title: 'Build App Prompt', url: '/build-app-prompt', icon: Wand2 },
+  { title: 'Translate', url: '/translate', icon: Languages },
+];
+
+const AppSidebar: React.FC = () => {
+  const { state, isMobile, setOpen, setOpenMobile } = useSidebar();
+  const collapsed = state === 'collapsed';
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  const { data: isAdmin = false } = useAdminStatus(user);
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const go = (url: string, isTool = false) => {
+    navigate(url);
+    if (isTool) {
+      // Auto-collapse to icons-only for an immersive tool experience
+      if (isMobile) setOpenMobile(false);
+      else setOpen(false);
+    }
+  };
+
+  return (
+    <Sidebar collapsible="icon" className="border-r border-border">
+      <SidebarContent className="bg-card pt-6">
+        <SidebarGroup className="mb-2">
+          <SidebarGroupLabel className="mb-2">Menu</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1.5">
+              {mainItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                    className={cn(
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
+                    )}
+                  >
+                    <button onClick={() => go(item.url)} className="w-full flex items-center gap-3">
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip="Library Admin"
+                    className={cn(
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive('/admin/library') && 'bg-primary/15 text-primary font-semibold'
+                    )}
+                  >
+                    <button onClick={() => go('/admin/library')} className="w-full flex items-center gap-3">
+                      <ShieldCheck className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>Library Admin</span>}
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-3">
+          <SidebarGroupLabel className="mb-2">Smart Tools</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1.5">
+              {aiTools.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    tooltip={item.title}
+                    className={cn(
+                      'h-10 px-3 transition-colors text-foreground hover:text-primary hover:bg-primary/10',
+                      isActive(item.url) && 'bg-primary/15 text-primary font-semibold'
+                    )}
+                  >
+                    <button onClick={() => go(item.url, true)} className="w-full flex items-center gap-3">
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      {!collapsed && <span>{item.title}</span>}
+                    </button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};
+
+export default AppSidebar;

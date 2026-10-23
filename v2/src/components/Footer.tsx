@@ -1,0 +1,91 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { BookOpen, Instagram, Mail } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+
+const Footer: React.FC = () => {
+  return (
+    <footer className="relative border-t border-border/50">
+      <div className="absolute inset-0 bg-gradient-to-t from-primary/[0.02] to-transparent" />
+      <div className="container mx-auto px-4 py-12 relative">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="col-span-2 md:col-span-1">
+            <Link to="/" className="flex items-center gap-2 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-[0_0_20px_-3px_hsl(187_85%_53%/0.4)]">
+                <BookOpen className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <span className="font-bold text-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                Smart<span className="text-primary">Mind</span>
+              </span>
+            </Link>
+            <p className="text-muted-foreground text-sm">Free study tools and TVET resources for Rwandan students.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4 text-foreground">Product</h4>
+            <ul className="space-y-2">
+              <li><Link to="/library" className="text-muted-foreground hover:text-primary text-sm transition-colors">TVET Library</Link></li>
+              <li><Link to="/learn" className="text-muted-foreground hover:text-primary text-sm transition-colors">Smart Tutor</Link></li>
+              <li><Link to="/ai-writer" className="text-muted-foreground hover:text-primary text-sm transition-colors">Writer Studio</Link></li>
+              <li><Link to="/translate" className="text-muted-foreground hover:text-primary text-sm transition-colors">Translator</Link></li>
+              <li><Link to="/how-to" className="text-muted-foreground hover:text-primary text-sm transition-colors">How-To</Link></li>
+              <li><Link to="/guides" className="text-muted-foreground hover:text-primary text-sm transition-colors">Study Guides</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-4 text-foreground">Company</h4>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="text-muted-foreground hover:text-primary text-sm transition-colors">About Us</Link></li>
+              <li><Link to="/blog" className="text-muted-foreground hover:text-primary text-sm transition-colors">Blog</Link></li>
+              <li><Link to="/faq" className="text-muted-foreground hover:text-primary text-sm transition-colors">FAQ</Link></li>
+              <li><Link to="/contact" className="text-muted-foreground hover:text-primary text-sm transition-colors">Contact</Link></li>
+              <li><Link to="/copyright" className="text-muted-foreground hover:text-primary text-sm transition-colors">Copyright Policy</Link></li>
+            </ul>
+          </div>
+
+
+          <div>
+            <h4 className="font-semibold mb-4 text-foreground">Legal</h4>
+            <ul className="space-y-2">
+              <li><Link to="/privacy" className="text-muted-foreground hover:text-primary text-sm transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="text-muted-foreground hover:text-primary text-sm transition-colors">Terms of Service</Link></li>
+            </ul>
+            <a href="mailto:mukunzibernard59@gmail.com" className="mt-4 inline-flex">
+              <Badge variant="secondary" className="gap-1.5 hover:bg-secondary/80 transition-colors cursor-pointer">
+                <Mail className="h-3.5 w-3.5" />
+                mukunzibernard59@gmail.com
+              </Badge>
+            </a>
+            <br />
+            <a
+              href="https://instagram.com/m.berndev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex"
+            >
+              <Badge variant="secondary" className="gap-1.5 hover:bg-secondary/80 transition-colors cursor-pointer">
+                <Instagram className="h-3.5 w-3.5" />
+                @m.berndev
+              </Badge>
+            </a>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-muted-foreground text-sm">© 2026 SmartMind. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            <span className="text-muted-foreground text-sm">Available in:</span>
+            <div className="flex gap-2">
+              {['🇬🇧', '🇫🇷', '🇷🇼', '🇰🇪'].map((flag) => (
+                <span key={flag} className="text-lg">{flag}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;

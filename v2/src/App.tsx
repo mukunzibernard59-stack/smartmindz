@@ -1,0 +1,146 @@
+import React, { Suspense, lazy } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { isContentRoute } from "@/lib/contentRoutes";
+import { HelmetProvider } from "react-helmet-async";
+import { LanguageProvider } from "@/contexts/LanguageContext";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/AppSidebar";
+import RouteRobotsMeta from "@/components/RouteRobotsMeta";
+import FloatingInstallButton from "@/components/FloatingInstallButton";
+import ThemeToggle from "@/components/ThemeToggle";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import UpdateNotification from "@/components/UpdateNotification";
+import AppRatingBanner from "@/components/AppRatingBanner";
+import AnnouncementPopup from "@/components/AnnouncementPopup";
+import PushPermissionPrompt from "@/components/PushPermissionPrompt";
+import OfflineGate from "@/components/OfflineGate";
+import { Skeleton } from "@/components/ui/skeleton";
+import { queryClient } from "@/lib/queryClient";
+
+const Index = lazy(() => import("./pages/Index"));
+const Learn = lazy(() => import("./pages/Learn"));
+const Quiz = lazy(() => import("./pages/Quiz"));
+const DevMode = lazy(() => import("./pages/DevMode"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
+const TermsOfService = lazy(() => import("./pages/TermsOfService"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AIWriter = lazy(() => import("./pages/AIWriter"));
+const AIDetector = lazy(() => import("./pages/AIDetector"));
+const GenerateImage = lazy(() => import("./pages/GenerateImage"));
+const BuildAppPrompt = lazy(() => import("./pages/BuildAppPrompt"));
+const Translate = lazy(() => import("./pages/Translate"));
+const YouTubeTutor = lazy(() => import("./pages/YouTubeTutor"));
+const HomeworkHelper = lazy(() => import("./pages/HomeworkHelper"));
+const Library = lazy(() => import("./pages/Library"));
+const AdminLibrary = lazy(() => import("./pages/AdminLibrary"));
+const About = lazy(() => import("./pages/About"));
+const FAQ = lazy(() => import("./pages/FAQ"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const HowTo = lazy(() => import("./pages/HowTo"));
+const Contact = lazy(() => import("./pages/Contact"));
+const CopyrightPolicy = lazy(() => import("./pages/CopyrightPolicy"));
+const Guides = lazy(() => import("./pages/Guides"));
+const StudyGuide = lazy(() => import("./pages/StudyGuide"));
+
+
+const RouteSkeleton = () => (
+  <div className="min-h-screen bg-background">
+    <div className="sticky top-0 z-20 h-16 border-b border-border bg-background/95 backdrop-blur" />
+    <main className="container mx-auto max-w-6xl px-4 py-6 space-y-6">
+      <div className="space-y-3">
+        <Skeleton className="h-8 w-2/3 max-w-md" />
+        <Skeleton className="h-4 w-full max-w-xl" />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Skeleton key={index} className="h-32 rounded-lg" />
+        ))}
+      </div>
+    </main>
+  </div>
+);
+
+/** Renders children only on tool/app screens, keeping editorial pages free of banners and the tool sidebar. */
+const HideOnContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { pathname } = useLocation();
+  return isContentRoute(pathname) ? null : <>{children}</>;
+};
+
+const AppContent = () => {
+  return (
+    <>
+      <Toaster />
+      <Sonner />
+      <UpdateNotification />
+        <BrowserRouter basename="/">
+        <HideOnContent><FloatingInstallButton /></HideOnContent>
+        <HideOnContent><AppRatingBanner /></HideOnContent>
+        <AnnouncementPopup />
+        <PushPermissionPrompt />
+        <RouteRobotsMeta />
+        <SidebarProvider defaultOpen={true}>
+          <div className="min-h-screen flex w-full">
+            <HideOnContent><AppSidebar /></HideOnContent>
+            <div className="flex-1 flex flex-col min-w-0">
+              <Suspense fallback={<RouteSkeleton />}>
+                <Routes>
+                  {/* Offline-friendly routes (no internet required) */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/privacy" element={<PrivacyPolicy />} />
+                  <Route path="/terms" element={<TermsOfService />} />
+                  <Route path="/ai-writer" element={<AIWriter />} />
+                  <Route path="/build-app-prompt" element={<BuildAppPrompt />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/how-to" element={<HowTo />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/copyright" element={<CopyrightPolicy />} />
+                  <Route path="/guides" element={<Guides />} />
+                  <Route path="/guides/:slug" element={<StudyGuide />} />
+
+                  {/* Internet-required routes (gated when offline) */}
+                  <Route path="/learn" element={<OfflineGate toolName="Learn"><Learn /></OfflineGate>} />
+                  {/* Duplicate entry points redirect to the single canonical Learn screen */}
+                  <Route path="/quiz" element={<Navigate to="/learn" replace />} />
+                  <Route path="/chat" element={<Navigate to="/learn" replace />} />
+                  <Route path="/dev" element={<OfflineGate toolName="Dev Mode"><DevMode /></OfflineGate>} />
+                  <Route path="/ai-detector" element={<OfflineGate toolName="AI Detector"><AIDetector /></OfflineGate>} />
+                  <Route path="/generate-image" element={<OfflineGate toolName="Design Studio"><GenerateImage /></OfflineGate>} />
+                  <Route path="/translate" element={<OfflineGate toolName="Translate"><Translate /></OfflineGate>} />
+                  <Route path="/youtube-tutor" element={<OfflineGate toolName="Learning Hub"><YouTubeTutor /></OfflineGate>} />
+                  <Route path="/ai-homework-helper" element={<OfflineGate toolName="Homework Helper"><HomeworkHelper /></OfflineGate>} />
+                  <Route path="/library" element={<OfflineGate toolName="TVET Library"><Library /></OfflineGate>} />
+                  <Route path="/admin/library" element={<OfflineGate toolName="Admin"><AdminLibrary /></OfflineGate>} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </div>
+          </div>
+        </SidebarProvider>
+      </BrowserRouter>
+    </>
+  );
+};
+
+const App = () => (
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <LanguageProvider>
+        <ThemeProvider>
+          <TooltipProvider>
+            <AppContent />
+          </TooltipProvider>
+        </ThemeProvider>
+      </LanguageProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
+);
+
+export default App;

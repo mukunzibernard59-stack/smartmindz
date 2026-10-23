@@ -1,0 +1,31 @@
+project_id = "wppdrxuqvolqnsojubsp"
+
+[functions.generate-notes]
+verify_jwt = false
+
+[functions.generate-quiz]
+verify_jwt = false
+
+[functions.chat]
+verify_jwt = false
+
+[functions.check-access]
+verify_jwt = false
+
+[functions.generate-image]
+verify_jwt = false
+
+[functions.generate-video]
+verify_jwt = false
+
+[functions.submit-rating]
+verify_jwt = true
+
+[functions.ai-task]
+verify_jwt = false
+
+[functions.youtube-search]
+verify_jwt = false
+
+[functions.send-announcement]
+verify_jwt = false

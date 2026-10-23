@@ -1,0 +1,1 @@
+DROP POLICY "Users can update their own subscription" ON public.subscriptions;

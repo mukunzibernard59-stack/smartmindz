@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789367936606,
+      "tag": "0000_share_admin_tvet_resources",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789450328872,
+      "tag": "0001_create_announcements",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789625172206,
+      "tag": "0002_create_push_tokens",
+      "breakpoints": true
+    }
+  ]
+}
