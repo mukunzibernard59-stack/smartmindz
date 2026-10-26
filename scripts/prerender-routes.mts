@@ -56,7 +56,7 @@ const routes: RouteMeta[] = [
     description:
       "SmartMind is a free learning app for Rwandan TVET students: study tools, a TVET library, translator, writer and more. No signup needed.",
     body: `<h1>SmartMind — Free Learning App for Rwandan Students</h1>
-<p>SmartMind is a free smart learning app built for Rwandan students. It brings together study tools, a TVET library of notes and guides, a translator, a writing helper, and practice quizzes — all free, with no signup required to start learning.</p>
+<p>SmartMind is a free smart learning app built for Rwandan students. It brings together study tools, a TVET library of notes and guides, a translator, a writing helper, and practice quizzes — all in one app.</p>
 <h2>What you can do with SmartMind</h2>
 <ul>
 <li>Browse the TVET Library for course notes and study guides</li>
@@ -71,7 +71,7 @@ const routes: RouteMeta[] = [
     description:
       "SmartMind is a free learning app built by Bernard Mukunzi for Rwandan TVET students. Learn who runs it, who it serves, and how to reach us.",
     body: `<h1>About SmartMind</h1>
-<p>SmartMind is a free learning app for Rwandan students, especially those in TVET (Technical and Vocational Education and Training) schools. It was founded by Bernard Mukunzi to make quality study materials and learning tools available to every student with a phone.</p>
+<p>SmartMind is a free learning app for Rwandan students, especially those in TVET (Technical and Vocational Education and Training) schools. It was founded by Bernard Mukunzi to make quality study tools more accessible.</p>
 <p>The app includes a TVET library, study guides, a translator, writing tools, and practice quizzes. SmartMind is supported by advertising so it can stay free for students.</p>
 <p>Contact: mukunzibernard59@gmail.com</p>`,
   },
@@ -141,7 +141,7 @@ const routes: RouteMeta[] = [
     description:
       "Browse free TVET course notes, modules, and study materials from Rwanda's RTB curriculum, organised by course, level, and module.",
     body: `<h1>TVET Library</h1>
-<p>Browse free TVET course notes and study materials organised by course, level, and module, based on Rwanda's RTB curriculum. Open any module to read notes, view PDFs, and download materials to your device.</p>`,
+<p>Browse free TVET course notes and study materials organised by course, level, and module, based on Rwanda's RTB curriculum. Open any module to read notes, view PDFs, and download materials to study offline.</p>`,
   },
   {
     path: "learn",
@@ -176,8 +176,6 @@ const routes: RouteMeta[] = [
 <p>Draft letters, CVs, and documents, then export them as PDF, DOCX, or TXT. Includes templates like the friendly letter format taught in school.</p>`,
   },
   {
-<<<<<<< HEAD
-=======
     path: "dev",
     title: "Dev Mode — Learn to Code in the Browser | SmartMind",
     description:
@@ -209,10 +207,9 @@ const routes: RouteMeta[] = [
     description:
       "Describe an app idea and get a structured plan with features, pages, data and a simple roadmap.",
     body: `<h1>App Planner</h1>
-<p>Describe the app you want to build and get a structured plan: the main features, the pages you need, the data to store and a step-by-step roadmap. It is useful for ICT students planning a final project.</p>`,
+<p>Describe the app you want to build and get a structured plan: the main features, the pages you need, the data to store and a step-by-step roadmap. It is useful for ICT students planning a final project or app prototype.</p>`,
   },
   {
->>>>>>> 05b305b (smartmindz v2)
     path: "ai-homework-helper",
     title: "Homework Helper — SmartMind",
     description:
