@@ -55,15 +55,7 @@ const routes: RouteMeta[] = [
     title: "SmartMind — Free Learning App for Rwandan Students",
     description:
       "SmartMind is a free learning app for Rwandan TVET students: study tools, a TVET library, translator, writer and more. No signup needed.",
-    body: `<h1>SmartMind — Free Learning App for Rwandan Students</h1>
-<p>SmartMind is a free smart learning app built for Rwandan students. It brings together study tools, a TVET library of notes and guides, a translator, a writing helper, and practice quizzes — all in one app.</p>
-<h2>What you can do with SmartMind</h2>
-<ul>
-<li>Browse the TVET Library for course notes and study guides</li>
-<li>Practice with quizzes and the learning assistant</li>
-<li>Translate between English, French, Kinyarwanda and Swahili</li>
-<li>Read study guides and blog articles written for TVET students</li>
-</ul>`,
+    body: "",
   },
   {
     path: "about",
@@ -71,7 +63,7 @@ const routes: RouteMeta[] = [
     description:
       "SmartMind is a free learning app built by Bernard Mukunzi for Rwandan TVET students. Learn who runs it, who it serves, and how to reach us.",
     body: `<h1>About SmartMind</h1>
-<p>SmartMind is a free learning app for Rwandan students, especially those in TVET (Technical and Vocational Education and Training) schools. It was founded by Bernard Mukunzi to make quality study tools more accessible.</p>
+<p>SmartMind is a free learning app for Rwandan students, especially those in TVET (Technical and Vocational Education and Training) schools. It was founded by Bernard Mukunzi to make quality study support more accessible across Africa.</p>
 <p>The app includes a TVET library, study guides, a translator, writing tools, and practice quizzes. SmartMind is supported by advertising so it can stay free for students.</p>
 <p>Contact: mukunzibernard59@gmail.com</p>`,
   },
@@ -207,7 +199,7 @@ const routes: RouteMeta[] = [
     description:
       "Describe an app idea and get a structured plan with features, pages, data and a simple roadmap.",
     body: `<h1>App Planner</h1>
-<p>Describe the app you want to build and get a structured plan: the main features, the pages you need, the data to store and a step-by-step roadmap. It is useful for ICT students planning a final project or app prototype.</p>`,
+<p>Describe the app you want to build and get a structured plan: the main features, the pages you need, the data to store and a step-by-step roadmap. It is useful for ICT students planning a final project or portfolio.</p>`,
   },
   {
     path: "ai-homework-helper",
