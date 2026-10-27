@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && bunx tsx scripts/prerender-routes.mts",
+   "build": "vite build && npx tsx scripts/prerender-routes.mts",
     "build:dev": "vite build --mode development && bunx tsx scripts/prerender-routes.mts",
     "lint": "eslint .",
     "preview": "vite preview"
