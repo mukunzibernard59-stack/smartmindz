@@ -27,7 +27,7 @@ const Hero: React.FC = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Study Smarter.{' '}
-            <span className="text-gradient-primary text-glow">Free for Rwandan Students.</span>
+            <span className="text-gradient-primary text-glow">Free for Every one.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -48,7 +48,7 @@ const Hero: React.FC = () => {
           transition={{ delay: 0.8 }}
           className="mt-10 text-center text-sm text-foreground/75 font-medium"
         >
-          A free smart learning app built for Rwandan students
+          A free smart learning app built for every one
         </motion.p>
       </div>
     </section>
