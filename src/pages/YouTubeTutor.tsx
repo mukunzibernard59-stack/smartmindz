@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Youtube, Search, ExternalLink, RefreshCw, Loader2, Sparkles } from 'lucide-react';
+import { Youtube, Search, ExternalLink, RefreshCw, Loader2, Sparkles, Download } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import ToolPage from '@/components/tools/ToolPage';
@@ -14,10 +14,35 @@ interface YtResult {
   channelTitle: string;
   thumbnail: string;
   publishedAt: string;
+  downloadUrl?: string | null;
 }
 
 const DEFAULT_VIDEO_ID = 'PkZNo7MFNFg';
 const DEFAULT_TITLE = 'Featured lesson';
+
+const sanitizeFileName = (value: string) =>
+  value
+    .trim()
+    .replace(/[\\/:*?"<>|]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\.$/, '') || 'lesson';
+
+const isAuthorizedDownloadUrl = (value?: string | null) => {
+  if (!value) return false;
+  const url = value.trim();
+  if (!url) return false;
+
+  try {
+    const parsed = new URL(url);
+    const allowedProtocols = ['http:', 'https:'];
+    if (!allowedProtocols.includes(parsed.protocol)) return false;
+    if (/^(https?:)?\/\/(?:www\.)?(?:youtube\.com|youtu\.be|m\.youtube\.com)\//i.test(url)) return false;
+    if (/\/embed\//i.test(url) || /[?&]v=[A-Za-z0-9_-]+/i.test(url)) return false;
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 const YouTubeTutor: React.FC = () => {
   const [activeId, setActiveId] = useState<string>(DEFAULT_VIDEO_ID);
@@ -28,6 +53,15 @@ const YouTubeTutor: React.FC = () => {
   const [ytResults, setYtResults] = useState<YtResult[]>([]);
   const [ytError, setYtError] = useState<string | null>(null);
   const searchCacheRef = useRef<Map<string, YtResult[]>>(new Map());
+
+  const activeResult = ytResults.find(r => r.videoId === activeId) ?? null;
+  const authorizedDownloadUrl = activeResult && isAuthorizedDownloadUrl(activeResult.downloadUrl)
+    ? activeResult.downloadUrl
+    : null;
+
+  const downloadHelpText = authorizedDownloadUrl
+    ? 'SmartMindz has an authorized downloadable lesson file for this lesson.'
+    : 'This lesson can still be watched on YouTube, but SmartMindz does not currently have an authorized downloadable file for it.';
 
   const runYouTubeSearch = async (q: string) => {
     const term = q.trim();
@@ -59,6 +93,48 @@ const YouTubeTutor: React.FC = () => {
     setActiveId(r.videoId);
     setActiveTitle(r.title);
     setTimeout(() => document.getElementById('yt-video-player')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+  };
+
+  const handleDownloadLesson = async () => {
+    if (!authorizedDownloadUrl) {
+      toast({
+        title: 'Download unavailable',
+        description: 'This lesson can still be watched on YouTube, but SmartMindz does not have an authorized downloadable file for it.',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(authorizedDownloadUrl, {
+        method: 'GET',
+        headers: {
+          Accept: 'video/*, application/octet-stream, */*',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Download request failed (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.rel = 'noopener noreferrer';
+      link.download = `${sanitizeFileName(activeTitle)}.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      toast({ title: 'Download started', description: 'Your authorized lesson file is downloading.' });
+    } catch (error: any) {
+      console.error('Lesson download failed:', error);
+      toast({
+        title: 'Download failed',
+        description: 'The authorized lesson file could not be downloaded right now. Please try again later.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const ytSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(`${activeTitle} tutorial`)}`;
@@ -132,7 +208,7 @@ const YouTubeTutor: React.FC = () => {
               className="w-full h-full border-0"
             />
           </div>
-          <div className="mt-2 flex flex-wrap gap-2 items-center text-xs">
+          <div className="mt-3 flex flex-wrap gap-2 items-center text-xs">
             <a href={ytSearchUrl} target="_blank" rel="noopener noreferrer"
               className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
               <RefreshCw className="h-3.5 w-3.5" /> Find more videos
@@ -141,7 +217,20 @@ const YouTubeTutor: React.FC = () => {
               className="px-3 py-1.5 rounded-lg border border-border hover:bg-secondary flex items-center gap-1">
               <ExternalLink className="h-3.5 w-3.5" /> Open on YouTube
             </a>
+            <Button
+              type="button"
+              onClick={handleDownloadLesson}
+              variant={authorizedDownloadUrl ? 'secondary' : 'outline'}
+              disabled={!authorizedDownloadUrl}
+              className="gap-1.5"
+            >
+              <Download className="h-3.5 w-3.5" />
+              Download Lesson
+            </Button>
           </div>
+          <p className={`mt-3 text-xs ${authorizedDownloadUrl ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground'}`}>
+            {downloadHelpText}
+          </p>
         </div>
       </div>
     </ToolPage>
