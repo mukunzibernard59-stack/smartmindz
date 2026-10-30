@@ -27,7 +27,7 @@ const Hero: React.FC = () => {
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Study Smarter.{' '}
-            <span className="text-gradient-primary text-glow">Free for Every one.</span>
+            <span className="text-gradient-primary text-glow">Free for Rwandan Students.</span>
           </motion.h1>
 
           {/* Subtitle */}
@@ -37,19 +37,9 @@ const Hero: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="text-base sm:text-lg md:text-xl text-foreground/85 max-w-xl mx-auto mb-10 leading-relaxed"
           >
-            Find <strong className="text-foreground">TVET course notes, study guides, letter-writing help and translation</strong> in one free app made for Rwandan students.
+            Learn with practical study tools for TVET, homework help, and language support.
           </motion.p>
         </div>
-
-        {/* SEO Tagline */}
-        <motion.p
-          initial={reducedMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-10 text-center text-sm text-foreground/75 font-medium"
-        >
-          A free smart learning app built for every one
-        </motion.p>
       </div>
     </section>
   );
