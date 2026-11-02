@@ -411,6 +411,15 @@ const Translate: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
+        <h2 className="text-sm font-semibold">How to use this translator</h2>
+        <p className="text-sm text-muted-foreground">
+          Type or paste text on the left, choose the language it is written in and the language you want, then tap Translate. You can also tap Speak and dictate instead of typing — your browser will ask for microphone permission the first time, and the listener keeps going through natural pauses until you tap Stop.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          After translating, choose Show as text to read the result or Speak it out to hear it pronounced in the target language. Use Copy to paste the translation into your notes, messages or documents. Translations come from a free dictionary service, so always double-check important official or academic wording.
+        </p>
+      </section>
     </ToolPage>
   );
 

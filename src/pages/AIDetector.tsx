@@ -251,11 +251,20 @@ const AIDetector: React.FC = () => {
           )}
         </div>
       </div>
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
+        <h2 className="text-sm font-semibold">How to use the Text Analyzer</h2>
+        <p className="text-sm text-muted-foreground">
+          Paste or type at least 20 characters and the report appears instantly as you write. It shows word and sentence counts, a readability score, repeated words you may want to vary, sentences longer than 25 words that readers may find hard to follow, keyword density, and spelling suggestions.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Use it to tighten essays, letters and reports before you submit them: shorten the flagged long sentences, replace repeated words, and fix the suggested spellings. The analysis runs entirely on your device — your text is never uploaded or stored anywhere.
+        </p>
+      </section>
     </ToolPage>
   );
 };
 
-const Stat = ({ label, value }: { label: string; value: number }) => (
+const Stat =  ({ label, value }: { label: string; value: number }) => (
   <div className="p-3 rounded-lg bg-secondary/60 text-center">
     <div className="text-lg font-semibold">{value}</div>
     <div className="text-xs text-muted-foreground">{label}</div>

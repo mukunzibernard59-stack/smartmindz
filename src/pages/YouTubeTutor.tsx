@@ -233,6 +233,15 @@ const YouTubeTutor: React.FC = () => {
           </p>
         </div>
       </div>
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
+        <h2 className="text-sm font-semibold">How to use the Learning Hub</h2>
+        <p className="text-sm text-muted-foreground">
+          Type any topic you want to learn — for example a subject from your TVET course, a math concept or a software skill — and tap Search. Tap any result card to play the video right here without leaving the app; the page scrolls to the player automatically.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Use Open on YouTube if you prefer the full YouTube interface, or Find more videos to widen the search. When lesson notes are available for a video, the Download Lesson button saves them to your device for offline study. Videos are provided by YouTube and play through YouTube's official embedded player, so captions, quality settings and fullscreen all work as usual.
+        </p>
+      </section>
     </ToolPage>
   );
 };

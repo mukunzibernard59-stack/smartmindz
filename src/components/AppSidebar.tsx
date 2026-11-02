@@ -27,7 +27,7 @@ const mainItems = [
 
 const aiTools = [
   { title: 'Writer', url: '/ai-writer', icon: Sparkles },
-  { title: 'Detector', url: '/ai-detector', icon: Brain },
+  { title: 'Text Analyzer', url: '/ai-detector', icon: Brain },
   { title: 'YouTube Tutor', url: '/youtube-tutor', icon: Youtube },
   { title: 'Design Studio', url: '/generate-image', icon: ImagePlus },
   { title: 'Build App Prompt', url: '/build-app-prompt', icon: Wand2 },

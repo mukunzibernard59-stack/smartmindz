@@ -363,6 +363,15 @@ const GenerateImage: React.FC = () => {
           </div>
         </div>
       )}
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
+        <h2 className="text-sm font-semibold">How to use the Design Studio</h2>
+        <p className="text-sm text-muted-foreground">
+          Upload a PNG, JPG or WEBP image by dragging it onto the upload area or browsing your device. Then adjust brightness, contrast and other settings, apply filters, crop or rotate, and add text overlays or frames using the control panel.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Every edit can be reversed with the undo button, so experiment freely. When you are happy with the result, export it as PNG, JPG or WEBP to save it on your device. All editing happens in your browser — your images are never uploaded to any server.
+        </p>
+      </section>
     </ToolPage>
   );
 };

@@ -165,11 +165,20 @@ const BuildAppPrompt: React.FC = () => {
           </div>
         </div>
       </div>
+      <section className="mt-6 bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
+        <h2 className="text-sm font-semibold">How to use the App Planner</h2>
+        <p className="text-sm text-muted-foreground">
+          Give your app idea a name, pick the closest app type, and list any custom features you have in mind — one per line. Switch Auth, Payments or Admin on if your idea needs user accounts, payments or an admin dashboard, and the plan updates instantly.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          The generated plan includes a feature checklist, a suggested page structure, a database schema and a build roadmap. Tap Copy and paste it into your notes or into an app builder as your starting specification. Everything is generated on your device — your idea is never uploaded anywhere.
+        </p>
+      </section>
     </ToolPage>
   );
 };
 
-const Toggle = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (b: boolean) => void }) => (
+const Toggle =  ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (b: boolean) => void }) => (
   <button onClick={() => onChange(!checked)}
     className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
       checked ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary border-border text-muted-foreground'
