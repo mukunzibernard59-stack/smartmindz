@@ -183,6 +183,46 @@ const routes: RouteMeta[] = [
     body: `<h1>Homework Helper</h1>
 <p>Get step-by-step help understanding your homework. SmartMind explains the method so you learn how to solve similar problems yourself.</p>`,
   },
+  {
+    path: "disclaimer",
+    title: "Disclaimer — SmartMind",
+    description:
+      "SmartMind's disclaimer: educational information provided in good faith, limits of AI-generated answers, external links, advertising, and no professional advice.",
+    body: `<h1>Disclaimer</h1>
+<p>SmartMind provides educational content in good faith for students in Rwanda and East Africa. Always confirm exam dates, registration steps, and official results with your school, the Rwanda TVET Board (RTB), or NESA. AI-generated answers can be wrong — verify them against official course materials before using them. Nothing on this site is legal, medical, financial, or career advice. SmartMind is supported by advertising, including Google AdSense.</p>`,
+  },
+  {
+    path: "dev",
+    title: "Dev Mode — Learn to Code | SmartMind",
+    description:
+      "Practice coding inside SmartMind's Dev Mode: a beginner-friendly coding workspace with a code assistant, exercises, and progress ranks.",
+    body: `<h1>Dev Mode</h1>
+<p>A beginner-friendly coding workspace inside SmartMind. Write and run code, get help from the code assistant, complete exercises, and earn experience points and ranks as you improve.</p>`,
+  },
+  {
+    path: "ai-detector",
+    title: "Writing Checker — SmartMind",
+    description:
+      "Check whether a piece of writing shows signs of being AI-generated, and get tips to make it more natural and original.",
+    body: `<h1>Writing Checker</h1>
+<p>Paste a piece of writing to check whether it shows signs of being AI-generated, and get practical tips to make your work more natural and original. Results are indicative, not proof — always use your own judgment.</p>`,
+  },
+  {
+    path: "generate-image",
+    title: "Design Studio — Image Creator | SmartMind",
+    description:
+      "Create images from text descriptions with SmartMind's Design Studio. Choose a style, generate, and download your image.",
+    body: `<h1>Design Studio</h1>
+<p>Create images from text descriptions. Describe what you need, choose a style, generate the image, and download it for your projects and presentations.</p>`,
+  },
+  {
+    path: "build-app-prompt",
+    title: "App Idea Prompts — SmartMind",
+    description:
+      "Turn your app idea into a clear, structured prompt you can use with AI app builders. A practical exercise for ICT students.",
+    body: `<h1>App Idea Prompts</h1>
+<p>Turn your app idea into a clear, structured prompt you can use with AI app builders. A practical exercise for ICT and software development students learning to specify software.</p>`,
+  },
 ];
 
 // Blog post routes (published only) with real article text.

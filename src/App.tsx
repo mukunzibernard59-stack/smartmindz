@@ -44,6 +44,7 @@ const BlogPost = lazy(() => import("./pages/BlogPost"));
 const HowTo = lazy(() => import("./pages/HowTo"));
 const Contact = lazy(() => import("./pages/Contact"));
 const CopyrightPolicy = lazy(() => import("./pages/CopyrightPolicy"));
+const Disclaimer = lazy(() => import("./pages/Disclaimer"));
 const Guides = lazy(() => import("./pages/Guides"));
 const StudyGuide = lazy(() => import("./pages/StudyGuide"));
 
@@ -101,6 +102,7 @@ const AppContent = () => {
                   <Route path="/how-to" element={<HowTo />} />
                   <Route path="/contact" element={<Contact />} />
                   <Route path="/copyright" element={<CopyrightPolicy />} />
+                  <Route path="/disclaimer" element={<Disclaimer />} />
                   <Route path="/guides" element={<Guides />} />
                   <Route path="/guides/:slug" element={<StudyGuide />} />
 
