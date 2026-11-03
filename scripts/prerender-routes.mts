@@ -276,9 +276,12 @@ const stamp = (r: RouteMeta): string => {
   html = html.replace(/<\/title>/, `</title>`); // no-op safeguard
   html = html.replace(/(<meta name="viewport"[^>]*>)/, `$1\n    ${headFor(r)}`);
   // Inject static content that React replaces on hydration.
+  // The SEO text stays in the HTML for crawlers but is kept off-screen so
+  // visitors never see an unstyled flash; a branded loading splash shows
+  // instead until React takes over.
   html = html.replace(
     /<div id="root"><\/div>/,
-    `<div id="root"><main style="max-width:720px;margin:0 auto;padding:2rem 1rem;font-family:system-ui,sans-serif;line-height:1.6">${r.body}</main></div>`
+    `<div id="root"><div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#0a0f1e;color:#e2e8f0;font-family:system-ui,sans-serif"><div style="font-size:1.5rem;font-weight:700;letter-spacing:0.02em">SmartMind</div><div style="margin-top:1rem;width:32px;height:32px;border:3px solid rgba(34,211,238,0.25);border-top-color:#22d3ee;border-radius:50%;animation:sm-spin 0.8s linear infinite"></div></div><style>@keyframes sm-spin{to{transform:rotate(360deg)}}</style><main style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">${r.body}</main></div>`
   );
   return html;
 };
