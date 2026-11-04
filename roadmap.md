@@ -1,5 +1,11 @@
 # AdSense-readiness overhaul (smartmindz.site)
 
+## Current cleanup
+- [ ] Remove the branded startup splash and off-screen crawler-only text.
+- [ ] Hide empty library branches without deleting the admin's curriculum.
+- [ ] Enforce draft filtering for unverified articles across pages and sitemap generation.
+- [ ] Check startup and public library navigation.
+
 - [x] 1. Per-page SEO — SEO.tsx per route; prerender now stamps real title/description/canonical/og per route into static HTML; keywords tag removed; unverifiable claims removed
 - [x] 2. Crawlable content — scripts/prerender-routes.mts emits per-route static HTML with real text inside #root (25+ routes incl. all published blog posts)
 - [x] 3. Routing/bugs — per-route index.html (no 404s), real noindex 404 page, sitemap generated from source at build time, robots.txt OK, library viewer has error+retry, internal links verified, downloads work
