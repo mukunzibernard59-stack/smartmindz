@@ -1,5 +1,9 @@
 # AdSense-readiness overhaul (smartmindz.site)
 
+## New requests
+- [ ] Complete inspection-only Gemini preparation report; do not change app services or request credentials.
+- [ ] Prepare the first ad campaign; agree goal, audience, channel, creative, and spending before creation or launch.
+
 ## Current cleanup
 - [x] Remove the branded startup splash and off-screen crawler-only text.
 - [x] Hide empty library branches without deleting the admin's curriculum.
