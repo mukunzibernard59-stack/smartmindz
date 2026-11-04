@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import ContentAd from '@/components/ContentAd';
 import { getPost, posts } from '@/data/blogPosts';
+import { isPublicArticle } from '@/lib/publicContent';
 import { Calendar, Clock, ArrowLeft } from 'lucide-react';
 
 const renderMarkdown = (md: string) => {
@@ -21,10 +22,10 @@ const BlogPost: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const post = slug ? getPost(slug) : undefined;
 
-  if (!post || post.status !== 'published') return <Navigate to="/blog" replace />;
+  if (!post || !isPublicArticle(post)) return <Navigate to="/blog" replace />;
 
   const related = posts
-    .filter((p) => p.slug !== post.slug && p.status === 'published')
+    .filter((p) => p.slug !== post.slug && isPublicArticle(p))
     .map((p) => ({ p, overlap: p.tags.filter((t) => post.tags.includes(t)).length }))
     .sort((a, b) => b.overlap - a.overlap)
     .slice(0, 3)

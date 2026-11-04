@@ -5,10 +5,11 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import ContentAd from '@/components/ContentAd';
 import { posts } from '@/data/blogPosts';
+import { isPublicArticle } from '@/lib/publicContent';
 import { Calendar, Clock } from 'lucide-react';
 
 const Blog: React.FC = () => {
-  const published = posts.filter((p) => p.status === 'published');
+  const published = posts.filter(isPublicArticle);
   return (
   <div className="min-h-screen bg-background">
     <SEO

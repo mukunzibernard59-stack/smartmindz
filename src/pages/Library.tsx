@@ -7,6 +7,7 @@ import SEO from '@/components/SEO';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { hasAvailableResources } from '@/lib/publicContent';
 import { ChevronRight, Search, BookOpen, FileText, Link2, HelpCircle, ArrowLeft, AlertCircle } from 'lucide-react';
 
 const EmbeddedViewer = lazy(() => import('@/components/library/EmbeddedViewer'));
@@ -61,6 +62,30 @@ const Library: React.FC = () => {
     : null;
   const activeCourseId = view.kind === 'course' || view.kind === 'module' ? view.course.id : null;
   const activeModuleId = view.kind === 'module' ? view.module.id : null;
+
+  const availabilityQuery = useQuery({
+    queryKey: ['tvet', 'public-availability'],
+    staleTime: 60 * 1000,
+    queryFn: async ({ signal }) => {
+      const { data, error } = await supabase
+        .from('tvet_resources')
+        .select('module_id, tvet_modules!inner(level_id, tvet_levels!inner(course_id, tvet_courses!inner(category_id)))')
+        .not('content', 'is', null)
+        .neq('content', '')
+        .abortSignal(signal);
+      if (error) throw error;
+      const categoryIds = new Set<string>();
+      const courseIds = new Set<string>();
+      const moduleIds = new Set<string>();
+      for (const resource of data || []) {
+        moduleIds.add(resource.module_id);
+        const level = resource.tvet_modules.tvet_levels;
+        courseIds.add(level.course_id);
+        categoryIds.add(level.tvet_courses.category_id);
+      }
+      return { categoryIds, courseIds, moduleIds };
+    },
+  });
 
   const categoriesQuery = useQuery({
     queryKey: ['tvet', 'categories'],
@@ -136,7 +161,7 @@ const Library: React.FC = () => {
         resourcesByModule[resource.module_id].push(resource);
       });
 
-      return { levels, modules, resourcesByModule };
+      return { levels, modules: modules.filter((module) => hasAvailableResources(module.id, resourcesByModule)), resourcesByModule };
     },
   });
 
@@ -204,8 +229,8 @@ const Library: React.FC = () => {
     },
   });
 
-  const categories = categoriesQuery.data || [];
-  const courses = coursesQuery.data || [];
+  const categories = (categoriesQuery.data || []).filter((category) => availabilityQuery.data?.categoryIds.has(category.id));
+  const courses = (coursesQuery.data || []).filter((course) => availabilityQuery.data?.courseIds.has(course.id));
   const levels = courseContentQuery.data?.levels || [];
   const modules = courseContentQuery.data?.modules || [];
   const resourcesByModule = courseContentQuery.data?.resourcesByModule || {};
@@ -214,11 +239,11 @@ const Library: React.FC = () => {
     : [];
 
   const isSearching = debouncedSearch.length >= 2;
-  const isInitialHubLoading = view.kind === 'hub' && categoriesQuery.isPending;
+  const isInitialHubLoading = view.kind === 'hub' && (categoriesQuery.isPending || availabilityQuery.isPending);
   const isCategoryLoading = view.kind === 'category' && coursesQuery.isFetching && courses.length === 0;
   const isCourseLoading = view.kind === 'course' && courseContentQuery.isFetching && modules.length === 0;
   const isModuleLoading = view.kind === 'module' && (courseContentQuery.isFetching || moduleResourcesQuery.isFetching) && resources.length === 0;
-  const currentError = categoriesQuery.error || coursesQuery.error || courseContentQuery.error || moduleResourcesQuery.error || searchQuery.error;
+  const currentError = availabilityQuery.error || categoriesQuery.error || coursesQuery.error || courseContentQuery.error || moduleResourcesQuery.error || searchQuery.error;
 
   const breadcrumb = useMemo(() => {
     const parts: { label: string; onClick: () => void }[] = [{ label: 'Library', onClick: () => setView({ kind: 'hub' }) }];
@@ -292,7 +317,11 @@ const Library: React.FC = () => {
           {isSearching ? (
             <SearchResults
               query={search}
-              results={searchQuery.data}
+              results={searchQuery.data ? {
+                ...searchQuery.data,
+                courses: searchQuery.data.courses.filter((course) => availabilityQuery.data?.courseIds.has(course.id)),
+                modules: [],
+              } : undefined}
               loading={searchQuery.isFetching && !searchQuery.data}
               categories={categories}
               setView={setView}
@@ -419,7 +448,7 @@ const CourseView = ({ category, course, levels, modules, resourcesByModule, load
     );
   }
 
-  if (levels.length === 0) return <EmptyState message="No levels are available for this course yet." />;
+  if (modules.length === 0) return <EmptyState message="No published notes are available for this course." />;
 
   return (
     <div className="space-y-5">
@@ -427,6 +456,7 @@ const CourseView = ({ category, course, levels, modules, resourcesByModule, load
         const level = levels.find((item) => item.level === levelName);
         if (!level) return null;
         const levelModules = modules.filter((module) => module.level_id === level.id);
+        if (levelModules.length === 0) return null;
         return (
           <div key={levelName} className="rounded-lg border border-border bg-card p-4">
             <div className="flex items-center gap-2 mb-3 min-h-6">
