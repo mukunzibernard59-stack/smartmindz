@@ -320,7 +320,7 @@ const Library: React.FC = () => {
               results={searchQuery.data ? {
                 ...searchQuery.data,
                 courses: searchQuery.data.courses.filter((course) => availabilityQuery.data?.courseIds.has(course.id)),
-                modules: [],
+                modules: searchQuery.data.modules.filter((module) => availabilityQuery.data?.moduleIds.has(module.id)),
               } : undefined}
               loading={searchQuery.isFetching && !searchQuery.data}
               categories={categories}
