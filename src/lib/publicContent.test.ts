@@ -1,17 +1,18 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, test } from 'node:test';
+import { strict as assert } from 'node:assert';
 import { hasAvailableResources, isPublicArticle } from './publicContent';
 
 describe('public content availability', () => {
   test('unfinished articles never become public even with published status', () => {
-    expect(isPublicArticle({ status: 'published', content: 'Advice [ADD/VERIFY: official requirements]' })).toBe(false);
-    expect(isPublicArticle({ status: 'published', content: 'A complete study lesson.' })).toBe(true);
+    assert.equal(isPublicArticle({ status: 'published', content: 'Advice [ADD/VERIFY: official requirements]' }), false);
+    assert.equal(isPublicArticle({ status: 'published', content: 'A complete study lesson.' }), true);
   });
   test('draft articles remain private', () => {
-    expect(isPublicArticle({ status: 'draft', content: 'A complete study lesson.' })).toBe(false);
+    assert.equal(isPublicArticle({ status: 'draft', content: 'A complete study lesson.' }), false);
   });
   test('modules without notes stay out of public browsing', () => {
-    expect(hasAvailableResources('empty', { empty: [] })).toBe(false);
-    expect(hasAvailableResources('missing', {})).toBe(false);
-    expect(hasAvailableResources('ready', { ready: [{ id: 'note' }] })).toBe(true);
+    assert.equal(hasAvailableResources('empty', { empty: [] }), false);
+    assert.equal(hasAvailableResources('missing', {}), false);
+    assert.equal(hasAvailableResources('ready', { ready: [{ id: 'note' }] }), true);
   });
 });
