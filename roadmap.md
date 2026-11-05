@@ -2,7 +2,7 @@
 
 ## New requests
 - [x] Complete inspection-only Gemini preparation report; app services and credentials unchanged; hosted function versions remain unverified.
-- [ ] Prepare the first ad campaign — waiting for the user's goal, audience, location, and paid-ad intent before channel/account setup.
+- [x] Clarify first-campaign intent — user wants AdSense earnings, not paid promotion; no campaign or spending created. Signup goal: all learners in Rwanda.
 
 ## Current cleanup
 - [x] Remove the branded startup splash and off-screen crawler-only text.
