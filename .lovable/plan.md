@@ -1,71 +1,84 @@
-# Rwanda TVET Learning Library
+# Priority One AdSense Recovery — Implementation Plan
 
-Transform the Learn menu into a full in-app TVET LMS with categories → courses → levels (L3/L4/L5) → modules → notes/PDFs/quizzes, all rendered inside the app with embedded viewers. Dark neon UI preserved.
+Nothing below is implemented yet. AdSense code, ads.txt, Google verification tags, sign-in, routes, learning tools and existing TVET files stay untouched.
 
-This is a large build. I'll ship it in 3 phases so each phase is reviewable and the app stays working. Phase 1 starts as soon as you approve.
+## 1. Homepage educational value
 
----
+**Problem:** the homepage shows about 18 words of real content (heading + one sentence).
 
-## Phase 1 — Foundation + UI shell (this round)
+**Change:** keep the current hero (photo background, gradient heading) and add three content sections below it:
+- **What SmartMindz is for** — a short, honest explanation: a free study companion for Rwandan TVET and secondary learners, with notes, study guides and practice tools. No claim of official RTB partnership.
+- **What you can study today** — list only what really exists now: Software Development notes in the library (PHP, databases, version control, Vue), the six study guides, and the blog. Future subjects are labelled "coming later", not presented as available.
+- **How to study with SmartMindz** — a 4-step practical method (read the note → check the study guide → test yourself with the tutor → revise weak points), plus short descriptions of Translate, YouTube Tutor and the Writer and what each is good for.
+- Links to Library, Guides, Blog and About.
 
-### Database (Supabase migration)
-- `tvet_categories` (slug, name, icon, sort_order)
-- `tvet_courses` (category_id, slug, title, description)
-- `tvet_levels` (course_id, level enum: L3/L4/L5)
-- `tvet_modules` (level_id, title, sort_order, source_url)
-- `tvet_resources` (module_id, type: pdf|note|link|quiz, title, url, extracted_text)
-- Full-text index on `extracted_text` + trigram on titles for smart search
-- RLS: public SELECT, service_role write
-- GRANTs to anon/authenticated/service_role
-- Seed: all 9 categories + initial course tree (ICT, Energy, Construction, Hospitality, Agriculture, Manufacturing, Transport, Crafts, Technical Services)
+Text will be written for students (roughly 400–600 useful words) — no filler, no keyword lists.
 
-### Routes & components
-- New `/library` route
-- `LibraryHub` — animated category grid (dark neon, glowing hover, skeletons)
-- `CategoryView` — courses list, collapsible
-- `CourseView` — L3/L4/L5 tabs → modules
-- `ModuleView` — notes, PDFs, quiz launcher
-- `EmbeddedViewer` — priority chain: iframe → react-pdf → in-app modal → new tab (last resort)
-- `TVETSearch` — searches courses/modules/resources/extracted_text
-- Install `react-pdf` + `pdfjs-dist` for in-app PDF preview (zoom, page nav, search)
+## 2. Vue learning note
 
-### Learn menu rewire
-- Replace static "Explore Subject Notes" in `AITutorTab` with a featured-categories CTA linking to `/library`
-- Keep AI chat, QuickQuiz, SubjectNotes intact
+**Problem:** the "Game in vue.js notes" resource contains only the title "Game In vue.js".
 
----
+**Change (no existing record is changed):** add a **new** shared note in the same module, "Building a Simple Game with Vue.js — Beginner Lesson", written originally, containing:
+- Learning objectives
+- What Vue is and why it suits small games (reactivity, components)
+- Setting up a project (`npm create vue@latest`)
+- Worked example: a "Guess the Number" game — data, methods, `v-model`, `v-if`, `@click`, with expected result
+- Second example: a click-counter with a timer (`setInterval`, cleanup in `onUnmounted`)
+- Common mistakes (mutating outside reactive state, forgetting to clear timers)
+- Exercises (3 graded tasks) with hints
+- Summary
+- Attribution line: "Original lesson by SmartMindz. Further reading: official Vue documentation (vuejs.org)."
 
-## Phase 2 — Content importer + Admin (next round)
+The old 14-character note stays in the database. To stop it appearing as an empty lesson, the library will skip notes under a minimum length in **public display only** (a code rule, not a data change). Admins still see it.
 
-- Edge function `import-rtb` scraping https://elearning.rtb.gov.rw via Firecrawl connector (needs Firecrawl link)
-- `user_roles` table + `has_role()` security definer (admin role)
-- `/admin/library` — manual PDF upload to Storage bucket `tvet-resources`, edit modules, manage quizzes, trigger RTB import
-- Quiz integration with existing `QuickQuiz` per module
+## 3. Misplaced business-plan PDF
 
----
+**Where it shows:** Software Development → PHP Programming, as "CCMDB401_Business plan development (1)". This module was renamed from "Business plan development" to "PHP Programming" earlier, so the PDF was originally uploaded for that business module.
 
-## Phase 3 — Polish & future-proof (later)
+**Recommended location:** a "Business Plan Development" (CCMDB401 — entrepreneurship) module. Two options:
+- **A (recommended, needs one data change):** move this one file to the correct entrepreneurship module (or a recreated "Business Plan Development" module if none exists). The file itself is not altered or deleted; only which module it belongs to changes. Reversible in one step.
+- **B (zero data change):** leave it in PHP Programming and hide it from that module's public view by code rule matching its CCMDB code.
 
-- Bookmark page / continue reading (per-user `tvet_progress`)
-- Offline PDF download (IndexedDB cache)
-- Kinyarwanda translation toggle on notes
-- Student progress dashboard
-- Teacher uploads
-- Lazy loading, category preload, mobile polish
+You choose A or B before I act — A modifies one existing record, which your rules otherwise forbid.
 
----
+## 4. Source attribution
 
-## Technical notes
+**Problem:** none of the 19 shared resources records an author, publisher, source link or licence.
 
-- PDF.js worker served from `/pdf.worker.min.js` to avoid CDN/CSP issues
-- iframe fallback detection via `onLoad` timeout + `X-Frame-Options` heuristic
-- Search uses Postgres `tsvector` on `extracted_text` + `pg_trgm` on titles
-- All RLS policies follow project convention (PERMISSIVE, public read for library tables)
+**Change:**
+- Add four **new, optional** fields to resources: author/institution, source URL, licence/rights note, and a "last reviewed" date. Existing rows are untouched (all blank).
+- The viewer shows an "About this resource" box when fields are filled; when blank it shows: "Source not yet recorded."
+- The admin upload/edit panel gets inputs for these fields.
+- I will provide you a table of all 19 resources with what the filename suggests (e.g. "TeM_" files look like RTB trainee manuals) — marked as **suggestions to verify**. I will not fill in any source or permission myself; you confirm and enter them.
 
----
+## Deliverables summary
 
-## Quick confirmations before I start Phase 1
+**Files to modify**
+- Homepage content (Index page + a new homepage content section)
+- Library page and document viewer (short-note filter, attribution box)
+- Admin library panel (attribution inputs)
+- Static page generator (so the new homepage text is in the published HTML)
 
-1. Proceed with Phase 1 now (DB + UI shell + `/library` + react-pdf), defer RTB scraping & admin to Phase 2?
-2. Seed with placeholder modules referencing public RTB PDF links, or empty until Phase 2 importer runs?
-3. Admin email for Phase 2 role grant — which account?
+**Database changes**
+- New optional attribution columns on resources (additive only)
+- One new Vue lesson resource (insert)
+- PDF: one module reassignment only if you pick option A
+
+## Risk assessment
+- Low: homepage text and attribution box are additive.
+- Low: short-note filter could hide another very short real note — mitigated by a small threshold (under ~100 characters) and admin visibility.
+- Medium (option A only): reassigning the PDF changes where students find it — fully reversible.
+- No risk to AdSense, ads.txt, verification, sign-in or routes: those files are not opened.
+
+## Testing plan
+- Browser: homepage on desktop and phone width — content readable, no overflow, hero unchanged.
+- Library: Vue module shows the new lesson, not the empty note; PHP module shows the expected files; attribution box displays.
+- Admin: attribution fields save and reload.
+- Confirm published static homepage HTML contains the new text.
+- Existing library availability tests still pass; build passes.
+
+## Rollback plan
+- Code: revert to the previous version from history.
+- Vue lesson: delete only the new inserted row.
+- Attribution columns: drop the new columns (no original data affected).
+- PDF (option A): set its module back to PHP Programming.
