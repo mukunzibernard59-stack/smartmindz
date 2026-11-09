@@ -55,6 +55,10 @@ const AdminLibrary: React.FC = () => {
 
   const [uploadTitle, setUploadTitle] = useState('');
   const [uploadContent, setUploadContent] = useState('');
+  const [uploadAuthor, setUploadAuthor] = useState('');
+  const [uploadSourceUrl, setUploadSourceUrl] = useState('');
+  const [uploadLicenseNote, setUploadLicenseNote] = useState('');
+  const [uploadReviewedAt, setUploadReviewedAt] = useState('');
   const [uploading, setUploading] = useState(false);
   const [selectedFileName, setSelectedFileName] = useState('');
   const [selectedFileType, setSelectedFileType] = useState<'pdf' | 'docx' | 'txt' | 'md' | null>(null);
@@ -238,12 +242,20 @@ const AdminLibrary: React.FC = () => {
           // Shared library material: visible to every user, not just the uploader.
           user_id: null,
           type: uploadType,
+          author: uploadAuthor.trim() || null,
+          source_url: uploadSourceUrl.trim() || null,
+          license_note: uploadLicenseNote.trim() || null,
+          reviewed_at: uploadReviewedAt || null,
         });
 
       if (insErr) throw insErr;
       toast({ title: 'Uploaded', description: `${uploadTitle} is now available to users in the library.` });
       setUploadTitle('');
       setUploadContent('');
+      setUploadAuthor('');
+      setUploadSourceUrl('');
+      setUploadLicenseNote('');
+      setUploadReviewedAt('');
       setSelectedFileName('');
       setSelectedFileType(null);
     } catch (e: any) {
@@ -401,6 +413,13 @@ const AdminLibrary: React.FC = () => {
 
         <div className="space-y-3">
           <Input placeholder="Resource title (shown to users)" value={uploadTitle} onChange={(e) => setUploadTitle(e.target.value)} />
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Input placeholder="Author / institution (if verified)" value={uploadAuthor} onChange={(e) => setUploadAuthor(e.target.value)} />
+            <Input placeholder="Original source URL (if verified)" value={uploadSourceUrl} onChange={(e) => setUploadSourceUrl(e.target.value)} />
+            <Input placeholder="Rights / licence note (if known)" value={uploadLicenseNote} onChange={(e) => setUploadLicenseNote(e.target.value)} />
+            <Input type="date" value={uploadReviewedAt} onChange={(e) => setUploadReviewedAt(e.target.value)} title="Date you reviewed this resource" />
+          </div>
+          <p className="text-[11px] text-muted-foreground">Attribution is optional but recommended — only enter sources you have verified. Leave blank if unsure.</p>
           <div
             className={`rounded-3xl border-2 ${dragActive ? 'border-primary bg-primary/10' : 'border-border bg-slate-900/5'} p-4 transition-all`}
             onDragOver={handleDragOver}
