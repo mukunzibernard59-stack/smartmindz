@@ -7,7 +7,7 @@ import SEO from '@/components/SEO';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { hasAvailableResources } from '@/lib/publicContent';
+import { hasAvailableResources, isPublicResource, MIN_PUBLIC_RESOURCE_LENGTH } from '@/lib/publicContent';
 import { ChevronRight, Search, BookOpen, FileText, Link2, HelpCircle, ArrowLeft, AlertCircle } from 'lucide-react';
 
 const EmbeddedViewer = lazy(() => import('@/components/library/EmbeddedViewer'));
@@ -25,6 +25,11 @@ type Resource = {
   user_id: string | null;
   created_at: string;
   sort_order: number;
+  content_length: number | null;
+  author: string | null;
+  source_url: string | null;
+  license_note: string | null;
+  reviewed_at: string | null;
 };
 
 type View =
@@ -38,7 +43,7 @@ const COURSE_COLUMNS = 'id, category_id, title, description, sort_order';
 const LEVEL_COLUMNS = 'id, course_id, level';
 const MODULE_COLUMNS = 'id, level_id, title, description, sort_order';
 // Meta-only columns keep course pages fast; heavy `content` (base64 PDFs) loads on demand.
-const RESOURCE_COLUMNS = 'id, module_id, type, title, user_id, created_at, sort_order';
+const RESOURCE_COLUMNS = 'id, module_id, type, title, user_id, created_at, sort_order, content_length, author, source_url, license_note, reviewed_at';
 
 const useDebouncedValue = (value: string, delay = 250) => {
   const [debounced, setDebounced] = useState(value);
@@ -70,8 +75,7 @@ const Library: React.FC = () => {
       const { data, error } = await supabase
         .from('tvet_resources')
         .select('module_id, tvet_modules!inner(level_id, tvet_levels!inner(course_id, tvet_courses!inner(category_id)))')
-        .not('content', 'is', null)
-        .neq('content', '')
+        .gte('content_length', MIN_PUBLIC_RESOURCE_LENGTH)
         .abortSignal(signal);
       if (error) throw error;
       const categoryIds = new Set<string>();
@@ -156,7 +160,7 @@ const Library: React.FC = () => {
       if (resourcesError) throw resourcesError;
 
       const resourcesByModule: Record<string, Resource[]> = {};
-      ((resourcesData || []) as Resource[]).forEach((resource) => {
+      ((resourcesData || []) as Resource[]).filter(isPublicResource).forEach((resource) => {
         resourcesByModule[resource.module_id] = resourcesByModule[resource.module_id] || [];
         resourcesByModule[resource.module_id].push(resource);
       });
@@ -173,11 +177,12 @@ const Library: React.FC = () => {
         .from('tvet_resources')
         .select(RESOURCE_COLUMNS)
         .eq('module_id', activeModuleId!)
+        .gte('content_length', MIN_PUBLIC_RESOURCE_LENGTH)
         .order('sort_order')
         .limit(100)
         .abortSignal(signal);
       if (error) throw error;
-      return (data || []) as Resource[];
+      return ((data || []) as Resource[]).filter(isPublicResource);
     },
   });
 
@@ -213,6 +218,7 @@ const Library: React.FC = () => {
           .from('tvet_resources')
           .select(RESOURCE_COLUMNS)
           .or(`title.ilike.%${q}%,content.ilike.%${q}%`)
+          .gte('content_length', MIN_PUBLIC_RESOURCE_LENGTH)
           .order('title')
           .limit(10)
           .abortSignal(signal),
@@ -224,7 +230,7 @@ const Library: React.FC = () => {
       return {
         courses: (courses.data || []) as Course[],
         modules: (modules.data || []) as Module[],
-        resources: (resources.data || []) as Resource[],
+        resources: ((resources.data || []) as Resource[]).filter(isPublicResource),
       };
     },
   });

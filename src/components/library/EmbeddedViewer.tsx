@@ -28,6 +28,10 @@ interface Resource {
   type: 'pdf' | 'note' | 'link' | 'quiz' | 'video';
   title: string;
   content?: string | null;
+  author?: string | null;
+  source_url?: string | null;
+  license_note?: string | null;
+  reviewed_at?: string | null;
 }
 
 interface Props {
@@ -128,6 +132,23 @@ const EmbeddedViewer: React.FC<Props> = ({ resource, loading = false, loadError 
               <DialogTitle className="text-xl sm:text-3xl lg:text-5xl font-black tracking-tight text-slate-900 break-words">
                 {resource.title}
               </DialogTitle>
+              <div className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 space-y-1">
+                <p className="font-semibold text-slate-700">About this resource</p>
+                {resource.author ? <p>Author / institution: {resource.author}</p> : null}
+                {resource.source_url ? (
+                  <p>
+                    Source:{' '}
+                    <a href={resource.source_url} target="_blank" rel="noopener noreferrer" className="text-primary underline break-all">
+                      {resource.source_url}
+                    </a>
+                  </p>
+                ) : null}
+                {resource.license_note ? <p>Rights: {resource.license_note}</p> : null}
+                {resource.reviewed_at ? <p>Last reviewed: {resource.reviewed_at}</p> : null}
+                {!resource.author && !resource.source_url && !resource.license_note && !resource.reviewed_at ? (
+                  <p>Source not yet recorded. Materials remain the property of their original authors; see our copyright policy.</p>
+                ) : null}
+              </div>
             </div>
             <div className="px-3 py-4 sm:px-8 sm:py-6">
               {loading ? (

@@ -382,36 +382,51 @@ export type Database = {
       }
       tvet_resources: {
         Row: {
+          author: string | null
           content: string | null
+          content_length: number | null
           created_at: string
           extracted_text: string | null
           id: string
+          license_note: string | null
           module_id: string
+          reviewed_at: string | null
           sort_order: number
+          source_url: string | null
           title: string
           type: Database["public"]["Enums"]["tvet_resource_type"]
           url: string | null
           user_id: string | null
         }
         Insert: {
+          author?: string | null
           content?: string | null
+          content_length?: number | null
           created_at?: string
           extracted_text?: string | null
           id?: string
+          license_note?: string | null
           module_id: string
+          reviewed_at?: string | null
           sort_order?: number
+          source_url?: string | null
           title: string
           type?: Database["public"]["Enums"]["tvet_resource_type"]
           url?: string | null
           user_id?: string | null
         }
         Update: {
+          author?: string | null
           content?: string | null
+          content_length?: number | null
           created_at?: string
           extracted_text?: string | null
           id?: string
+          license_note?: string | null
           module_id?: string
+          reviewed_at?: string | null
           sort_order?: number
+          source_url?: string | null
           title?: string
           type?: Database["public"]["Enums"]["tvet_resource_type"]
           url?: string | null
