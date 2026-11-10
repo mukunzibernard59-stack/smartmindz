@@ -57,14 +57,26 @@ const routes: RouteMeta[] = [
     description:
       "SmartMind is a free learning app for Rwandan TVET students: study tools, a TVET library, translator, writer and more. No signup needed.",
     body: `<h1>SmartMind — Free Learning App for Rwandan Students</h1>
-<p>SmartMind is a free smart learning app built for Rwandan students. It brings together study tools, a TVET library of notes and guides, a translator, a writing helper, and practice quizzes — all free, with no signup required to start learning.</p>
-<h2>What you can do with SmartMind</h2>
+<h2>What SmartMindz is for</h2>
+<p>SmartMindz is a free study companion for Rwandan students — especially learners in TVET (Technical and Vocational Education and Training) schools and secondary school. It puts course notes, study guides and practice tools in one place, on the phone you already have, so you can revise anywhere without paying for textbooks or data-heavy websites.</p>
+<p>The app is independent: it is not run by the Rwanda TVET Board or any school. Library materials are based on published TVET curricula and remain the property of their original authors.</p>
+<h2>What you can study today</h2>
+<p>The library currently covers Software Development (ICT &amp; Multimedia) — including PHP programming, databases, version control and Vue.js — plus six study guides and a growing blog. More subjects and sectors are being added over time.</p>
 <ul>
-<li>Browse the TVET Library for course notes and study guides</li>
-<li>Practice with quizzes and the learning assistant</li>
-<li>Translate between English, French, Kinyarwanda and Swahili</li>
-<li>Read study guides and blog articles written for TVET students</li>
-</ul>`,
+<li><a href="/library">TVET Library</a> — course notes and documents organised by sector, course, level and module</li>
+<li><a href="/guides">Study Guides</a> — subject overviews with revision questions and explained answers</li>
+<li><a href="/translate">Translator</a> — English, French, Kinyarwanda and Swahili, with voice input and read-aloud</li>
+<li><a href="/youtube-tutor">YouTube Tutor</a> — search a topic and watch educational videos inside the app</li>
+<li><a href="/ai-writer">Writer</a> — draft letters, essays and documents, then edit them in your own words</li>
+<li><a href="/blog">Blog</a> — study tips, career guidance and learning strategies for Rwandan students</li>
+</ul>
+<h2>How to study with SmartMindz</h2>
+<ol>
+<li>Read the note — open the Library and read the lesson for your module; notes are short and focused.</li>
+<li>Check the study guide — each guide summarises the key ideas and ends with practice questions.</li>
+<li>Test yourself — ask the learning assistant to quiz you on the topic you just read.</li>
+<li>Revise the weak points — go back to the note for anything you missed, then test again a day later.</li>
+</ol>`,
   },
   {
     path: "about",
